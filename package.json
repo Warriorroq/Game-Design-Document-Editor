@@ -1,0 +1,63 @@
+{
+  "name": "gdd-editor",
+  "private": true,
+  "version": "0.0.300",
+  "type": "module",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "vite",
+    "dev:desktop": "concurrently -k \"vite\" \"wait-on http://127.0.0.1:5173 && cross-env VITE_DEV_SERVER_URL=http://127.0.0.1:5173 electron .\"",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "build:win": "npm run build && electron-builder --win"
+  },
+  "build": {
+    "appId": "com.gdd.editor",
+    "productName": "GDD Editor",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "dependencies": {
+    "jszip": "^3.10.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "@vitejs/plugin-react": "^4.4.1",
+    "concurrently": "^10.0.3",
+    "cross-env": "^10.1.0",
+    "electron": "^35.7.5",
+    "electron-builder": "^26.0.12",
+    "typescript": "~5.8.3",
+    "vite": "^6.3.5",
+    "wait-on": "^9.0.10"
+  }
+}
