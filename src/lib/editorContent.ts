@@ -8,7 +8,7 @@ import { previewMissingTableControls, renderMarkdown } from "./markdown";
 export { previewMissingTableControls };
 
 const EMPTY_PLACEHOLDER =
-  "<p class='empty-preview'>Click here to start writing…</p>";
+  "<p class='empty-preview'>Click here to start writing</p>";
 
 export function looksLikeMarkdown(text: string): boolean {
   const t = text.trim();

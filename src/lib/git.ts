@@ -187,6 +187,7 @@ const GIT_ERROR_KEYS: Record<string, MessageKey> = {
   network_failed: "git.networkFailed",
   ff_only_failed: "git.ffOnlyFailed",
   push_rejected_pull_first: "git.pushRejectedPullFirst",
+  no_initial_commit: "git.noInitialCommit",
   not_a_repo: "git.notARepo",
   remote_branch_not_found: "git.remoteBranchNotFound",
 };

@@ -123,7 +123,7 @@ export function suggestLinkText(doc: GddDocument, href: string): string {
     const label = section.texts.find((t) => t.id === link.textId)?.content.trim();
     if (label) {
       const short = label.replace(/\s+/g, " ").slice(0, 48);
-      return short.length < label.length ? `${short}…` : short;
+      return short;
     }
     return `Text · ${section.title}`;
   }

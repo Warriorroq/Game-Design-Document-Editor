@@ -177,7 +177,7 @@ function parseMarkdown(md: string): Block[] {
 
 export function renderMarkdown(md: string): string {
   if (!md.trim()) {
-    return "<p class='empty-preview'>Click here to start writing…</p>";
+    return "<p class='empty-preview'>Click here to start writing</p>";
   }
 
   const blocks = parseMarkdown(md);

@@ -21,7 +21,7 @@ function plainSnippet(
   const text = (doc.body.textContent ?? "").replace(/\s+/g, " ").trim();
   if (!text) return emptyLabel;
   if (text.length <= max) return text;
-  return `${text.slice(0, max - 1)}…`;
+  return text.slice(0, max);
 }
 
 export function LinkPreviewLayer() {

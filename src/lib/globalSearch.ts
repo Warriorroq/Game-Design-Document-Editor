@@ -51,10 +51,7 @@ export function snippetAround(
   if (idx < 0) return normalized.slice(0, radius * 2);
   const start = Math.max(0, idx - radius);
   const end = Math.min(normalized.length, idx + query.length + radius);
-  let snippet = normalized.slice(start, end);
-  if (start > 0) snippet = `…${snippet}`;
-  if (end < normalized.length) snippet += "…";
-  return snippet;
+  return normalized.slice(start, end);
 }
 
 function pushResult(

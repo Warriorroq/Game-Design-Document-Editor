@@ -121,7 +121,28 @@ function normalizeGitError(message) {
   if (/no upstream|set-upstream|has no upstream|no tracking/i.test(text)) {
     return "no_upstream";
   }
+  if (
+    /could not resolve (HEAD|Head)|unknown revision|bad revision|unborn branch|does not have any commits yet|Cannot stash without/i.test(
+      text
+    )
+  ) {
+    return "no_initial_commit";
+  }
   return text;
+}
+
+async function repoHasCommits(dir) {
+  const result = await runGit(dir, ["rev-parse", "--verify", "HEAD"]);
+  return result.ok;
+}
+
+function parseBranchFromStatusHeader(header) {
+  const unborn = header.match(/^No commits yet on (.+)$/);
+  if (unborn) return unborn[1].trim();
+
+  const branchPart = header.split("...")[0].trim();
+  if (!branchPart) return null;
+  return branchPart.split(/\s+/)[0];
 }
 
 function emitProgress(onProgress, phase, line) {
@@ -167,7 +188,7 @@ function pullArgs(branchName, hasTracking, options = {}) {
 }
 
 async function resolveMergeConflictsPreferRemote(dir, onProgress) {
-  emitProgress(onProgress, "pull", "Resolving conflicts (keeping remote files)…");
+  emitProgress(onProgress, "pull", "Resolving conflicts (keeping remote files)");
 
   const status = await runGit(dir, ["status", "--porcelain"]);
   if (!status.ok) return { ok: false, error: status.error };
@@ -202,7 +223,7 @@ async function resolveMergeConflictsPreferRemote(dir, onProgress) {
 }
 
 async function stageAndCommitLocal(dir, message, onProgress) {
-  emitProgress(onProgress, "pull", "Staging local project files…");
+  emitProgress(onProgress, "pull", "Staging local project files");
   const add = await runGit(dir, ["add", "-A"]);
   if (!add.ok) return { ok: false, error: add.error };
 
@@ -516,8 +537,8 @@ async function getStatus(dir) {
   for (const line of lines) {
     if (line.startsWith("## ")) {
       const header = line.slice(3);
-      const branchPart = header.split("...")[0];
-      branch = branchPart || branch;
+      const parsedBranch = parseBranchFromStatusHeader(header);
+      if (parsedBranch) branch = parsedBranch;
 
       const trackingMatch = header.match(/\.\.\.([^ \[]+)/);
       if (trackingMatch) tracking = trackingMatch[1];
@@ -606,7 +627,7 @@ async function syncProjectFromRemote(dir, branchName, onProgress) {
     return { ok: false, error: "remote_branch_not_found" };
   }
 
-  emitProgress(onProgress, "pull", "Restoring project files from remote…");
+  emitProgress(onProgress, "pull", "Restoring project files from remote");
 
   const list = await runGit(dir, [
     "ls-tree",
@@ -663,7 +684,17 @@ async function syncProjectFromRemote(dir, branchName, onProgress) {
 }
 
 async function stashChanges(dir, onProgress) {
-  emitProgress(onProgress, "pull", "Stashing local changes…");
+  emitProgress(onProgress, "pull", "Stashing local changes");
+  if (!(await repoHasCommits(dir))) {
+    const saved = await stageAndCommitLocal(
+      dir,
+      "GDD Editor: local snapshot before pull",
+      onProgress
+    );
+    if (!saved.ok) return saved;
+    return { ok: true, stashed: Boolean(saved.committed) };
+  }
+
   const result = await runGit(dir, [
     "stash",
     "push",
@@ -682,16 +713,30 @@ async function stashChanges(dir, onProgress) {
 }
 
 async function discardProjectChanges(dir, onProgress) {
-  emitProgress(onProgress, "pull", "Discarding local project changes…");
+  emitProgress(onProgress, "pull", "Discarding local project changes");
 
-  const restore = await runGit(dir, [
-    "restore",
-    "--staged",
-    "--worktree",
-    "--",
-    ...PROJECT_PATHS,
-  ]);
-  if (!restore.ok) return restore;
+  if (await repoHasCommits(dir)) {
+    const restore = await runGit(dir, [
+      "restore",
+      "--staged",
+      "--worktree",
+      "--",
+      ...PROJECT_PATHS,
+    ]);
+    if (!restore.ok) return restore;
+  } else {
+    for (const projectPath of PROJECT_PATHS) {
+      const unstage = await runGit(dir, [
+        "rm",
+        "-rf",
+        "--cached",
+        "--ignore-unmatch",
+        "--",
+        projectPath,
+      ]);
+      if (!unstage.ok) return unstage;
+    }
+  }
 
   const clean = await runGit(dir, ["clean", "-fd", "--", ...PROJECT_PATHS]);
   if (!clean.ok) return clean;
@@ -708,7 +753,7 @@ async function push(dir, onProgress) {
   let status = await getStatus(dir);
   const hasTracking = Boolean(status.tracking);
 
-  emitProgress(onProgress, "push", "Fetching from remote…");
+  emitProgress(onProgress, "push", "Fetching from remote");
   const fetch = await runGit(dir, ["fetch", "origin"], true);
   if (!fetch.ok) return fetch;
 
@@ -717,7 +762,7 @@ async function push(dir, onProgress) {
     return { ok: false, error: "push_rejected_pull_first" };
   }
 
-  emitProgress(onProgress, "push", "Connecting to remote…");
+  emitProgress(onProgress, "push", "Connecting to remote");
 
   const args = hasTracking
     ? ["push", "--progress"]
@@ -727,7 +772,7 @@ async function push(dir, onProgress) {
     emitProgress(
       onProgress,
       "push",
-      `Publishing branch ${branchName} to origin…`
+      `Publishing branch ${branchName} to origin`
     );
   }
 
@@ -749,10 +794,10 @@ async function pull(dir, onProgress) {
   const status = await getStatus(dir);
   const hasTracking = Boolean(status.tracking);
 
-  emitProgress(onProgress, "pull", "Fetching from remote…");
+  emitProgress(onProgress, "pull", "Fetching from remote");
 
   if (!hasTracking) {
-    emitProgress(onProgress, "pull", `Pulling origin/${branchName}…`);
+    emitProgress(onProgress, "pull", `Pulling origin/${branchName}`);
   }
 
   let result = await runGitStream(
@@ -766,7 +811,7 @@ async function pull(dir, onProgress) {
     emitProgress(
       onProgress,
       "pull",
-      "Local files conflict with remote — saving local snapshot…"
+      "Local files conflict with remote — saving local snapshot"
     );
     const saved = await stageAndCommitLocal(
       dir,
@@ -775,7 +820,7 @@ async function pull(dir, onProgress) {
     );
     if (!saved.ok) return saved;
 
-    emitProgress(onProgress, "pull", "Retrying pull with merge…");
+    emitProgress(onProgress, "pull", "Retrying pull with merge");
     result = await runGitStream(
       dir,
       pullArgs(branchName, hasTracking, { ffOnly: false, preferRemote: true }),
@@ -785,7 +830,7 @@ async function pull(dir, onProgress) {
   }
 
   if (!result.ok && isUnrelatedHistoriesError(result.error)) {
-    emitProgress(onProgress, "pull", "Merging unrelated histories…");
+    emitProgress(onProgress, "pull", "Merging unrelated histories");
     result = await runGitStream(
       dir,
       pullArgs(branchName, hasTracking, {
@@ -799,7 +844,7 @@ async function pull(dir, onProgress) {
   }
 
   if (!result.ok && isFfOnlyError(result.error)) {
-    emitProgress(onProgress, "pull", "Fast-forward not possible, merging…");
+    emitProgress(onProgress, "pull", "Fast-forward not possible, merging");
     result = await runGitStream(
       dir,
       pullArgs(branchName, hasTracking, { ffOnly: false, preferRemote: true }),
