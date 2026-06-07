@@ -12,6 +12,7 @@ import { GitProgressDialog } from "./GitProgressDialog";
 
 interface ProjectMenuProps {
   doc: GddDocument;
+  onNewProject?: () => void;
   onImport: (doc: GddDocument) => void;
   folderName?: string | null;
   folderPath?: string | null;
@@ -25,6 +26,7 @@ interface ProjectMenuProps {
 
 export function ProjectMenu({
   doc,
+  onNewProject,
   onImport,
   folderName,
   folderPath = null,
@@ -79,6 +81,11 @@ export function ProjectMenu({
 
   const handleImportClick = () => {
     fileInputRef.current?.click();
+    setOpen(false);
+  };
+
+  const handleNewProject = () => {
+    onNewProject?.();
     setOpen(false);
   };
 
@@ -138,6 +145,19 @@ export function ProjectMenu({
         </button>
         {open && (
           <div className="project-menu-dropdown" role="menu">
+            {onNewProject && (
+              <button
+                type="button"
+                className="project-menu-item"
+                role="menuitem"
+                onClick={handleNewProject}
+              >
+                {t("project.new")}
+              </button>
+            )}
+            {onNewProject && (
+              <div className="project-menu-separator" role="separator" />
+            )}
             {isDesktopApp && onOpenFolder && (
               <>
                 <button

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  createDocument,
   loadDocument,
   normalizeDocument,
   saveDocument,
@@ -593,6 +594,10 @@ export function useGddDocument() {
     [syncActiveSection]
   );
 
+  const newProject = useCallback(() => {
+    replaceDocument(createDocument());
+  }, [replaceDocument]);
+
   useEffect(() => {
     return () => {
       if (saveTimer.current) clearTimeout(saveTimer.current);
@@ -639,5 +644,6 @@ export function useGddDocument() {
     beginTransient,
     endTransient,
     replaceDocument,
+    newProject,
   };
 }

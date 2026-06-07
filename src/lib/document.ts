@@ -47,6 +47,16 @@ export function createDocument(): GddDocument {
   };
 }
 
+/** Imported archive opened as a fresh in-editor project (new id, detached from folder). */
+export function importAsNewProject(doc: GddDocument): GddDocument {
+  const normalized = normalizeDocument(doc);
+  return {
+    ...normalized,
+    id: crypto.randomUUID(),
+    lastModified: new Date().toISOString(),
+  };
+}
+
 export function loadDocument(): GddDocument | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);

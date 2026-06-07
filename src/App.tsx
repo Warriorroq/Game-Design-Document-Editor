@@ -27,6 +27,8 @@ import {
 } from "./lib/globalSearch";
 import { useSidebarVisible } from "./hooks/useSidebarVisible";
 import { restoreAppFocus } from "./lib/desktop";
+import { importAsNewProject } from "./lib/document";
+import type { GddDocument } from "./types";
 
 type AppView = "editor" | "settings";
 
@@ -62,6 +64,7 @@ function AppMain({
   beginTransient,
   endTransient,
   replaceDocument,
+  newProject,
 }: GddState) {
   const [view, setView] = useState<AppView>("editor");
   const [searchQuery, setSearchQuery] = useState("");
@@ -121,18 +124,41 @@ function AppMain({
     projectFolder.scheduleSaveDoc(doc);
   }, [doc, projectFolder.scheduleSaveDoc]);
 
+  const handleNewProject = useCallback(() => {
+    const ok = window.confirm(t("project.confirmNew"));
+    if (!ok) return;
+    projectFolder.closeFolder();
+    newProject();
+  }, [newProject, projectFolder, t]);
+
+  const handleImportProject = useCallback(
+    (incoming: GddDocument) => {
+      projectFolder.closeFolder();
+      replaceDocument(importAsNewProject(incoming));
+    },
+    [projectFolder, replaceDocument]
+  );
+
   const handleOpenProjectFolder = useCallback(async () => {
     if (projectFolder.folderPath) {
-      projectFolder.closeFolder();
+      try {
+        await projectFolder.saveDoc(doc);
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : t("project.readError");
+        window.alert(message);
+        return;
+      }
     }
 
-    const picked = await projectFolder.openFolder();
+    const picked = await projectFolder.pickFolder();
     if (!picked) return;
 
     if (picked.hasProject) {
       const ok = window.confirm(t("project.confirmLoadFolder"));
       if (!ok) return;
       try {
+        projectFolder.bindProjectFolder(picked.folderPath);
         const imported = await projectFolder.loadFromFolder(picked.folderPath);
         replaceDocument(imported);
       } catch (err) {
@@ -143,8 +169,12 @@ function AppMain({
       return;
     }
 
+    const ok = window.confirm(t("project.confirmSaveToEmptyFolder"));
+    if (!ok) return;
+
     try {
-      await projectFolder.saveDoc(doc);
+      projectFolder.bindProjectFolder(picked.folderPath);
+      await projectFolder.saveDocTo(picked.folderPath, doc);
     } catch (err) {
       const message =
         err instanceof Error ? err.message : t("project.readError");
@@ -200,7 +230,8 @@ function AppMain({
         sidebarVisible={sidebarVisible}
         onToggleSidebar={toggleSidebar}
         doc={doc}
-        onImportProject={replaceDocument}
+        onImportProject={handleImportProject}
+        onNewProject={handleNewProject}
         settingsOpen={view === "settings"}
         onOpenSettings={() => setView("settings")}
         onBackFromSettings={() => setView("editor")}

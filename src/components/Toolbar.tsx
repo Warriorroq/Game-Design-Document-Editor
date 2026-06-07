@@ -12,6 +12,7 @@ interface ToolbarProps {
   onToggleSidebar: () => void;
   doc: GddDocument;
   onImportProject: (doc: GddDocument) => void;
+  onNewProject?: () => void;
   settingsOpen?: boolean;
   onOpenSettings?: () => void;
   onBackFromSettings?: () => void;
@@ -34,6 +35,7 @@ export function Toolbar({
   onToggleSidebar,
   doc,
   onImportProject,
+  onNewProject,
   settingsOpen = false,
   onOpenSettings,
   onBackFromSettings,
@@ -111,6 +113,7 @@ export function Toolbar({
           <div className="toolbar-actions">
             <ProjectMenu
               doc={doc}
+              onNewProject={onNewProject}
               onImport={onImportProject}
               folderName={projectFolderName}
               folderPath={projectFolderPath}

@@ -50,24 +50,35 @@ export function useProjectFolder() {
     [refreshGitStatus]
   );
 
-  const openFolder = useCallback(async () => {
-    const picked = await pickProjectFolder();
-    if (!picked) return null;
-    bindFolder(picked.folderPath);
-    return picked;
-  }, [bindFolder]);
+  const pickFolder = useCallback(async () => {
+    return pickProjectFolder();
+  }, []);
+
+  const bindProjectFolder = useCallback(
+    (path: string | null) => {
+      bindFolder(path);
+    },
+    [bindFolder]
+  );
 
   const loadFromFolder = useCallback(async (path: string) => {
     return loadProjectFromFolder(path);
   }, []);
 
+  const saveDocTo = useCallback(
+    async (path: string, doc: GddDocument) => {
+      await saveProjectToFolder(path, doc);
+      await refreshGitStatus(path);
+    },
+    [refreshGitStatus]
+  );
+
   const saveDoc = useCallback(
     async (doc: GddDocument) => {
       if (!folderPath) return;
-      await saveProjectToFolder(folderPath, doc);
-      await refreshGitStatus(folderPath);
+      await saveDocTo(folderPath, doc);
     },
-    [folderPath, refreshGitStatus]
+    [folderPath, saveDocTo]
   );
 
   const scheduleSaveDoc = useCallback(
@@ -96,9 +107,11 @@ export function useProjectFolder() {
     folderName: folderPath ? folderLabel(folderPath) : null,
     gitStatus,
     gitAvailable,
-    openFolder,
+    pickFolder,
+    bindProjectFolder,
     loadFromFolder,
     saveDoc,
+    saveDocTo,
     scheduleSaveDoc,
     closeFolder,
     refreshGitStatus,

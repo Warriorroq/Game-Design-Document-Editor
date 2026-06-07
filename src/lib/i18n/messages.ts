@@ -74,19 +74,24 @@ const en = {
   "toolbar.settings": "Settings",
 
   "project.menu": "Project",
+  "project.new": "New project",
   "project.export": "Export archive .gde…",
   "project.import": "Import archive .gde…",
   "project.loadDemo": "Load 10 demo sections",
+  "project.confirmNew":
+    "Start a new empty project? Unsaved changes will be lost and the project folder link will be closed.",
   "project.confirmDemo":
-    "Replace the current project with 10 demo sections?",
+    "Open 10 demo sections as a new project? The current project will be replaced.",
   "project.invalidFile": "Please choose a .gde project file.",
   "project.confirmImport":
-    "Import will replace your current project. Continue?",
+    "Open this archive as a new project? The current project will be replaced and the project folder link will be closed.",
   "project.readError": "Could not read project file.",
   "project.folder": "Project folder…",
   "project.folderActive": "Folder: {name}",
   "project.confirmLoadFolder":
-    "This folder already has a GDD project (gdd.json). Load it and replace the current project?",
+    "This folder contains a GDD project. Load it into the editor? (Folder files will not be modified.)",
+  "project.confirmSaveToEmptyFolder":
+    "This folder is empty. Save the current project into it?",
 
   "git.menuTitle": "Git",
   "git.notAvailable": "Git is not installed or not on PATH.",
@@ -347,19 +352,24 @@ const ru: Record<keyof typeof en, string> = {
   "toolbar.settings": "Настройки",
 
   "project.menu": "Проект",
+  "project.new": "Новый проект",
   "project.export": "Экспорт архива .gde…",
   "project.import": "Импорт архива .gde…",
   "project.loadDemo": "Загрузить 10 демо-секций",
+  "project.confirmNew":
+    "Создать новый пустой проект? Несохранённые изменения будут потеряны, связь с папкой проекта закроется.",
   "project.confirmDemo":
-    "Заменить текущий проект на 10 демо-секций?",
+    "Открыть 10 демо-секций как новый проект? Текущий проект будет заменён.",
   "project.invalidFile": "Выберите файл проекта .gde",
   "project.confirmImport":
-    "Импорт заменит текущий проект. Продолжить?",
+    "Открыть архив как новый проект? Текущий проект будет заменён, связь с папкой проекта закроется.",
   "project.readError": "Не удалось прочитать файл проекта.",
   "project.folder": "Папка проекта…",
   "project.folderActive": "Папка: {name}",
   "project.confirmLoadFolder":
-    "В этой папке уже есть проект GDD (gdd.json). Загрузить и заменить текущий проект?",
+    "В папке есть проект GDD. Загрузить в редактор? (Файлы в папке не будут изменены.)",
+  "project.confirmSaveToEmptyFolder":
+    "Папка пуста. Сохранить текущий проект в неё?",
 
   "git.menuTitle": "Git",
   "git.notAvailable": "Git не установлен или недоступен в PATH.",
