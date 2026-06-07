@@ -139,8 +139,10 @@ function isUnrelatedHistoriesError(error) {
 }
 
 function isFfOnlyError(error) {
-  return /Not possible to fast-forward|Cannot fast-forward|ff-only/i.test(
-    String(error)
+  const text = String(error);
+  return (
+    text === "ff_only_failed" ||
+    /Not possible to fast-forward|Cannot fast-forward|ff-only/i.test(text)
   );
 }
 
@@ -660,14 +662,60 @@ async function syncProjectFromRemote(dir, branchName, onProgress) {
   return { ok: true };
 }
 
+async function stashChanges(dir, onProgress) {
+  emitProgress(onProgress, "pull", "Stashing local changes…");
+  const result = await runGit(dir, [
+    "stash",
+    "push",
+    "-m",
+    "GDD Editor: before pull",
+    "--",
+    ...PROJECT_PATHS,
+  ]);
+  if (!result.ok) {
+    if (/No local changes to save/i.test(result.error)) {
+      return { ok: true, stashed: false };
+    }
+    return { ok: false, error: result.error };
+  }
+  return { ok: true, stashed: true };
+}
+
+async function discardProjectChanges(dir, onProgress) {
+  emitProgress(onProgress, "pull", "Discarding local project changes…");
+
+  const restore = await runGit(dir, [
+    "restore",
+    "--staged",
+    "--worktree",
+    "--",
+    ...PROJECT_PATHS,
+  ]);
+  if (!restore.ok) return restore;
+
+  const clean = await runGit(dir, ["clean", "-fd", "--", ...PROJECT_PATHS]);
+  if (!clean.ok) return clean;
+
+  return { ok: true };
+}
+
 async function push(dir, onProgress) {
   if (!(await hasRemote(dir))) {
     return { ok: false, error: "no_remote" };
   }
 
   const branchName = await currentBranch(dir);
-  const status = await getStatus(dir);
+  let status = await getStatus(dir);
   const hasTracking = Boolean(status.tracking);
+
+  emitProgress(onProgress, "push", "Fetching from remote…");
+  const fetch = await runGit(dir, ["fetch", "origin"], true);
+  if (!fetch.ok) return fetch;
+
+  status = await getStatus(dir);
+  if (status.behind > 0) {
+    return { ok: false, error: "push_rejected_pull_first" };
+  }
 
   emitProgress(onProgress, "push", "Connecting to remote…");
 
@@ -811,6 +859,8 @@ module.exports = {
   commit,
   push,
   pull,
+  stashChanges,
+  discardProjectChanges,
   getRemoteUrl,
   setRemoteUrl,
   authenticateRemote,

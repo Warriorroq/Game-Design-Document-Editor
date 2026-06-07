@@ -71,6 +71,12 @@ interface Window {
       ) => Promise<{ ok: boolean; error?: string }>;
       push: (folderPath: string) => Promise<{ ok: boolean; error?: string }>;
       pull: (folderPath: string) => Promise<{ ok: boolean; error?: string }>;
+      stash: (
+        folderPath: string
+      ) => Promise<{ ok: boolean; stashed?: boolean; error?: string }>;
+      discardProject: (
+        folderPath: string
+      ) => Promise<{ ok: boolean; error?: string }>;
       onProgress: (
         listener: (payload: { phase: string; line: string }) => void
       ) => () => void;

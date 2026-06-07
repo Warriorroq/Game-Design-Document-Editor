@@ -127,6 +127,14 @@ const en = {
   "git.progressClose": "Close",
   "git.uncommitted": "Uncommitted changes",
   "git.changes": "Changes",
+  "git.pullConfirmTitle": "Local changes before pull",
+  "git.pullConfirmMessage":
+    "You have uncommitted changes. Pull will replace project files with the remote version. Stash saves your changes in Git; Discard removes them permanently.",
+  "git.pullConfirmStash": "Stash & pull",
+  "git.pullConfirmDiscard": "Discard & pull",
+  "git.pullConfirmMore": "+{count} more files",
+  "git.pushRejectedPullFirst":
+    "Remote has new commits. Pull first, then push again.",
   "git.missingIdentity":
     "Set your Git name and email in Settings → Git before committing.",
   "git.settingsDesktopOnly": "Git settings are available in the desktop app.",
@@ -405,6 +413,14 @@ const ru: Record<keyof typeof en, string> = {
   "git.progressClose": "Закрыть",
   "git.uncommitted": "Есть несохранённые в Git изменения",
   "git.changes": "Изменения",
+  "git.pullConfirmTitle": "Локальные изменения перед pull",
+  "git.pullConfirmMessage":
+    "Есть незакоммиченные изменения. Pull заменит файлы проекта версией с remote. Stash сохранит изменения в Git; «Отменить» удалит их безвозвратно.",
+  "git.pullConfirmStash": "Stash и pull",
+  "git.pullConfirmDiscard": "Отменить и pull",
+  "git.pullConfirmMore": "ещё {count} файлов",
+  "git.pushRejectedPullFirst":
+    "На remote есть новые коммиты. Сначала сделайте pull, затем push.",
   "git.missingIdentity":
     "Укажите имя и email в Настройки → Git перед коммитом.",
   "git.settingsDesktopOnly": "Настройки Git доступны в десктопном приложении.",

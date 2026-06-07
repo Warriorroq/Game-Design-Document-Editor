@@ -132,6 +132,20 @@ export async function pullGitChanges(
   return withGitProgress(() => api.pull(folderPath), onProgress);
 }
 
+export async function stashGitChanges(
+  folderPath: string
+): Promise<{ ok: boolean; stashed?: boolean; error?: string }> {
+  const api = requireGitApi();
+  return api.stash(folderPath);
+}
+
+export async function discardGitProjectChanges(
+  folderPath: string
+): Promise<{ ok: boolean; error?: string }> {
+  const api = requireGitApi();
+  return api.discardProject(folderPath);
+}
+
 export async function getGitRemote(
   folderPath: string
 ): Promise<string | null> {
@@ -172,6 +186,7 @@ const GIT_ERROR_KEYS: Record<string, MessageKey> = {
   token_https_only: "git.tokenHttpsOnly",
   network_failed: "git.networkFailed",
   ff_only_failed: "git.ffOnlyFailed",
+  push_rejected_pull_first: "git.pushRejectedPullFirst",
   not_a_repo: "git.notARepo",
   remote_branch_not_found: "git.remoteBranchNotFound",
 };

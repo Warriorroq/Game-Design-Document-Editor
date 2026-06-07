@@ -34,6 +34,9 @@ contextBridge.exposeInMainWorld("gddDesktop", {
       ipcRenderer.invoke("git:set-identity", folderPath, name, email),
     push: (folderPath) => ipcRenderer.invoke("git:push", folderPath),
     pull: (folderPath) => ipcRenderer.invoke("git:pull", folderPath),
+    stash: (folderPath) => ipcRenderer.invoke("git:stash", folderPath),
+    discardProject: (folderPath) =>
+      ipcRenderer.invoke("git:discard-project", folderPath),
     getRemote: (folderPath) => ipcRenderer.invoke("git:get-remote", folderPath),
     setRemote: (folderPath, url) =>
       ipcRenderer.invoke("git:set-remote", folderPath, url),

@@ -8,6 +8,7 @@ import type { GddDocument } from "../types";
 import { useGitActions } from "../hooks/useGitActions";
 import { GitIndicators } from "./GitIndicators";
 import { GitPromptDialog } from "./GitPromptDialog";
+import { GitPullConfirmDialog } from "./GitPullConfirmDialog";
 import { GitProgressDialog } from "./GitProgressDialog";
 
 interface ProjectMenuProps {
@@ -297,6 +298,13 @@ export function ProjectMenu({
         initialValue={git.promptInitial}
         onClose={() => git.setPromptKind(null)}
         onSubmit={git.handlePromptSubmit}
+      />
+      <GitPullConfirmDialog
+        open={Boolean(git.pullConfirmFiles)}
+        files={git.pullConfirmFiles ?? []}
+        busy={git.busy || git.syncProgress?.status === "running"}
+        onClose={git.handlePullConfirmClose}
+        onConfirm={git.handlePullConfirm}
       />
       <GitProgressDialog
         state={git.syncProgress}

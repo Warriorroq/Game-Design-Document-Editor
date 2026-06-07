@@ -3,15 +3,20 @@ import { useLocale } from "../context/LocaleContext";
 import {
   applyGitIdentity,
   commitGitChanges,
+  discardGitProjectChanges,
   formatGitError,
   getGitRemote,
+  getGitStatus,
   initGitRepo,
   pullGitChanges,
   pushGitChanges,
   setGitRemote,
+  stashGitChanges,
+  type GitFileStatus,
   type GitStatus,
 } from "../lib/git";
 import type { GitPromptKind } from "../components/GitPromptDialog";
+import type { GitPullConfirmAction } from "../components/GitPullConfirmDialog";
 import {
   parseGitProgressPercent,
   type GitSyncOperation,
@@ -43,6 +48,9 @@ export function useGitActions({
   const [promptInitial, setPromptInitial] = useState("");
   const [syncProgress, setSyncProgress] =
     useState<GitSyncProgressState | null>(null);
+  const [pullConfirmFiles, setPullConfirmFiles] = useState<
+    GitFileStatus[] | null
+  >(null);
 
   const isRepo = Boolean(gitStatus?.isRepo);
   const dirty = Boolean(gitStatus?.dirty);
@@ -172,7 +180,54 @@ export function useGitActions({
 
   const handlePull = () => {
     if (busy || syncProgress?.status === "running") return;
-    void runSync("pull");
+    void (async () => {
+      await onFlushProject?.();
+      onRefreshStatus();
+
+      if (!folderPath) return;
+      let status: GitStatus;
+      try {
+        status = await getGitStatus(folderPath);
+      } catch {
+        void runSync("pull");
+        return;
+      }
+
+      if (status.dirty && status.files && status.files.length > 0) {
+        onCloseMenu?.();
+        setPullConfirmFiles(status.files);
+        return;
+      }
+
+      void runSync("pull");
+    })();
+  };
+
+  const handlePullConfirm = (action: GitPullConfirmAction) => {
+    if (!folderPath || busy || syncProgress?.status === "running") return;
+    const files = pullConfirmFiles;
+    setPullConfirmFiles(null);
+
+    void (async () => {
+      const prep =
+        action === "stash"
+          ? await stashGitChanges(folderPath)
+          : await discardGitProjectChanges(folderPath);
+
+      if (!prep.ok) {
+        window.alert(formatGitError(prep.error, t));
+        if (files) setPullConfirmFiles(files);
+        return;
+      }
+
+      onRefreshStatus();
+      void runSync("pull");
+    })();
+  };
+
+  const handlePullConfirmClose = () => {
+    if (busy || syncProgress?.status === "running") return;
+    setPullConfirmFiles(null);
   };
 
   return {
@@ -192,5 +247,8 @@ export function useGitActions({
     handlePromptSubmit,
     handlePush,
     handlePull,
+    pullConfirmFiles,
+    handlePullConfirm,
+    handlePullConfirmClose,
   };
 }

@@ -11,6 +11,7 @@ export const isWindowsDesktopApp =
 /** Restore renderer focus after a native Electron dialog (or similar) stole it. */
 export function restoreAppFocus() {
   requestAnimationFrame(() => {
+    if (document.querySelector(".link-dialog-backdrop")) return;
     const active = document.activeElement;
     if (active instanceof HTMLElement && active !== document.body) {
       active.blur();

@@ -142,6 +142,20 @@ function createWindow() {
     return git.pull(folderPath, onProgress);
   });
 
+  ipcMain.handle("git:stash", (_event, folderPath) => {
+    if (typeof folderPath !== "string" || !folderPath) {
+      return { ok: false, error: "invalid_path" };
+    }
+    return git.stashChanges(folderPath);
+  });
+
+  ipcMain.handle("git:discard-project", (_event, folderPath) => {
+    if (typeof folderPath !== "string" || !folderPath) {
+      return { ok: false, error: "invalid_path" };
+    }
+    return git.discardProjectChanges(folderPath);
+  });
+
   ipcMain.handle("git:get-remote", (_event, folderPath) => {
     if (typeof folderPath !== "string" || !folderPath) {
       return { ok: false, error: "invalid_path" };

@@ -151,10 +151,13 @@ export function SectionEditor({
 
   useEffect(() => {
     if (section.content.trim() || section.title !== "New Section") return;
+    if (document.querySelector(".link-dialog-backdrop")) return;
     const frame = requestAnimationFrame(() => {
+      if (document.querySelector(".link-dialog-backdrop")) return;
       editorRef.current?.focus();
     });
     const timer = window.setTimeout(() => {
+      if (document.querySelector(".link-dialog-backdrop")) return;
       editorRef.current?.focus();
     }, 50);
     return () => {

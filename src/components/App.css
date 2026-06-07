@@ -458,6 +458,64 @@ mark.gdd-search-hit {
   color: var(--warning);
 }
 
+.git-pull-confirm-dialog {
+  max-width: 480px;
+}
+
+.git-pull-confirm-message {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.45;
+}
+
+.git-pull-confirm-changes {
+  margin-bottom: 12px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  max-height: 180px;
+  overflow: auto;
+}
+
+.git-pull-confirm-changes ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--text-dim);
+}
+
+.git-pull-confirm-changes li {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.git-pull-confirm-more {
+  margin: 6px 0 0;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.git-pull-confirm-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.btn-warning {
+  background: var(--warning);
+  color: var(--bg);
+  border-color: var(--warning);
+}
+
+.btn-warning:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
 .sections-toggle.active {
   background: var(--accent-soft);
   color: var(--accent);
