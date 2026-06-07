@@ -240,6 +240,17 @@ export function ImageBoard({
     () => new Set(selection.strokeIds),
     [selection.strokeIds]
   );
+  const boxShapes = useMemo(
+    () => shapes.filter((shape) => shape.type === "box"),
+    [shapes]
+  );
+  const lineShapes = useMemo(
+    () => shapes.filter((shape) => shape.type !== "box"),
+    [shapes]
+  );
+  const boxDrawPreview = drawPreview?.type === "box" ? drawPreview : null;
+  const lineDrawPreview =
+    drawPreview && drawPreview.type !== "box" ? drawPreview : null;
   const selectionSize = selectionCount(selection);
   const penMode = activeTool === "pen";
   const isDrawing = activeTool !== null;
@@ -1551,6 +1562,17 @@ export function ImageBoard({
                 <p>{t("desk.empty")}</p>
               </div>
             )}
+            <BoardShapesLayer
+              canvasWidth={canvasWidth}
+              canvasHeight={canvasHeight}
+              items={items}
+              shapes={boxShapes}
+              preview={boxDrawPreview}
+              selectedShapeIds={selectedShapeIds}
+              className="board-boxes-layer"
+              onShapePointerDown={handleShapePointerDown}
+              onEndpointPointerDown={startEndpointDrag}
+            />
             {items.map((item) => (
               <div
                 key={item.id}
@@ -1605,8 +1627,8 @@ export function ImageBoard({
               canvasWidth={canvasWidth}
               canvasHeight={canvasHeight}
               items={items}
-              shapes={shapes}
-              preview={drawPreview}
+              shapes={lineShapes}
+              preview={lineDrawPreview}
               selectedShapeIds={selectedShapeIds}
               onShapePointerDown={handleShapePointerDown}
               onEndpointPointerDown={startEndpointDrag}

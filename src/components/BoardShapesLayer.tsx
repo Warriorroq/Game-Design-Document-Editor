@@ -1,6 +1,10 @@
 import { boardBoxBounds, resolveBoardPoint } from "../lib/boardGeometry";
 import type { BoardItem, BoardPoint, BoardShape, BoardShapeType } from "../types";
 
+const SHAPE_LINE_HIT_WIDTH = 14;
+const SHAPE_BOX_HIT_PAD = 4;
+const SHAPE_BOX_MIN_HIT = 14;
+
 interface BoardShapesLayerProps {
   canvasWidth: number;
   canvasHeight: number;
@@ -8,6 +12,7 @@ interface BoardShapesLayerProps {
   shapes: BoardShape[];
   preview: { type: BoardShapeType; start: BoardPoint; end: BoardPoint } | null;
   selectedShapeIds: ReadonlySet<string>;
+  className?: string;
   onShapePointerDown: (e: React.PointerEvent, shapeId: string) => void;
   onEndpointPointerDown: (
     e: React.PointerEvent,
@@ -40,6 +45,10 @@ function ShapeView({
   if (shape.type === "box") {
     const { x, y, width, height } = boardBoxBounds(a, b);
     if (width < 2 && height < 2) return null;
+    const hitX = x - SHAPE_BOX_HIT_PAD;
+    const hitY = y - SHAPE_BOX_HIT_PAD;
+    const hitWidth = Math.max(width + SHAPE_BOX_HIT_PAD * 2, SHAPE_BOX_MIN_HIT);
+    const hitHeight = Math.max(height + SHAPE_BOX_HIT_PAD * 2, SHAPE_BOX_MIN_HIT);
     return (
       <g
         className={`board-shape board-shape--box ${selected ? "selected" : ""}`}
@@ -50,6 +59,18 @@ function ShapeView({
         }}
       >
         <rect
+          className="board-shape-hit board-shape-hit--box"
+          x={hitX}
+          y={hitY}
+          width={hitWidth}
+          height={hitHeight}
+          fill="transparent"
+          stroke="transparent"
+          strokeWidth={SHAPE_LINE_HIT_WIDTH}
+          rx={6}
+        />
+        <rect
+          className="board-shape-visual"
           x={x}
           y={y}
           width={width}
@@ -82,6 +103,17 @@ function ShapeView({
       }}
     >
       <line
+        className="board-shape-hit"
+        x1={a.x}
+        y1={a.y}
+        x2={b.x}
+        y2={b.y}
+        stroke="transparent"
+        strokeWidth={SHAPE_LINE_HIT_WIDTH}
+        strokeLinecap="round"
+      />
+      <line
+        className="board-shape-visual"
         x1={a.x}
         y1={a.y}
         x2={b.x}
@@ -130,12 +162,13 @@ export function BoardShapesLayer({
   shapes,
   preview,
   selectedShapeIds,
+  className = "board-shapes-layer",
   onShapePointerDown,
   onEndpointPointerDown,
 }: BoardShapesLayerProps) {
   return (
     <svg
-      className="board-shapes-layer"
+      className={className}
       width={canvasWidth}
       height={canvasHeight}
       aria-hidden
