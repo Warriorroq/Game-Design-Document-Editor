@@ -240,7 +240,6 @@
   color: var(--text-muted);
 }
 
-.board-item--link-target,
 .board-text--link-target {
   outline: 2px solid var(--accent);
   outline-offset: 2px;

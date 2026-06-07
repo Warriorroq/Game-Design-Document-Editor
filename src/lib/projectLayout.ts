@@ -49,6 +49,9 @@ interface SectionFileBoardItem {
   width: number;
   height: number;
   locked?: boolean;
+  rotation?: number;
+  flipH?: boolean;
+  flipV?: boolean;
 }
 
 interface SectionFile {
@@ -113,6 +116,9 @@ function boardItemToFile(
       width: item.width,
       height: item.height,
       locked: item.locked,
+      rotation: item.rotation,
+      flipH: item.flipH,
+      flipV: item.flipV,
     };
   }
 
@@ -125,6 +131,9 @@ function boardItemToFile(
       width: item.width,
       height: item.height,
       locked: item.locked,
+      rotation: item.rotation,
+      flipH: item.flipH,
+      flipV: item.flipV,
     };
   }
 
@@ -147,6 +156,9 @@ function boardItemFromFile(
     width: item.width,
     height: item.height,
     locked: item.locked,
+    rotation: item.rotation,
+    flipH: item.flipH,
+    flipV: item.flipV,
   };
 }
 

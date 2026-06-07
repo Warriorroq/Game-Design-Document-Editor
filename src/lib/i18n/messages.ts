@@ -202,6 +202,11 @@ const en = {
   "desk.textStyleAria": "Text style",
   "desk.newText": "Text",
   "desk.editTextAria": "Edit board text",
+  "desk.bringForward": "Bring forward",
+  "desk.sendBackward": "Send backward",
+  "desk.flipHorizontal": "Flip horizontal",
+  "desk.flipVertical": "Flip vertical",
+  "desk.rotate": "Rotate",
 
   "menu.copy": "Copy",
   "menu.paste": "Paste",
@@ -470,6 +475,11 @@ const ru: Record<keyof typeof en, string> = {
   "desk.textStyleAria": "Стиль текста",
   "desk.newText": "Текст",
   "desk.editTextAria": "Редактирование подписи",
+  "desk.bringForward": "На передний план",
+  "desk.sendBackward": "На задний план",
+  "desk.flipHorizontal": "Отразить по горизонтали",
+  "desk.flipVertical": "Отразить по вертикали",
+  "desk.rotate": "Поворот",
 
   "menu.copy": "Копировать",
   "menu.paste": "Вставить",

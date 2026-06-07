@@ -112,6 +112,16 @@ export function selectionCount(selection: DeskSelection): number {
   );
 }
 
+/** Exactly one board image selected, nothing else. */
+export function isSingleImageSelection(selection: DeskSelection): boolean {
+  return (
+    selection.itemIds.length === 1 &&
+    selection.shapeIds.length === 0 &&
+    selection.textIds.length === 0 &&
+    selection.strokeIds.length === 0
+  );
+}
+
 export function applyDeskSelectClick(
   kind: "item" | "shape" | "text" | "stroke",
   id: string,

@@ -86,6 +86,10 @@ export interface BoardItem {
   width: number;
   height: number;
   locked?: boolean;
+  /** Rotation in degrees (0, 90, 180, 270 when snapped). */
+  rotation?: number;
+  flipH?: boolean;
+  flipV?: boolean;
 }
 
 export interface GddDocument {

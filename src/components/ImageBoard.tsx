@@ -18,6 +18,7 @@ import {
   applyDeskSelectClick,
   armDragAfterThreshold,
   groupsTouchingSelection,
+  isSingleImageSelection,
   selectionCount,
 } from "../lib/deskGroups";
 import {
@@ -37,7 +38,14 @@ import {
   getImageFromClipboard,
   loadImageDimensions,
 } from "../lib/imageUtils";
+import {
+  boardItemTransform,
+  pointerAngleRad,
+  rotationDeltaDeg,
+  snapRotationAngle,
+} from "../lib/boardItemTransform";
 import { resolveBoardPoint, snapBoardPoint } from "../lib/boardGeometry";
+import { canReorderDeskLayer } from "../lib/deskLayerOrder";
 import {
   BOARD_MAX_SCALE,
   constrainBoardViewport,
@@ -98,6 +106,10 @@ interface ImageBoardProps {
     shapeIds: string[],
     textIds: string[],
     strokeIds: string[]
+  ) => void;
+  onReorderLayer: (
+    selection: DeskSelection,
+    direction: "forward" | "backward"
   ) => void;
   onBeginTransientEdit?: () => void;
   onEndTransientEdit?: () => void;
@@ -163,6 +175,7 @@ export function ImageBoard({
   onRemoveGroup,
   onPasteDesk,
   onRemoveSelection,
+  onReorderLayer,
   onBeginTransientEdit,
   onEndTransientEdit,
 }: ImageBoardProps) {
@@ -415,6 +428,82 @@ export function ImageBoard({
     for (const id of selection.strokeIds) onUpdateStroke(id, { locked: false });
   }, [selection, onUpdate, onUpdateShape, onUpdateText, onUpdateStroke]);
 
+  const deskLayerState = useMemo(
+    () => ({ items, shapes, texts, strokes }),
+    [items, shapes, texts, strokes]
+  );
+
+  const singleImageSelection = useMemo(
+    () => (isSingleImageSelection(selection) ? selection.itemIds[0]! : null),
+    [selection]
+  );
+
+  const singleImageLayerSelection = useMemo(
+    (): DeskSelection =>
+      singleImageSelection
+        ? {
+            itemIds: [singleImageSelection],
+            shapeIds: [],
+            textIds: [],
+            strokeIds: [],
+          }
+        : EMPTY_SELECTION,
+    [singleImageSelection]
+  );
+
+  const canBringForward = useMemo(
+    () =>
+      singleImageSelection !== null &&
+      canReorderDeskLayer(deskLayerState, singleImageLayerSelection, "forward"),
+    [deskLayerState, singleImageLayerSelection, singleImageSelection]
+  );
+
+  const canSendBackward = useMemo(
+    () =>
+      singleImageSelection !== null &&
+      canReorderDeskLayer(deskLayerState, singleImageLayerSelection, "backward"),
+    [deskLayerState, singleImageLayerSelection, singleImageSelection]
+  );
+
+  const canFlipImages = useMemo(() => {
+    if (!singleImageSelection) return false;
+    return !isSelectionLocked.item(singleImageSelection);
+  }, [isSelectionLocked, singleImageSelection]);
+
+  const bringSelectionForward = useCallback(() => {
+    if (!canBringForward || !singleImageSelection) return;
+    onReorderLayer(singleImageLayerSelection, "forward");
+  }, [
+    canBringForward,
+    onReorderLayer,
+    singleImageLayerSelection,
+    singleImageSelection,
+  ]);
+
+  const sendSelectionBackward = useCallback(() => {
+    if (!canSendBackward || !singleImageSelection) return;
+    onReorderLayer(singleImageLayerSelection, "backward");
+  }, [
+    canSendBackward,
+    onReorderLayer,
+    singleImageLayerSelection,
+    singleImageSelection,
+  ]);
+
+  const flipSelectionHorizontal = useCallback(() => {
+    if (!singleImageSelection || isSelectionLocked.item(singleImageSelection)) return;
+    const item = items.find((i) => i.id === singleImageSelection);
+    if (!item) return;
+    onUpdate(singleImageSelection, { flipH: !item.flipH });
+  }, [items, isSelectionLocked, onUpdate, singleImageSelection]);
+
+  const flipSelectionVertical = useCallback(() => {
+    if (!singleImageSelection || isSelectionLocked.item(singleImageSelection)) return;
+    const item = items.find((i) => i.id === singleImageSelection);
+    if (!item) return;
+    onUpdate(singleImageSelection, { flipV: !item.flipV });
+  }, [items, isSelectionLocked, onUpdate, singleImageSelection]);
+
   const openDeskObjectMenu = useCallback(
     (clientX: number, clientY: number, nextSelection: DeskSelection, copyHref?: string) => {
       setSelection(nextSelection);
@@ -443,15 +532,67 @@ export function ImageBoard({
             disabled:
               selectionCount(nextSelection) === 0 || selectionLockSummary.locked === 0,
           },
+          ...(isSingleImageSelection(nextSelection)
+            ? [
+                {
+                  id: "desk.bringForward",
+                  label: t("desk.bringForward"),
+                  onClick: bringSelectionForward,
+                  disabled: !canReorderDeskLayer(
+                    deskLayerState,
+                    {
+                      itemIds: [nextSelection.itemIds[0]!],
+                      shapeIds: [],
+                      textIds: [],
+                      strokeIds: [],
+                    },
+                    "forward"
+                  ),
+                },
+                {
+                  id: "desk.sendBackward",
+                  label: t("desk.sendBackward"),
+                  onClick: sendSelectionBackward,
+                  disabled: !canReorderDeskLayer(
+                    deskLayerState,
+                    {
+                      itemIds: [nextSelection.itemIds[0]!],
+                      shapeIds: [],
+                      textIds: [],
+                      strokeIds: [],
+                    },
+                    "backward"
+                  ),
+                },
+                {
+                  id: "desk.flipHorizontal",
+                  label: t("desk.flipHorizontal"),
+                  onClick: flipSelectionHorizontal,
+                  disabled: isSelectionLocked.item(nextSelection.itemIds[0]!),
+                },
+                {
+                  id: "desk.flipVertical",
+                  label: t("desk.flipVertical"),
+                  onClick: flipSelectionVertical,
+                  disabled: isSelectionLocked.item(nextSelection.itemIds[0]!),
+                },
+              ]
+            : []),
         ],
       });
     },
     [
+      bringSelectionForward,
       copyDesk,
+      deskLayerState,
+      flipSelectionHorizontal,
+      flipSelectionVertical,
+      isSelectionLocked,
       lockSelection,
       openContextMenu,
       selectionLockSummary.locked,
       selectionLockSummary.unlocked,
+      sendSelectionBackward,
       t,
       unlockSelection,
     ]
@@ -1064,6 +1205,47 @@ export function ImageBoard({
     window.addEventListener("pointerup", onUp);
   };
 
+  const startItemRotate = (e: React.PointerEvent, item: BoardItem) => {
+    if (item.locked) return;
+    e.stopPropagation();
+    e.preventDefault();
+    onBeginTransientEdit?.();
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+
+    const centerX = item.x + item.width / 2;
+    const centerY = item.y + item.height / 2;
+    const origRotation = item.rotation ?? 0;
+    const startWorld = screenToWorld(e.clientX, e.clientY);
+    const startRad = pointerAngleRad(
+      centerX,
+      centerY,
+      startWorld.x,
+      startWorld.y
+    );
+
+    const rotationAt = (clientX: number, clientY: number) => {
+      const world = screenToWorld(clientX, clientY);
+      const currentRad = pointerAngleRad(centerX, centerY, world.x, world.y);
+      return origRotation + rotationDeltaDeg(startRad, currentRad);
+    };
+
+    const onMove = (ev: PointerEvent) => {
+      onUpdate(item.id, { rotation: rotationAt(ev.clientX, ev.clientY) });
+    };
+
+    const onUp = (ev: PointerEvent) => {
+      onUpdate(item.id, {
+        rotation: snapRotationAngle(rotationAt(ev.clientX, ev.clientY)),
+      });
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      finishTransientEdit();
+    };
+
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+  };
+
   const handleItemPointerDown = (
     e: React.PointerEvent,
     item: BoardItem,
@@ -1295,7 +1477,9 @@ export function ImageBoard({
       target.closest(".board-item") ||
         target.closest(".board-shape-handle") ||
         target.closest(".board-text") ||
-        target.closest(".board-stroke")
+        target.closest(".board-stroke") ||
+        target.closest(".board-item-rotate") ||
+        target.closest(".board-item-resize")
     );
 
   const startPanSession = (e: React.PointerEvent) => {
@@ -1576,7 +1760,7 @@ export function ImageBoard({
             {items.map((item) => (
               <div
                 key={item.id}
-                className={`board-item ${item.locked ? "locked" : ""} ${selectedItemSet.has(item.id) ? "selected" : ""} ${highlightMediaId === item.id ? "board-item--link-target" : ""}`}
+                className={`board-item ${item.locked ? "locked" : ""} ${selectedItemSet.has(item.id) ? "selected" : ""} ${singleImageSelection === item.id ? "board-item--image-tools" : ""} ${highlightMediaId === item.id ? "board-item--link-target" : ""}`}
                 style={{
                   left: item.x,
                   top: item.y,
@@ -1593,34 +1777,52 @@ export function ImageBoard({
                   openDeskObjectMenu(e.clientX, e.clientY, next, buildMediaHref(sectionId, item.id));
                 }}
               >
-                <img src={item.src} alt="" draggable={false} />
                 <div
                   className="board-item-drag"
                   onPointerDown={(e) => handleItemPointerDown(e, item, "move")}
                 />
-                <button
-                  type="button"
-                  className="board-item-remove"
-                  disabled={item.locked}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (item.locked) return;
-                    onRemove(item.id);
-                    setSelection((prev) => ({
-                      itemIds: prev.itemIds.filter((id) => id !== item.id),
-                      shapeIds: prev.shapeIds,
-                      textIds: prev.textIds,
-                      strokeIds: prev.strokeIds,
-                    }));
-                  }}
-                  aria-label="Remove image"
-                >
-                  ×
-                </button>
                 <div
-                  className="board-item-resize"
-                  onPointerDown={(e) => handleItemPointerDown(e, item, "resize")}
-                />
+                  className="board-item-body"
+                  style={{ transform: boardItemTransform(item) }}
+                >
+                  <div className="board-item-frame" aria-hidden />
+                  <div className="board-item-visual">
+                    <img src={item.src} alt="" draggable={false} />
+                  </div>
+                  <div className="board-item-handles">
+                    <button
+                      type="button"
+                      className="board-item-remove"
+                      disabled={item.locked}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (item.locked) return;
+                        onRemove(item.id);
+                        setSelection((prev) => ({
+                          itemIds: prev.itemIds.filter((id) => id !== item.id),
+                          shapeIds: prev.shapeIds,
+                          textIds: prev.textIds,
+                          strokeIds: prev.strokeIds,
+                        }));
+                      }}
+                      aria-label="Remove image"
+                    >
+                      ×
+                    </button>
+                    <div
+                      className="board-item-resize"
+                      onPointerDown={(e) => handleItemPointerDown(e, item, "resize")}
+                    />
+                    {singleImageSelection === item.id && !item.locked && (
+                      <div
+                        className="board-item-rotate"
+                        title={t("desk.rotate")}
+                        aria-label={t("desk.rotate")}
+                        onPointerDown={(e) => startItemRotate(e, item)}
+                      />
+                    )}
+                  </div>
+                </div>
               </div>
             ))}
             <BoardShapesLayer
@@ -1688,6 +1890,10 @@ export function ImageBoard({
           canPaste={canPasteDesk}
           canLock={selectionSize > 0 && selectionLockSummary.unlocked > 0}
           canUnlock={selectionSize > 0 && selectionLockSummary.locked > 0}
+          canBringForward={canBringForward}
+          canSendBackward={canSendBackward}
+          canFlipHorizontal={canFlipImages}
+          canFlipVertical={canFlipImages}
           onClose={() => setDeskMenu(null)}
           onPick={(type) => {
             penSession.current = null;
@@ -1722,6 +1928,22 @@ export function ImageBoard({
           }}
           onUnlock={() => {
             unlockSelection();
+            setDeskMenu(null);
+          }}
+          onBringForward={() => {
+            bringSelectionForward();
+            setDeskMenu(null);
+          }}
+          onSendBackward={() => {
+            sendSelectionBackward();
+            setDeskMenu(null);
+          }}
+          onFlipHorizontal={() => {
+            flipSelectionHorizontal();
+            setDeskMenu(null);
+          }}
+          onFlipVertical={() => {
+            flipSelectionVertical();
             setDeskMenu(null);
           }}
         />

@@ -56,6 +56,7 @@ function AppMain({
   addBoardGroup,
   removeBoardGroup,
   pasteDeskContent,
+  reorderDeskLayerOrder,
   removeDeskSelection,
   undo,
   beginTransient,
@@ -358,6 +359,9 @@ function AppMain({
                     }
                     onPasteDesk={(payload) =>
                       pasteDeskContent(activeSection.id, payload)
+                    }
+                    onReorderLayer={(selection, direction) =>
+                      reorderDeskLayerOrder(activeSection.id, selection, direction)
                     }
                     onRemoveSelection={(itemIds, shapeIds, textIds, strokeIds) =>
                       removeDeskSelection(

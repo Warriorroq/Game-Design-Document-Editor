@@ -6,6 +6,8 @@ import {
 } from "../lib/document";
 import { createDemoDocument } from "../lib/demoDocument";
 import { removeMembersFromGroups } from "../lib/deskGroups";
+import { reorderDeskLayer } from "../lib/deskLayerOrder";
+import type { DeskSelection } from "../lib/deskClipboard";
 import type {
   BoardGroup,
   BoardItem,
@@ -492,6 +494,35 @@ export function useGddDocument() {
     [mutateDoc]
   );
 
+  const reorderDeskLayerOrder = useCallback(
+    (sectionId: string, selection: DeskSelection, direction: "forward" | "backward") => {
+      mutateDoc((prev) => ({
+        ...prev,
+        sections: prev.sections.map((s) => {
+          if (s.id !== sectionId) return s;
+          const next = reorderDeskLayer(
+            {
+              items: s.board,
+              shapes: s.shapes,
+              texts: s.texts,
+              strokes: s.strokes,
+            },
+            selection,
+            direction
+          );
+          return {
+            ...s,
+            board: next.items,
+            shapes: next.shapes,
+            texts: next.texts,
+            strokes: next.strokes,
+          };
+        }),
+      }));
+    },
+    [mutateDoc]
+  );
+
   const removeDeskSelection = useCallback(
     (
       sectionId: string,
@@ -602,6 +633,7 @@ export function useGddDocument() {
     addBoardGroup,
     removeBoardGroup,
     pasteDeskContent,
+    reorderDeskLayerOrder,
     removeDeskSelection,
     undo,
     beginTransient,

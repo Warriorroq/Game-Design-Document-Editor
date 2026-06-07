@@ -13,6 +13,10 @@ interface DeskContextMenuProps {
   canPaste: boolean;
   canLock: boolean;
   canUnlock: boolean;
+  canBringForward: boolean;
+  canSendBackward: boolean;
+  canFlipHorizontal: boolean;
+  canFlipVertical: boolean;
   onPick: (type: BoardDrawTool) => void;
   onAddText: () => void;
   onGroup: () => void;
@@ -21,6 +25,10 @@ interface DeskContextMenuProps {
   onPaste: () => void;
   onLock: () => void;
   onUnlock: () => void;
+  onBringForward: () => void;
+  onSendBackward: () => void;
+  onFlipHorizontal: () => void;
+  onFlipVertical: () => void;
   onClose: () => void;
 }
 
@@ -33,6 +41,10 @@ export function DeskContextMenu({
   canPaste,
   canLock,
   canUnlock,
+  canBringForward,
+  canSendBackward,
+  canFlipHorizontal,
+  canFlipVertical,
   onPick,
   onAddText,
   onGroup,
@@ -41,6 +53,10 @@ export function DeskContextMenu({
   onPaste,
   onLock,
   onUnlock,
+  onBringForward,
+  onSendBackward,
+  onFlipHorizontal,
+  onFlipVertical,
   onClose,
 }: DeskContextMenuProps) {
   const { t } = useLocale();
@@ -120,6 +136,49 @@ export function DeskContextMenu({
       {canUnlock && (
         <button type="button" className="link-menu-item" role="menuitem" onClick={onUnlock}>
           {t("desk.unlock")}
+        </button>
+      )}
+      {(canBringForward || canSendBackward || canFlipHorizontal || canFlipVertical) && (
+        <div className="board-menu-sep" role="separator" />
+      )}
+      {canBringForward && (
+        <button
+          type="button"
+          className="link-menu-item"
+          role="menuitem"
+          onClick={onBringForward}
+        >
+          {t("desk.bringForward")}
+        </button>
+      )}
+      {canSendBackward && (
+        <button
+          type="button"
+          className="link-menu-item"
+          role="menuitem"
+          onClick={onSendBackward}
+        >
+          {t("desk.sendBackward")}
+        </button>
+      )}
+      {canFlipHorizontal && (
+        <button
+          type="button"
+          className="link-menu-item"
+          role="menuitem"
+          onClick={onFlipHorizontal}
+        >
+          {t("desk.flipHorizontal")}
+        </button>
+      )}
+      {canFlipVertical && (
+        <button
+          type="button"
+          className="link-menu-item"
+          role="menuitem"
+          onClick={onFlipVertical}
+        >
+          {t("desk.flipVertical")}
         </button>
       )}
       {canGroup && (
