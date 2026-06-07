@@ -55,6 +55,10 @@
   color: var(--danger) !important;
 }
 
+.board-group-action {
+  color: #fff;
+}
+
 .board-panel--embedded {
   height: 100%;
 }
@@ -463,6 +467,15 @@
 
 .board-text.editing .board-text-drag {
   display: none;
+}
+
+.board-marquee {
+  position: absolute;
+  pointer-events: none;
+  border: 1px solid var(--accent);
+  background: rgba(99, 102, 241, 0.12);
+  z-index: 50;
+  box-sizing: border-box;
 }
 
 @media (max-width: 768px) {

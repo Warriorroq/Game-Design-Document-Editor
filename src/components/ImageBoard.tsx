@@ -20,6 +20,10 @@ import {
   groupsTouchingSelection,
   selectionCount,
 } from "../lib/deskGroups";
+import {
+  boardRectFromPoints,
+  selectionFromMarqueeRect,
+} from "../lib/deskMarquee";
 import { translateStroke } from "../lib/deskStrokeTransform";
 import { translateShapeForDrag } from "../lib/deskTransform";
 import {
@@ -97,7 +101,6 @@ interface ImageBoardProps {
   ) => void;
   onBeginTransientEdit?: () => void;
   onEndTransientEdit?: () => void;
-  onUndo?: () => boolean;
 }
 
 const DEFAULT_PLACE = { x: 120, y: 120 };
@@ -162,7 +165,6 @@ export function ImageBoard({
   onRemoveSelection,
   onBeginTransientEdit,
   onEndTransientEdit,
-  onUndo,
 }: ImageBoardProps) {
   const { t } = useLocale();
   const { width: canvasWidth, height: canvasHeight } = useBoardSize();
@@ -180,6 +182,11 @@ export function ImageBoard({
     origPanY: number;
     moved: boolean;
     button: number;
+  } | null>(null);
+  const marqueeSession = useRef<{
+    startWorld: BoardPoint;
+    shiftKey: boolean;
+    moved: boolean;
   } | null>(null);
   const drawSession = useRef<{
     type: BoardShapeType;
@@ -199,6 +206,10 @@ export function ImageBoard({
   } | null>(null);
   const [drawPreview, setDrawPreview] = useState<{
     type: BoardShapeType;
+    start: BoardPoint;
+    end: BoardPoint;
+  } | null>(null);
+  const [marqueePreview, setMarqueePreview] = useState<{
     start: BoardPoint;
     end: BoardPoint;
   } | null>(null);
@@ -697,17 +708,6 @@ export function ImageBoard({
         return;
       }
 
-      if (shortcutMatches("undo", e) && desk && onUndo) {
-        const target = e.target as HTMLElement;
-        if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") return;
-        if (target.isContentEditable && !surfaceRef.current?.contains(target)) {
-          return;
-        }
-        e.preventDefault();
-        onUndo();
-        return;
-      }
-
       if (e.key === " " && !mod && desk) {
         e.preventDefault();
         spaceHeld.current = true;
@@ -724,6 +724,8 @@ export function ImageBoard({
         setActiveTool(null);
         setDrawPreview(null);
         drawSession.current = null;
+        marqueeSession.current = null;
+        setMarqueePreview(null);
         setDeskMenu(null);
         clearSelection();
         return;
@@ -756,7 +758,6 @@ export function ImageBoard({
     selectionSize,
     ungroupSelection,
     editingTextId,
-    onUndo,
   ]);
 
   const commitDraw = useCallback(
@@ -1227,6 +1228,8 @@ export function ImageBoard({
     setPenPreview(null);
     setDrawPreview(null);
     drawSession.current = null;
+    marqueeSession.current = null;
+    setMarqueePreview(null);
   }, []);
 
   const showDeskMenuForSelection = useCallback(
@@ -1236,20 +1239,6 @@ export function ImageBoard({
     },
     [showDeskMenuAt]
   );
-
-  const openDeskMenu = (e: React.MouseEvent) => {
-    const target = e.target as HTMLElement;
-    if (
-      target.closest(".board-item") ||
-      target.closest(".board-shape-handle") ||
-      target.closest(".board-text")
-    ) {
-      return;
-    }
-    e.preventDefault();
-    e.stopPropagation();
-    showDeskMenuAt(e.clientX, e.clientY);
-  };
 
   const handleSurfaceContextMenu = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
@@ -1287,11 +1276,7 @@ export function ImageBoard({
     ) {
       return;
     }
-    if (penMode && target.closest(".board-canvas")) {
-      e.preventDefault();
-      return;
-    }
-    openDeskMenu(e);
+    e.preventDefault();
   };
 
   const isPanBlocker = (target: HTMLElement) =>
@@ -1327,7 +1312,7 @@ export function ImageBoard({
       return;
     }
 
-    if (e.button === 2 && penMode && onCanvas && !isPanBlocker(target)) {
+    if (e.button === 2 && !isPanBlocker(target)) {
       e.preventDefault();
       startPanSession(e);
       return;
@@ -1369,12 +1354,30 @@ export function ImageBoard({
       return;
     }
 
-    startPanSession(e);
+    const world = screenToWorld(e.clientX, e.clientY);
+    marqueeSession.current = {
+      startWorld: world,
+      shiftKey: e.shiftKey,
+      moved: false,
+    };
+    setMarqueePreview({ start: world, end: world });
+    surfaceRef.current?.setPointerCapture(e.pointerId);
   };
 
   const onSurfacePointerMove = (e: React.PointerEvent) => {
     const world = screenToWorld(e.clientX, e.clientY);
     cursorRef.current = world;
+
+    if (marqueeSession.current) {
+      const session = marqueeSession.current;
+      const dx = world.x - session.startWorld.x;
+      const dy = world.y - session.startWorld.y;
+      if (Math.abs(dx) > 3 / viewport.scale || Math.abs(dy) > 3 / viewport.scale) {
+        session.moved = true;
+      }
+      setMarqueePreview({ start: session.startWorld, end: world });
+      return;
+    }
 
     if (penSession.current) {
       const point = { x: world.x, y: world.y };
@@ -1427,9 +1430,37 @@ export function ImageBoard({
       return;
     }
 
+    if (marqueeSession.current) {
+      const session = marqueeSession.current;
+      if (!session.moved && !editingTextId && !session.shiftKey) {
+        clearSelection();
+      } else if (session.moved && marqueePreview) {
+        const rect = boardRectFromPoints(marqueePreview.start, marqueePreview.end);
+        if (rect.width >= 2 || rect.height >= 2) {
+          setSelection(
+            selectionFromMarqueeRect(
+              rect,
+              items,
+              shapes,
+              texts,
+              strokes,
+              groups,
+              session.shiftKey,
+              selection
+            )
+          );
+        } else if (!session.shiftKey) {
+          clearSelection();
+        }
+      }
+      marqueeSession.current = null;
+      setMarqueePreview(null);
+      return;
+    }
+
     const pan = panSession.current;
     if (pan) {
-      if (pan.button === 2 && penMode && !pan.moved) {
+      if (pan.button === 2 && !pan.moved) {
         showDeskMenuAt(pan.startX, pan.startY);
       } else if (!pan.moved && !editingTextId && pan.button === 0) {
         clearSelection();
@@ -1453,12 +1484,20 @@ export function ImageBoard({
           <span>{t("desk.shapes", { count: shapes.length })}</span>
           <span>{t("desk.labels", { count: texts.length })}</span>
           {canGroup && (
-            <button type="button" className="btn btn-ghost" onClick={groupSelection}>
+            <button
+              type="button"
+              className="btn btn-ghost board-group-action"
+              onClick={groupSelection}
+            >
               {t("desk.group")}
             </button>
           )}
           {canUngroup && (
-            <button type="button" className="btn btn-ghost" onClick={ungroupSelection}>
+            <button
+              type="button"
+              className="btn btn-ghost board-group-action"
+              onClick={ungroupSelection}
+            >
               {t("desk.ungroup")}
             </button>
           )}
@@ -1602,6 +1641,17 @@ export function ImageBoard({
               selectedStrokeIds={selectedStrokeIds}
               onStrokePointerDown={handleStrokePointerDown}
             />
+            {marqueePreview && (
+              <div
+                className="board-marquee"
+                style={{
+                  left: Math.min(marqueePreview.start.x, marqueePreview.end.x),
+                  top: Math.min(marqueePreview.start.y, marqueePreview.end.y),
+                  width: Math.abs(marqueePreview.end.x - marqueePreview.start.x),
+                  height: Math.abs(marqueePreview.end.y - marqueePreview.start.y),
+                }}
+              />
+            )}
           </div>
         </div>
       </div>

@@ -198,6 +198,13 @@ export function eventMatchesBinding(
   const key = normalizeEventKey(e);
   if (key === binding.key) return true;
   if (binding.key === "Delete" && key === "Backspace") return true;
+
+  // Ctrl/Meta + letter: match physical key so undo works on any keyboard layout.
+  if (binding.ctrlOrMeta && !binding.alt && binding.key.length === 1) {
+    const code = `Key${binding.key.toUpperCase()}`;
+    if (e.code === code) return true;
+  }
+
   return false;
 }
 

@@ -168,13 +168,9 @@ function AppMain({
       if (view !== "editor") return;
       if (!shortcutMatches("undo", e)) return;
       const target = e.target as HTMLElement;
-      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
-        return;
-      }
-      // Desk handles its own Ctrl+Z (including board text labels).
-      if (target.closest(".board-surface")) {
-        return;
-      }
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") return;
+      // In-board label edit: let the browser undo typing inside the field.
+      if (target.closest(".board-text-editor")) return;
       e.preventDefault();
       undo();
     };
@@ -342,7 +338,6 @@ function AppMain({
                     onUpdateText={(textId, patch, options) =>
                       updateBoardText(activeSection.id, textId, patch, options)
                     }
-                    onUndo={undo}
                     onRemoveText={(textId) =>
                       removeBoardText(activeSection.id, textId)
                     }
