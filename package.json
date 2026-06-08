@@ -14,6 +14,7 @@
   "build": {
     "appId": "com.gdd.editor",
     "productName": "GDD Editor",
+    "icon": "build/icon.png",
     "directories": {
       "output": "release"
     },
@@ -23,6 +24,7 @@
       "package.json"
     ],
     "win": {
+      "icon": "build/icon.png",
       "target": [
         {
           "target": "nsis",

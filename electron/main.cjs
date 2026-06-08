@@ -4,6 +4,7 @@ const git = require("./git.cjs");
 const project = require("./project.cjs");
 
 const BG = "#0f1117";
+const APP_ICON = path.join(__dirname, "icon.png");
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -14,6 +15,7 @@ function createWindow() {
     frame: false,
     roundedCorners: false,
     backgroundColor: BG,
+    icon: APP_ICON,
     show: false,
     webPreferences: {
       contextIsolation: true,
