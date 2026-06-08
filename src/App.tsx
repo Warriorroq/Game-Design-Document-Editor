@@ -42,6 +42,7 @@ function AppMain({
   updateDoc,
   updateSection,
   addSection,
+  reorderSections,
   removeSection,
   updateBoardItem,
   addBoardItem,
@@ -268,6 +269,7 @@ function AppMain({
             onSelect={setActiveSectionId}
             onAdd={addSection}
             onRemove={removeSection}
+            onReorder={reorderSections}
           />
           <div ref={mainRef} className="main-panel">
             <PanelSplitter

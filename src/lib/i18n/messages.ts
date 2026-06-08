@@ -180,6 +180,7 @@ const en = {
   "sidebar.addSection": "Add section",
   "sidebar.sectionsAria": "Document sections",
   "sidebar.removeSection": "Remove section",
+  "sidebar.reorderSection": 'Reorder section "{title}"',
   "sidebar.confirmRemove": 'Remove section "{title}"?',
 
   "doc.titlePlaceholder": "Game title",
@@ -468,6 +469,7 @@ const ru: Record<keyof typeof en, string> = {
   "sidebar.addSection": "Добавить секцию",
   "sidebar.sectionsAria": "Секции документа",
   "sidebar.removeSection": "Удалить секцию",
+  "sidebar.reorderSection": "Переместить секцию «{title}»",
   "sidebar.confirmRemove": 'Удалить секцию «{title}»?',
 
   "doc.titlePlaceholder": "Название игры",

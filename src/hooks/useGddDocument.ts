@@ -8,6 +8,10 @@ import {
 import { createDemoDocument } from "../lib/demoDocument";
 import { removeMembersFromGroups } from "../lib/deskGroups";
 import { reorderDeskLayer } from "../lib/deskLayerOrder";
+import {
+  reorderSections as reorderSectionList,
+  type SectionDropPosition,
+} from "../lib/sectionOrder";
 import type { DeskSelection } from "../lib/deskClipboard";
 import type {
   BoardGroup,
@@ -178,6 +182,22 @@ export function useGddDocument() {
     }));
     setActiveSectionId(id);
   }, [mutateDoc]);
+
+  const reorderSections = useCallback(
+    (activeId: string, overId: string, position: SectionDropPosition) => {
+      mutateDoc((prev) => {
+        const sections = reorderSectionList(
+          prev.sections,
+          activeId,
+          overId,
+          position
+        );
+        if (sections === prev.sections) return prev;
+        return { ...prev, sections };
+      });
+    },
+    [mutateDoc]
+  );
 
   const removeSection = useCallback(
     (id: string) => {
@@ -622,6 +642,7 @@ export function useGddDocument() {
     updateDoc,
     updateSection,
     addSection,
+    reorderSections,
     removeSection,
     updateBoardItem,
     addBoardItem,
