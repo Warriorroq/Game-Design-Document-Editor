@@ -9,9 +9,13 @@ import { createDemoDocument } from "../lib/demoDocument";
 import { removeMembersFromGroups } from "../lib/deskGroups";
 import { reorderDeskLayer } from "../lib/deskLayerOrder";
 import {
-  reorderSections as reorderSectionList,
-  type SectionDropPosition,
-} from "../lib/sectionOrder";
+  applySidebarDrop,
+  firstSectionId,
+  nextChildOrder,
+  removeFolderFromDoc,
+  removeSectionFromDoc,
+  type SidebarDropTarget,
+} from "../lib/sidebarOrder";
 import type { DeskSelection } from "../lib/deskClipboard";
 import type {
   BoardGroup,
@@ -21,6 +25,7 @@ import type {
   BoardText,
   GddDocument,
   GddSection,
+  GddSectionFolder,
 } from "../types";
 
 const MAX_UNDO = 50;
@@ -160,40 +165,94 @@ export function useGddDocument() {
     [armContentUndo, mutateDoc, scheduleSave]
   );
 
-  const addSection = useCallback(() => {
-    const id = crypto.randomUUID();
-    mutateDoc((prev) => ({
-      ...prev,
-      sections: [
-        ...prev.sections,
-        {
-          id,
-          title: "New Section",
-          description: "",
-          content: "",
-          order: prev.sections.length,
-          board: [],
-          shapes: [],
-          strokes: [],
-          texts: [],
-          groups: [],
-        },
-      ],
-    }));
-    setActiveSectionId(id);
-  }, [mutateDoc]);
-
-  const reorderSections = useCallback(
-    (activeId: string, overId: string, position: SectionDropPosition) => {
+  const addSection = useCallback(
+    (folderId?: string) => {
+      const id = crypto.randomUUID();
       mutateDoc((prev) => {
-        const sections = reorderSectionList(
-          prev.sections,
-          activeId,
-          overId,
-          position
-        );
-        if (sections === prev.sections) return prev;
-        return { ...prev, sections };
+        const order = nextChildOrder(prev, folderId ?? null);
+        return {
+          ...prev,
+          sections: [
+            ...prev.sections,
+            {
+              id,
+              title: "New Section",
+              description: "",
+              content: "",
+              order,
+              folderId,
+              board: [],
+              shapes: [],
+              strokes: [],
+              texts: [],
+              groups: [],
+            },
+          ],
+        };
+      });
+      setActiveSectionId(id);
+    },
+    [mutateDoc]
+  );
+
+  const addFolder = useCallback(
+    (parentFolderId?: string) => {
+      const id = crypto.randomUUID();
+      mutateDoc((prev) => ({
+        ...prev,
+        folders: [
+          ...(prev.folders ?? []),
+          {
+            id,
+            title: "New Folder",
+            order: nextChildOrder(prev, parentFolderId ?? null),
+            parentFolderId,
+          },
+        ],
+      }));
+    },
+    [mutateDoc]
+  );
+
+  const updateFolder = useCallback(
+    (id: string, patch: Partial<GddSectionFolder>) => {
+      mutateDoc((prev) => ({
+        ...prev,
+        folders: (prev.folders ?? []).map((folder) =>
+          folder.id === id ? { ...folder, ...patch } : folder
+        ),
+      }));
+    },
+    [mutateDoc]
+  );
+
+  const toggleFolderCollapsed = useCallback(
+    (id: string) => {
+      mutateDoc((prev) => ({
+        ...prev,
+        folders: (prev.folders ?? []).map((folder) =>
+          folder.id === id ? { ...folder, collapsed: !folder.collapsed } : folder
+        ),
+      }));
+    },
+    [mutateDoc]
+  );
+
+  const removeFolder = useCallback(
+    (id: string) => {
+      mutateDoc((prev) => removeFolderFromDoc(prev, id));
+    },
+    [mutateDoc]
+  );
+
+  const reorderSidebar = useCallback(
+    (
+      drag: { kind: "section" | "folder"; id: string },
+      target: SidebarDropTarget
+    ) => {
+      mutateDoc((prev) => {
+        const next = applySidebarDrop(prev, drag, target);
+        return next ?? prev;
       });
     },
     [mutateDoc]
@@ -201,21 +260,14 @@ export function useGddDocument() {
 
   const removeSection = useCallback(
     (id: string) => {
-      const sections = docRef.current.sections
-        .filter((s) => s.id !== id)
-        .map((s, i) => ({ ...s, order: i }));
+      const nextDoc = removeSectionFromDoc(docRef.current, id);
 
-      mutateDoc((prev) => ({
-        ...prev,
-        sections: prev.sections
-          .filter((s) => s.id !== id)
-          .map((s, i) => ({ ...s, order: i })),
-      }));
+      mutateDoc((prev) => removeSectionFromDoc(prev, id));
 
       setActiveSectionId((current) => {
-        if (sections.length === 0) return "";
+        if (nextDoc.sections.length === 0) return "";
         if (current !== id) return current;
-        return sections[0]?.id ?? "";
+        return firstSectionId(nextDoc);
       });
     },
     [mutateDoc]
@@ -642,7 +694,11 @@ export function useGddDocument() {
     updateDoc,
     updateSection,
     addSection,
-    reorderSections,
+    addFolder,
+    updateFolder,
+    toggleFolderCollapsed,
+    removeFolder,
+    reorderSidebar,
     removeSection,
     updateBoardItem,
     addBoardItem,

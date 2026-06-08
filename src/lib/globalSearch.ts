@@ -11,6 +11,7 @@ export type GlobalSearchMatchKind =
   | "section-title"
   | "section-description"
   | "section-content"
+  | "folder-title"
   | "anchor"
   | "desk-text";
 
@@ -19,6 +20,7 @@ export interface GlobalSearchResult {
   href: string;
   sectionId: string;
   sectionTitle: string;
+  folderTitle?: string;
   kind: GlobalSearchMatchKind;
   where: string;
   snippet: string;
@@ -68,6 +70,7 @@ const SEARCH_WHERE_KEYS: Record<GlobalSearchMatchKind, MessageKey> = {
   "section-title": "search.where.sectionTitle",
   "section-description": "search.where.sectionDescription",
   "section-content": "search.where.sectionContent",
+  "folder-title": "search.where.folderTitle",
   anchor: "search.where.anchor",
   "desk-text": "search.where.deskText",
 };
@@ -153,6 +156,30 @@ function searchSection(
   }
 }
 
+function searchFolders(
+  doc: GddDocument,
+  query: string,
+  results: GlobalSearchResult[],
+  lang: AppLanguage
+) {
+  for (const folder of doc.folders ?? []) {
+    if (!folder.title || !matches(folder.title, query)) continue;
+    const firstSection = doc.sections
+      .filter((section) => section.folderId === folder.id)
+      .sort((a, b) => a.order - b.order)[0];
+    pushResult(results, {
+      key: `folder:${folder.id}`,
+      href: firstSection ? buildSectionHref(firstSection.id) : "",
+      sectionId: firstSection?.id ?? "",
+      sectionTitle: firstSection?.title ?? folder.title,
+      folderTitle: folder.title,
+      kind: "folder-title",
+      where: translate(lang, SEARCH_WHERE_KEYS["folder-title"]),
+      snippet: snippetAround(folder.title, query),
+    });
+  }
+}
+
 export interface SearchFocusTarget {
   sectionId: string;
   query: string;
@@ -169,6 +196,7 @@ export function searchDocument(
   if (!q) return [];
 
   const results: GlobalSearchResult[] = [];
+  searchFolders(doc, q, results, lang);
   const sorted = [...doc.sections].sort((a, b) => a.order - b.order);
   for (const section of sorted) {
     searchSection(section, q, results, lang);

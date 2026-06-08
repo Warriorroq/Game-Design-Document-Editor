@@ -42,7 +42,11 @@ function AppMain({
   updateDoc,
   updateSection,
   addSection,
-  reorderSections,
+  addFolder,
+  updateFolder,
+  toggleFolderCollapsed,
+  removeFolder,
+  reorderSidebar,
   removeSection,
   updateBoardItem,
   addBoardItem,
@@ -97,6 +101,10 @@ function AppMain({
   const handleSelectSearchResult = useCallback(
     (result: GlobalSearchResult) => {
       const q = searchQuery.trim();
+      if (!result.sectionId) {
+        setSearchFocus(null);
+        return;
+      }
       navigateToHref(result.href);
       if (!q) {
         setSearchFocus(null);
@@ -264,12 +272,17 @@ function AppMain({
         <div className="app-body">
           <Sidebar
             hidden={!sidebarVisible}
+            folders={doc.folders ?? []}
             sections={doc.sections}
             activeId={activeSectionId}
             onSelect={setActiveSectionId}
-            onAdd={addSection}
+            onAddSection={addSection}
+            onAddFolder={addFolder}
             onRemove={removeSection}
-            onReorder={reorderSections}
+            onRemoveFolder={removeFolder}
+            onUpdateFolder={updateFolder}
+            onToggleFolder={toggleFolderCollapsed}
+            onReorder={reorderSidebar}
           />
           <div ref={mainRef} className="main-panel">
             <PanelSplitter

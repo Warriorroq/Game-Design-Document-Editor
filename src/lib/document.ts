@@ -1,5 +1,43 @@
 import { ensureHtmlContent } from "./editorContent";
-import type { BoardItem, GddDocument } from "../types";
+import type { BoardItem, GddDocument, GddSection, GddSectionFolder } from "../types";
+
+function parentKey(folderId: string | null | undefined): string {
+  return folderId ?? "";
+}
+
+function renumberSectionsInParent(
+  sections: GddDocument["sections"],
+  folderId: string | null
+): GddDocument["sections"] {
+  const siblings = sections
+    .filter((section) => parentKey(section.folderId) === parentKey(folderId))
+    .sort((a, b) => a.order - b.order);
+  const orderMap = new Map(siblings.map((section, index) => [section.id, index]));
+  return sections.map((section) => {
+    const order = orderMap.get(section.id);
+    return order !== undefined ? { ...section, order } : section;
+  });
+}
+
+function normalizeFolders(
+  folders: GddSectionFolder[] | undefined
+): GddSectionFolder[] {
+  const normalized = (folders ?? []).map((folder) => ({
+    ...folder,
+    title: folder.title || "Folder",
+  }));
+  const folderIds = new Set(normalized.map((folder) => folder.id));
+  return normalized.map((folder) => {
+    if (
+      folder.parentFolderId &&
+      (!folderIds.has(folder.parentFolderId) ||
+        folder.parentFolderId === folder.id)
+    ) {
+      return { ...folder, parentFolderId: undefined };
+    }
+    return folder;
+  });
+}
 
 export function normalizeDocument(doc: GddDocument & { board?: BoardItem[] }): GddDocument {
   const legacyBoard = Array.isArray(doc.board) ? doc.board : [];
@@ -16,6 +54,10 @@ export function normalizeDocument(doc: GddDocument & { board?: BoardItem[] }): G
       memberTextIds: Array.isArray(g.memberTextIds) ? g.memberTextIds : [],
       memberStrokeIds: Array.isArray(g.memberStrokeIds) ? g.memberStrokeIds : [],
     }));
+    const folderId =
+      s.folderId && Array.isArray(doc.folders) && doc.folders.some((f) => f.id === s.folderId)
+        ? s.folderId
+        : undefined;
     return {
       ...s,
       board,
@@ -23,6 +65,7 @@ export function normalizeDocument(doc: GddDocument & { board?: BoardItem[] }): G
       texts,
       strokes,
       groups,
+      folderId,
       content: ensureHtmlContent(s.content),
     };
   });
@@ -32,7 +75,20 @@ export function normalizeDocument(doc: GddDocument & { board?: BoardItem[] }): G
   }
 
   const { board: _removed, ...rest } = doc;
-  return { ...rest, sections };
+  const folders = normalizeFolders(doc.folders);
+  const folderIds = new Set(folders.map((folder) => folder.id));
+  let normalizedSections: GddSection[] = sections.map((section) =>
+    section.folderId && !folderIds.has(section.folderId)
+      ? { ...section, folderId: undefined }
+      : section
+  );
+
+  for (const folderId of folderIds) {
+    normalizedSections = renumberSectionsInParent(normalizedSections, folderId);
+  }
+  normalizedSections = renumberSectionsInParent(normalizedSections, null);
+
+  return { ...rest, folders, sections: normalizedSections };
 }
 
 const STORAGE_KEY = "gdd-editor-document";
@@ -43,6 +99,7 @@ export function createDocument(): GddDocument {
     title: "Untitled Game",
     subtitle: "Game Design Document",
     lastModified: new Date().toISOString(),
+    folders: [],
     sections: [],
   };
 }

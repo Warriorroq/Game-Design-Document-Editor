@@ -1,8 +1,8 @@
 import { normalizeDocument } from "./document";
-import type { BoardItem, GddDocument, GddSection } from "../types";
+import type { BoardItem, GddDocument, GddSection, GddSectionFolder } from "../types";
 
 export const FOLDER_FORMAT = "gdd-editor-folder" as const;
-export const FOLDER_VERSION = 1;
+export const FOLDER_VERSION = 2;
 export const MANIFEST_FILE = "gdd.json";
 export const SECTIONS_DIR = "sections";
 export const ASSETS_DIR = "assets";
@@ -31,6 +31,14 @@ interface ManifestSectionRef {
   order: number;
 }
 
+interface ManifestFolderRef {
+  id: string;
+  title: string;
+  order: number;
+  parentFolderId?: string;
+  collapsed?: boolean;
+}
+
 interface ManifestFile {
   format: typeof FOLDER_FORMAT;
   version: number;
@@ -38,6 +46,7 @@ interface ManifestFile {
   title: string;
   subtitle: string;
   lastModified: string;
+  folders?: ManifestFolderRef[];
   sections: ManifestSectionRef[];
 }
 
@@ -60,6 +69,7 @@ interface SectionFile {
   description: string;
   content: string;
   order: number;
+  folderId?: string;
   board: SectionFileBoardItem[];
   shapes: GddSection["shapes"];
   strokes: GddSection["strokes"];
@@ -175,6 +185,7 @@ export function documentToFolderPayload(doc: GddDocument): FolderProjectPayload 
       description: section.description,
       content: section.content,
       order: section.order,
+      folderId: section.folderId,
       board: section.board.map((item) => boardItemToFile(item, assets)),
       shapes: section.shapes,
       strokes: section.strokes,
@@ -196,6 +207,13 @@ export function documentToFolderPayload(doc: GddDocument): FolderProjectPayload 
     title: updated.title,
     subtitle: updated.subtitle,
     lastModified: updated.lastModified,
+    folders: (updated.folders ?? []).map((folder) => ({
+      id: folder.id,
+      title: folder.title,
+      order: folder.order,
+      parentFolderId: folder.parentFolderId,
+      collapsed: folder.collapsed,
+    })),
     sections: sorted.map((section) => ({
       id: section.id,
       file: sectionFilePath(section.id),
@@ -248,6 +266,7 @@ export function folderPayloadToDocument(payload: FolderProjectPayload): GddDocum
         description: sectionFile.description,
         content: sectionFile.content,
         order: sectionFile.order,
+        folderId: sectionFile.folderId,
         board: sectionFile.board.map((item) => boardItemFromFile(item, assetMap)),
         shapes: sectionFile.shapes ?? [],
         strokes: sectionFile.strokes ?? [],
@@ -261,6 +280,15 @@ export function folderPayloadToDocument(payload: FolderProjectPayload): GddDocum
     title: manifest.title,
     subtitle: manifest.subtitle,
     lastModified: manifest.lastModified,
+    folders: (manifest.folders ?? []).map(
+      (folder): GddSectionFolder => ({
+        id: folder.id,
+        title: folder.title,
+        order: folder.order,
+        parentFolderId: folder.parentFolderId,
+        collapsed: folder.collapsed,
+      })
+    ),
     sections,
   });
 }

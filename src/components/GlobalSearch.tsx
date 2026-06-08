@@ -107,7 +107,15 @@ export function GlobalSearch({
                 onClick={() => onSelectResult(result)}
               >
                 <span className="global-search-item-where">{result.where}</span>
-                <span className="global-search-item-section">{result.sectionTitle}</span>
+                <span className="global-search-item-section">
+                  {result.folderTitle &&
+                  result.kind !== "folder-title" &&
+                  result.sectionTitle
+                    ? `${result.folderTitle} / ${result.sectionTitle}`
+                    : result.folderTitle && result.kind === "folder-title"
+                      ? result.folderTitle
+                      : result.sectionTitle}
+                </span>
                 <span className="global-search-item-snippet">
                   <SnippetHighlight snippet={result.snippet} query={query} />
                 </span>

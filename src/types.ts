@@ -65,12 +65,21 @@ export interface BoardGroup {
   memberStrokeIds: string[];
 }
 
+export interface GddSectionFolder {
+  id: string;
+  title: string;
+  order: number;
+  parentFolderId?: string;
+  collapsed?: boolean;
+}
+
 export interface GddSection {
   id: string;
   title: string;
   description: string;
   content: string;
   order: number;
+  folderId?: string;
   board: BoardItem[];
   shapes: BoardShape[];
   strokes: BoardStroke[];
@@ -97,5 +106,6 @@ export interface GddDocument {
   title: string;
   subtitle: string;
   lastModified: string;
+  folders?: GddSectionFolder[];
   sections: GddSection[];
 }
