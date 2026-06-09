@@ -122,6 +122,10 @@
   cursor: crosshair;
 }
 
+.board-surface--draw .board-canvas * {
+  pointer-events: none !important;
+}
+
 .board-shapes-layer {
   position: absolute;
   inset: 0;

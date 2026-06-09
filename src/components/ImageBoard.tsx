@@ -1209,6 +1209,7 @@ export function ImageBoard({
 
   const startItemRotate = (e: React.PointerEvent, item: BoardItem) => {
     if (item.locked) return;
+    if (isDrawing && e.button === 0) return;
     e.stopPropagation();
     e.preventDefault();
     onBeginTransientEdit?.();
@@ -1496,6 +1497,54 @@ export function ImageBoard({
     surfaceRef.current?.setPointerCapture(e.pointerId);
   };
 
+  const tryStartDrawing = useCallback(
+    (e: React.PointerEvent): boolean => {
+      if (!isDrawing) return false;
+      const target = e.target as HTMLElement;
+      if (!target.closest(".board-canvas")) return false;
+
+      if (activeTool === "pen") {
+        e.preventDefault();
+        const world = screenToWorld(e.clientX, e.clientY);
+        const start = { x: world.x, y: world.y };
+        penSession.current = { points: [start] };
+        setPenPreview({ points: [start], color: penColor, width: penWidth });
+        clearSelection();
+        surfaceRef.current?.setPointerCapture(e.pointerId);
+        return true;
+      }
+
+      if (activeTool && isShapeTool(activeTool)) {
+        e.preventDefault();
+        const world = screenToWorld(e.clientX, e.clientY);
+        const start = snapBoardPoint(world.x, world.y, items);
+        drawSession.current = { type: activeTool, start };
+        setDrawPreview({ type: activeTool, start, end: start });
+        clearSelection();
+        surfaceRef.current?.setPointerCapture(e.pointerId);
+        return true;
+      }
+
+      return false;
+    },
+    [
+      isDrawing,
+      activeTool,
+      screenToWorld,
+      penColor,
+      penWidth,
+      clearSelection,
+      items,
+    ]
+  );
+
+  const onSurfacePointerDownCapture = (e: React.PointerEvent) => {
+    if (e.button !== 0) return;
+    if (tryStartDrawing(e)) {
+      e.stopPropagation();
+    }
+  };
+
   const onSurfacePointerDown = (e: React.PointerEvent) => {
     const target = e.target as HTMLElement;
     const onCanvas = Boolean(target.closest(".board-canvas"));
@@ -1517,39 +1566,18 @@ export function ImageBoard({
 
     if (e.button !== 0) return;
 
+    if (isDrawing) return;
+
     if (
-      !isDrawing &&
-      (target.closest(".board-item") ||
-        target.closest(".board-shape-handle") ||
-        target.closest(".board-text") ||
-        target.closest(".board-stroke"))
+      target.closest(".board-item") ||
+      target.closest(".board-shape-handle") ||
+      target.closest(".board-text") ||
+      target.closest(".board-stroke")
     ) {
       return;
     }
 
     if (!onCanvas) return;
-
-    if (activeTool === "pen") {
-      e.preventDefault();
-      const world = screenToWorld(e.clientX, e.clientY);
-      const start = { x: world.x, y: world.y };
-      penSession.current = { points: [start] };
-      setPenPreview({ points: [start], color: penColor, width: penWidth });
-      clearSelection();
-      surfaceRef.current?.setPointerCapture(e.pointerId);
-      return;
-    }
-
-    if (activeTool && isShapeTool(activeTool)) {
-      e.preventDefault();
-      const world = screenToWorld(e.clientX, e.clientY);
-      const start = snapBoardPoint(world.x, world.y, items);
-      drawSession.current = { type: activeTool, start };
-      setDrawPreview({ type: activeTool, start, end: start });
-      clearSelection();
-      surfaceRef.current?.setPointerCapture(e.pointerId);
-      return;
-    }
 
     const world = screenToWorld(e.clientX, e.clientY);
     marqueeSession.current = {
@@ -1712,10 +1740,11 @@ export function ImageBoard({
 
       <div
         ref={surfaceRef}
-        className={`board-surface ${pasteHint ? "paste-ready" : ""} ${penMode || (activeTool && isShapeTool(activeTool)) ? "board-surface--draw" : ""}`}
+        className={`board-surface ${pasteHint ? "paste-ready" : ""} ${isDrawing ? "board-surface--draw" : ""}`}
         tabIndex={0}
         onFocus={() => setPasteHint(true)}
         onBlur={() => setPasteHint(false)}
+        onPointerDownCapture={onSurfacePointerDownCapture}
         onPointerDown={onSurfacePointerDown}
         onPointerMove={onSurfacePointerMove}
         onPointerUp={onSurfacePointerUp}

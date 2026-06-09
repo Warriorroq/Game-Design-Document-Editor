@@ -2,7 +2,7 @@
 
 Local-first editor for game design documents: structured sections, rich text, image boards, export.
 
-**Version:** 0.0.502
+**Version:** 0.0.510
 
 ## What you get
 
