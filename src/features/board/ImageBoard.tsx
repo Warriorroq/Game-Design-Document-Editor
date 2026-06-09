@@ -336,6 +336,8 @@ export function ImageBoard({
     );
     if (!clip) return;
     onStoreDeskClipboard(clip);
+    // Replace any stale image in the system clipboard so paste prefers desk content.
+    void navigator.clipboard.writeText("").catch(() => {});
   }, [items, shapes, texts, strokes, groups, selection, onStoreDeskClipboard]);
 
   const pasteDesk = useCallback(() => {
@@ -727,15 +729,16 @@ export function ImageBoard({
 
   const handlePaste = useCallback(
     async (e: ClipboardEvent) => {
+      const blob = getImageFromClipboard(e.clipboardData!);
+      if (blob) {
+        e.preventDefault();
+        await placeImage(blob);
+        return;
+      }
       if (isDeskFocused() && deskClipboard) {
         e.preventDefault();
         pasteDesk();
-        return;
       }
-      const blob = getImageFromClipboard(e.clipboardData!);
-      if (!blob) return;
-      e.preventDefault();
-      await placeImage(blob);
     },
     [deskClipboard, isDeskFocused, pasteDesk, placeImage]
   );
@@ -844,14 +847,6 @@ export function ImageBoard({
         return;
       }
 
-      if (shortcutMatches("desk.paste", e) && desk) {
-        if (deskClipboard) {
-          e.preventDefault();
-          pasteDesk();
-        }
-        return;
-      }
-
       if (mod && e.shiftKey && e.key === "g" && desk && canUngroup) {
         e.preventDefault();
         ungroupSelection();
@@ -910,8 +905,6 @@ export function ImageBoard({
     shortcutMatches,
     groupSelection,
     isDeskFocused,
-    deskClipboard,
-    pasteDesk,
     selectionSize,
     ungroupSelection,
     editingTextId,
