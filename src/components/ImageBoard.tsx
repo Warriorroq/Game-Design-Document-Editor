@@ -114,6 +114,9 @@ interface ImageBoardProps {
   ) => void;
   onBeginTransientEdit?: () => void;
   onEndTransientEdit?: () => void;
+  resolveItemSrc: (item: BoardItem) => string;
+  deskClipboard: DeskClipboard | null;
+  onStoreDeskClipboard: (clip: DeskClipboard | null) => void;
 }
 
 const DEFAULT_PLACE = { x: 120, y: 120 };
@@ -180,6 +183,9 @@ export function ImageBoard({
   onReorderLayer,
   onBeginTransientEdit,
   onEndTransientEdit,
+  resolveItemSrc,
+  deskClipboard,
+  onStoreDeskClipboard,
 }: ImageBoardProps) {
   const { t } = useLocale();
   const { width: canvasWidth, height: canvasHeight } = useBoardSize();
@@ -189,7 +195,6 @@ export function ImageBoard({
   const surfaceSizeRef = useRef({ w: 0, h: 0 });
   const pasteCount = useRef(0);
   const cursorRef = useRef({ x: DEFAULT_PLACE.x, y: DEFAULT_PLACE.y });
-  const deskClipboardRef = useRef<DeskClipboard | null>(null);
   const panSession = useRef<{
     startX: number;
     startY: number;
@@ -283,7 +288,7 @@ export function ImageBoard({
   const canGroup = selectionSize >= 2;
   const canUngroup = groupsTouchingSelection(groups, selection).length > 0;
   const canCopy = selectionSize > 0;
-  const canPasteDesk = Boolean(deskClipboardRef.current);
+  const canPasteDesk = Boolean(deskClipboard);
 
   const clearSelection = useCallback(() => {
     setSelection(EMPTY_SELECTION);
@@ -330,15 +335,12 @@ export function ImageBoard({
       selection
     );
     if (!clip) return;
-    deskClipboardRef.current = clip;
-  }, [items, shapes, texts, strokes, groups, selection]);
+    onStoreDeskClipboard(clip);
+  }, [items, shapes, texts, strokes, groups, selection, onStoreDeskClipboard]);
 
   const pasteDesk = useCallback(() => {
-    if (!deskClipboardRef.current) return;
-    const result = pasteDeskClipboard(
-      deskClipboardRef.current,
-      cursorRef.current
-    );
+    if (!deskClipboard) return;
+    const result = pasteDeskClipboard(deskClipboard, cursorRef.current);
     onPasteDesk({
       items: result.items,
       shapes: result.shapes,
@@ -348,7 +350,7 @@ export function ImageBoard({
     });
     setSelection(result.selection);
     surfaceRef.current?.focus();
-  }, [onPasteDesk]);
+  }, [deskClipboard, onPasteDesk]);
 
   const groupSelection = useCallback(() => {
     if (selectionSize < 2) return;
@@ -725,7 +727,7 @@ export function ImageBoard({
 
   const handlePaste = useCallback(
     async (e: ClipboardEvent) => {
-      if (isDeskFocused() && deskClipboardRef.current) {
+      if (isDeskFocused() && deskClipboard) {
         e.preventDefault();
         pasteDesk();
         return;
@@ -735,7 +737,7 @@ export function ImageBoard({
       e.preventDefault();
       await placeImage(blob);
     },
-    [isDeskFocused, pasteDesk, placeImage]
+    [deskClipboard, isDeskFocused, pasteDesk, placeImage]
   );
 
   const handleDrop = useCallback(
@@ -843,7 +845,7 @@ export function ImageBoard({
       }
 
       if (shortcutMatches("desk.paste", e) && desk) {
-        if (deskClipboardRef.current) {
+        if (deskClipboard) {
           e.preventDefault();
           pasteDesk();
         }
@@ -908,6 +910,7 @@ export function ImageBoard({
     shortcutMatches,
     groupSelection,
     isDeskFocused,
+    deskClipboard,
     pasteDesk,
     selectionSize,
     ungroupSelection,
@@ -1818,7 +1821,7 @@ export function ImageBoard({
                 >
                   <div className="board-item-frame" aria-hidden />
                   <div className="board-item-visual">
-                    <img src={item.src} alt="" draggable={false} />
+                    <img src={resolveItemSrc(item)} alt="" draggable={false} />
                   </div>
                   <div className="board-item-handles">
                     <button

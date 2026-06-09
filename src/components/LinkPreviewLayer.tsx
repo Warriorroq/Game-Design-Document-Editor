@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useLocale } from "../context/LocaleContext";
 import { useLinkContext } from "../context/LinkContext";
+import { resolveBoardItemSrc } from "../lib/boardImageRegistry";
 import {
   findBoardItem,
   findBoardText,
@@ -110,7 +111,7 @@ export function LinkPreviewLayer() {
   } else if (link.type === "media") {
     const item = findBoardItem(doc, link.sectionId, link.itemId);
     body = item ? (
-      <img src={item.src} alt="" className="link-preview-image" />
+      <img src={resolveBoardItemSrc(doc, item)} alt="" className="link-preview-image" />
     ) : (
       <p className="link-preview-fallback">{t("link.imageNotFound")}</p>
     );

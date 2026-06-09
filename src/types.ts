@@ -87,9 +87,18 @@ export interface GddSection {
   groups: BoardGroup[];
 }
 
-export interface BoardItem {
+/** Shared image in the document flyweight registry (`GddDocument.boardImages`). */
+export interface BoardImageAsset {
   id: string;
   src: string;
+}
+
+export interface BoardItem {
+  id: string;
+  /** Reference to a shared entry in `boardImages`. */
+  assetId?: string;
+  /** Inline source for new pastes; migrated into `boardImages` on add/load. */
+  src?: string;
   x: number;
   y: number;
   width: number;
@@ -107,5 +116,7 @@ export interface GddDocument {
   subtitle: string;
   lastModified: string;
   folders?: GddSectionFolder[];
+  /** Shared board image registry keyed by asset id. */
+  boardImages?: Record<string, BoardImageAsset>;
   sections: GddSection[];
 }

@@ -1,3 +1,4 @@
+import { migrateBoardImages } from "./boardImageRegistry";
 import { ensureHtmlContent } from "./editorContent";
 import type { BoardItem, GddDocument, GddSection, GddSectionFolder } from "../types";
 
@@ -88,7 +89,7 @@ export function normalizeDocument(doc: GddDocument & { board?: BoardItem[] }): G
   }
   normalizedSections = renumberSectionsInParent(normalizedSections, null);
 
-  return { ...rest, folders, sections: normalizedSections };
+  return migrateBoardImages({ ...rest, folders, sections: normalizedSections });
 }
 
 const STORAGE_KEY = "gdd-editor-document";

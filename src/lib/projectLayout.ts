@@ -1,5 +1,17 @@
+import {
+  assetIdFromAssetPath,
+  collectBoardImageAsset,
+  migrateBoardImages,
+  resolveBoardItemSrc,
+} from "./boardImageRegistry";
 import { normalizeDocument } from "./document";
-import type { BoardItem, GddDocument, GddSection, GddSectionFolder } from "../types";
+import type {
+  BoardImageAsset,
+  BoardItem,
+  GddDocument,
+  GddSection,
+  GddSectionFolder,
+} from "../types";
 
 export const FOLDER_FORMAT = "gdd-editor-folder" as const;
 export const FOLDER_VERSION = 2;
@@ -102,22 +114,33 @@ function sectionFilePath(sectionId: string): string {
   return `${SECTIONS_DIR}/${sectionId}.json`;
 }
 
-function assetFilePath(itemId: string, mime: string): string {
-  return `${ASSETS_DIR}/${itemId}.${extensionForMime(mime)}`;
+function assetFilePath(assetId: string, mime: string): string {
+  return `${ASSETS_DIR}/${assetId}.${extensionForMime(mime)}`;
 }
 
 function boardItemToFile(
+  doc: GddDocument,
   item: BoardItem,
   assets: Map<string, FolderAsset>
 ): SectionFileBoardItem {
-  const parsed = parseDataUrl(item.src);
+  const src = resolveBoardItemSrc(doc, item);
+  const assetId =
+    item.assetId ??
+    Object.entries(doc.boardImages ?? {}).find(([, asset]) => asset.src === src)?.[0];
+  if (!assetId) {
+    throw new Error(`Board item ${item.id} has no asset id`);
+  }
+
+  const parsed = parseDataUrl(src);
   if (parsed) {
-    const path = assetFilePath(item.id, parsed.mime);
-    assets.set(path, {
-      path,
-      mime: parsed.mime,
-      dataBase64: parsed.dataBase64,
-    });
+    const path = assetFilePath(assetId, parsed.mime);
+    if (!assets.has(path)) {
+      assets.set(path, {
+        path,
+        mime: parsed.mime,
+        dataBase64: parsed.dataBase64,
+      });
+    }
     return {
       id: item.id,
       asset: path,
@@ -132,10 +155,10 @@ function boardItemToFile(
     };
   }
 
-  if (item.src.startsWith(`${ASSETS_DIR}/`)) {
+  if (src.startsWith(`${ASSETS_DIR}/`)) {
     return {
       id: item.id,
-      asset: item.src,
+      asset: src,
       x: item.x,
       y: item.y,
       width: item.width,
@@ -152,15 +175,19 @@ function boardItemToFile(
 
 function boardItemFromFile(
   item: SectionFileBoardItem,
-  assetMap: Map<string, FolderAsset>
+  assetMap: Map<string, FolderAsset>,
+  registry: Record<string, BoardImageAsset>
 ): BoardItem {
   const asset = assetMap.get(item.asset);
   if (!asset) {
     throw new Error(`Missing asset file: ${item.asset}`);
   }
+  const assetId = assetIdFromAssetPath(item.asset);
+  const src = dataUrlFromBase64(asset.mime, asset.dataBase64);
+  collectBoardImageAsset(registry, assetId, src);
   return {
     id: item.id,
-    src: dataUrlFromBase64(asset.mime, asset.dataBase64),
+    assetId,
     x: item.x,
     y: item.y,
     width: item.width,
@@ -173,7 +200,10 @@ function boardItemFromFile(
 }
 
 export function documentToFolderPayload(doc: GddDocument): FolderProjectPayload {
-  const updated = { ...doc, lastModified: new Date().toISOString() };
+  const updated = migrateBoardImages({
+    ...doc,
+    lastModified: new Date().toISOString(),
+  });
   const assets = new Map<string, FolderAsset>();
   const sections: FolderSectionEntry[] = [];
 
@@ -186,7 +216,7 @@ export function documentToFolderPayload(doc: GddDocument): FolderProjectPayload 
       content: section.content,
       order: section.order,
       folderId: section.folderId,
-      board: section.board.map((item) => boardItemToFile(item, assets)),
+      board: section.board.map((item) => boardItemToFile(updated, item, assets)),
       shapes: section.shapes,
       strokes: section.strokes,
       texts: section.texts,
@@ -241,6 +271,7 @@ export function folderPayloadToDocument(payload: FolderProjectPayload): GddDocum
   }
 
   const assetMap = new Map(payload.assets.map((asset) => [asset.path, asset]));
+  const boardImages: Record<string, BoardImageAsset> = {};
   const sectionById = new Map(
     payload.sections.map((entry) => [entry.id, entry.content])
   );
@@ -267,7 +298,9 @@ export function folderPayloadToDocument(payload: FolderProjectPayload): GddDocum
         content: sectionFile.content,
         order: sectionFile.order,
         folderId: sectionFile.folderId,
-        board: sectionFile.board.map((item) => boardItemFromFile(item, assetMap)),
+        board: sectionFile.board.map((item) =>
+          boardItemFromFile(item, assetMap, boardImages)
+        ),
         shapes: sectionFile.shapes ?? [],
         strokes: sectionFile.strokes ?? [],
         texts: sectionFile.texts ?? [],
@@ -280,6 +313,7 @@ export function folderPayloadToDocument(payload: FolderProjectPayload): GddDocum
     title: manifest.title,
     subtitle: manifest.subtitle,
     lastModified: manifest.lastModified,
+    boardImages,
     folders: (manifest.folders ?? []).map(
       (folder): GddSectionFolder => ({
         id: folder.id,

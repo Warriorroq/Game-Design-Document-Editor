@@ -16,7 +16,12 @@ import {
   removeSectionFromDoc,
   type SidebarDropTarget,
 } from "../lib/sidebarOrder";
-import type { DeskSelection } from "../lib/deskClipboard";
+import {
+  prepareBoardItemForDoc,
+  prepareBoardItemsForDoc,
+  pruneUnusedBoardImages,
+} from "../lib/boardImageRegistry";
+import type { DeskClipboard, DeskSelection } from "../lib/deskClipboard";
 import type {
   BoardGroup,
   BoardItem,
@@ -46,6 +51,7 @@ export function useGddDocument() {
   const [activeSectionId, setActiveSectionId] = useState<string>(
     () => doc.sections[0]?.id ?? ""
   );
+  const [deskClipboard, setDeskClipboard] = useState<DeskClipboard | null>(null);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const docRef = useRef(doc);
   const undoStack = useRef<GddDocument[]>([]);
@@ -297,36 +303,40 @@ export function useGddDocument() {
 
   const addBoardItem = useCallback(
     (sectionId: string, item: BoardItem) => {
-      mutateDoc((prev) => ({
-        ...prev,
-        sections: prev.sections.map((s) =>
-          s.id === sectionId ? { ...s, board: [...s.board, item] } : s
-        ),
-      }));
+      mutateDoc((prev) => {
+        const { doc: withAsset, item: normalized } = prepareBoardItemForDoc(prev, item);
+        return {
+          ...withAsset,
+          sections: withAsset.sections.map((s) =>
+            s.id === sectionId ? { ...s, board: [...s.board, normalized] } : s
+          ),
+        };
+      });
     },
     [mutateDoc]
   );
 
   const removeBoardItem = useCallback(
     (sectionId: string, itemId: string) => {
-      mutateDoc((prev) => ({
-        ...prev,
-        sections: prev.sections.map((s) =>
-          s.id === sectionId
-            ? {
-                ...s,
-                board: s.board.filter((item) => item.id !== itemId),
-                groups: removeMembersFromGroups(s.groups, [itemId], [], [], []),
-                shapes: s.shapes.map((shape) => ({
-                  ...shape,
-                  start:
-                    shape.start.attach?.itemId === itemId
-                      ? { x: shape.start.x, y: shape.start.y }
-                      : shape.start,
-                  end:
-                    shape.end.attach?.itemId === itemId
-                      ? { x: shape.end.x, y: shape.end.y }
-                      : shape.end,
+      mutateDoc((prev) =>
+        pruneUnusedBoardImages({
+          ...prev,
+          sections: prev.sections.map((s) =>
+            s.id === sectionId
+              ? {
+                  ...s,
+                  board: s.board.filter((item) => item.id !== itemId),
+                  groups: removeMembersFromGroups(s.groups, [itemId], [], [], []),
+                  shapes: s.shapes.map((shape) => ({
+                    ...shape,
+                    start:
+                      shape.start.attach?.itemId === itemId
+                        ? { x: shape.start.x, y: shape.start.y }
+                        : shape.start,
+                    end:
+                      shape.end.attach?.itemId === itemId
+                        ? { x: shape.end.x, y: shape.end.y }
+                        : shape.end,
                 })),
               }
             : s
@@ -548,21 +558,24 @@ export function useGddDocument() {
         groups: BoardGroup[];
       }
     ) => {
-      mutateDoc((prev) => ({
-        ...prev,
-        sections: prev.sections.map((s) =>
-          s.id === sectionId
-            ? {
-                ...s,
-                board: [...s.board, ...payload.items],
-                shapes: [...s.shapes, ...payload.shapes],
-                texts: [...s.texts, ...payload.texts],
-                strokes: [...s.strokes, ...payload.strokes],
-                groups: [...s.groups, ...payload.groups],
-              }
-            : s
-        ),
-      }));
+      mutateDoc((prev) => {
+        const { doc: withAssets, items } = prepareBoardItemsForDoc(prev, payload.items);
+        return {
+          ...withAssets,
+          sections: withAssets.sections.map((s) =>
+            s.id === sectionId
+              ? {
+                  ...s,
+                  board: [...s.board, ...items],
+                  shapes: [...s.shapes, ...payload.shapes],
+                  texts: [...s.texts, ...payload.texts],
+                  strokes: [...s.strokes, ...payload.strokes],
+                  groups: [...s.groups, ...payload.groups],
+                }
+              : s
+          ),
+        };
+      });
     },
     [mutateDoc]
   );
@@ -608,40 +621,42 @@ export function useGddDocument() {
       const shapeSet = new Set(shapeIds);
       const textSet = new Set(textIds);
       const strokeSet = new Set(strokeIds);
-      mutateDoc((prev) => ({
-        ...prev,
-        sections: prev.sections.map((s) => {
-          if (s.id !== sectionId) return s;
-          return {
-            ...s,
-            board: s.board.filter((item) => !itemSet.has(item.id)),
-            texts: s.texts.filter((t) => !textSet.has(t.id)),
-            strokes: s.strokes.filter((st) => !strokeSet.has(st.id)),
-            shapes: s.shapes
-              .filter((sh) => !shapeSet.has(sh.id))
-              .map((shape) => ({
-                ...shape,
-                start:
-                  shape.start.attach?.itemId &&
-                  itemSet.has(shape.start.attach.itemId)
-                    ? { x: shape.start.x, y: shape.start.y }
-                    : shape.start,
-                end:
-                  shape.end.attach?.itemId &&
-                  itemSet.has(shape.end.attach.itemId)
-                    ? { x: shape.end.x, y: shape.end.y }
-                    : shape.end,
-              })),
-            groups: removeMembersFromGroups(
-              s.groups,
-              itemIds,
-              shapeIds,
-              textIds,
-              strokeIds
-            ),
-          };
-        }),
-      }));
+      mutateDoc((prev) =>
+        pruneUnusedBoardImages({
+          ...prev,
+          sections: prev.sections.map((s) => {
+            if (s.id !== sectionId) return s;
+            return {
+              ...s,
+              board: s.board.filter((item) => !itemSet.has(item.id)),
+              texts: s.texts.filter((t) => !textSet.has(t.id)),
+              strokes: s.strokes.filter((st) => !strokeSet.has(st.id)),
+              shapes: s.shapes
+                .filter((sh) => !shapeSet.has(sh.id))
+                .map((shape) => ({
+                  ...shape,
+                  start:
+                    shape.start.attach?.itemId &&
+                    itemSet.has(shape.start.attach.itemId)
+                      ? { x: shape.start.x, y: shape.start.y }
+                      : shape.start,
+                  end:
+                    shape.end.attach?.itemId &&
+                    itemSet.has(shape.end.attach.itemId)
+                      ? { x: shape.end.x, y: shape.end.y }
+                      : shape.end,
+                })),
+              groups: removeMembersFromGroups(
+                s.groups,
+                itemIds,
+                shapeIds,
+                textIds,
+                strokeIds
+              ),
+            };
+          }),
+        })
+      );
     },
     [mutateDoc]
   );
@@ -662,6 +677,7 @@ export function useGddDocument() {
       setDoc(next);
       saveDocument(next);
       syncActiveSection(next);
+      setDeskClipboard(null);
     },
     [syncActiveSection]
   );
@@ -669,6 +685,10 @@ export function useGddDocument() {
   const newProject = useCallback(() => {
     replaceDocument(createDocument());
   }, [replaceDocument]);
+
+  const storeDeskClipboard = useCallback((clip: DeskClipboard | null) => {
+    setDeskClipboard(clip);
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -714,6 +734,8 @@ export function useGddDocument() {
     removeBoardStroke,
     addBoardGroup,
     removeBoardGroup,
+    deskClipboard,
+    storeDeskClipboard,
     pasteDeskContent,
     reorderDeskLayerOrder,
     removeDeskSelection,

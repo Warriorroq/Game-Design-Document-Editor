@@ -27,6 +27,7 @@ import {
 } from "./lib/globalSearch";
 import { useSidebarVisible } from "./hooks/useSidebarVisible";
 import { restoreAppFocus } from "./lib/desktop";
+import { resolveBoardItemSrc } from "./lib/boardImageRegistry";
 import { importAsNewProject } from "./lib/document";
 import type { GddDocument } from "./types";
 
@@ -62,6 +63,8 @@ function AppMain({
   removeBoardStroke,
   addBoardGroup,
   removeBoardGroup,
+  deskClipboard,
+  storeDeskClipboard,
   pasteDeskContent,
   reorderDeskLayerOrder,
   removeDeskSelection,
@@ -419,6 +422,9 @@ function AppMain({
                         strokeIds
                       )
                     }
+                    resolveItemSrc={(item) => resolveBoardItemSrc(doc, item)}
+                    deskClipboard={deskClipboard}
+                    onStoreDeskClipboard={storeDeskClipboard}
                     onBeginTransientEdit={beginTransient}
                     onEndTransientEdit={endTransient}
                   />
