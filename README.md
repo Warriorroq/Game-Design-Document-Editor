@@ -24,7 +24,7 @@ my-game/
   assets/
 ```
 
-- **Project** menu - open folder, export/import `.gde` zip archive, demo GDD
+- **Project** menu - open folder, export/import `.gde` zip archive
 - **Git** (in Project menu) - init, commit, push, pull; branch/dirty indicator on the Project button
 - **Settings → Git** - commit author, remote URL, sign-in or Personal Access Token
 

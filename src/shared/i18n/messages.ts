@@ -77,11 +77,8 @@ const en = {
   "project.new": "New project",
   "project.export": "Export archive .gde",
   "project.import": "Import archive .gde",
-  "project.loadDemo": "Load 10 demo sections",
   "project.confirmNew":
     "Start a new empty project? Unsaved changes will be lost and the project folder link will be closed.",
-  "project.confirmDemo":
-    "Open 10 demo sections as a new project? The current project will be replaced.",
   "project.invalidFile": "Please choose a .gde project file.",
   "project.confirmImport":
     "Open this archive as a new project? The current project will be replaced and the project folder link will be closed.",
@@ -379,11 +376,8 @@ const ru: Record<keyof typeof en, string> = {
   "project.new": "Новый проект",
   "project.export": "Экспорт архива .gde",
   "project.import": "Импорт архива .gde",
-  "project.loadDemo": "Загрузить 10 демо-секций",
   "project.confirmNew":
     "Создать новый пустой проект? Несохранённые изменения будут потеряны, связь с папкой проекта закроется.",
-  "project.confirmDemo":
-    "Открыть 10 демо-секций как новый проект? Текущий проект будет заменён.",
   "project.invalidFile": "Выберите файл проекта .gde",
   "project.confirmImport":
     "Открыть архив как новый проект? Текущий проект будет заменён, связь с папкой проекта закроется.",

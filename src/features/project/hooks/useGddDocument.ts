@@ -5,7 +5,6 @@ import {
   normalizeDocument,
   saveDocument,
 } from "@/features/project/lib/document";
-import { createDemoDocument } from "@/features/project/lib/demoDocument";
 import { removeMembersFromGroups } from "@/features/board/lib/deskGroups";
 import { reorderDeskLayer } from "@/features/board/lib/deskLayerOrder";
 import {
@@ -43,10 +42,10 @@ function cloneDoc(doc: GddDocument): GddDocument {
 export function useGddDocument() {
   const [doc, setDoc] = useState<GddDocument>(() => {
     const loaded = loadDocument();
-    if (loaded && loaded.sections.length > 0) return loaded;
-    const demo = createDemoDocument();
-    saveDocument(demo);
-    return demo;
+    if (loaded) return loaded;
+    const fresh = createDocument();
+    saveDocument(fresh);
+    return fresh;
   });
   const [activeSectionId, setActiveSectionId] = useState<string>(
     () => doc.sections[0]?.id ?? ""

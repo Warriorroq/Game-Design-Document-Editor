@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { useLocale } from "@/shared/context/LocaleContext";
-import { createDemoDocument } from "@/features/project/lib/demoDocument";
 import { isDesktopApp } from "@/shared/lib/desktop";
 import { downloadGdeArchive, parseGdeArchive } from "@/features/project/lib/gdeArchive";
 import type { GitStatus } from "@/features/git/lib/git";
@@ -87,13 +86,6 @@ export function ProjectMenu({
 
   const handleNewProject = () => {
     onNewProject?.();
-    setOpen(false);
-  };
-
-  const handleLoadDemo = () => {
-    const ok = window.confirm(t("project.confirmDemo"));
-    if (!ok) return;
-    onImport(createDemoDocument());
     setOpen(false);
   };
 
@@ -192,14 +184,6 @@ export function ProjectMenu({
               onClick={handleImportClick}
             >
               {t("project.import")}
-            </button>
-            <button
-              type="button"
-              className="project-menu-item"
-              role="menuitem"
-              onClick={handleLoadDemo}
-            >
-              {t("project.loadDemo")}
             </button>
 
             {isDesktopApp && (
