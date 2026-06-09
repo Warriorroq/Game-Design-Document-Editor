@@ -174,6 +174,15 @@ export function applyDeskSelectClick(
     };
   }
 
+  const alreadySelected =
+    (kind === "item" && prev.itemIds.includes(id)) ||
+    (kind === "shape" && prev.shapeIds.includes(id)) ||
+    (kind === "text" && prev.textIds.includes(id)) ||
+    (kind === "stroke" && prev.strokeIds.includes(id));
+  if (alreadySelected && selectionCount(prev) > 1) {
+    return prev;
+  }
+
   if (kind === "item") {
     const group = findGroupForItem(groups, id);
     if (group) return selectionFromGroup(group);
