@@ -1,11 +1,11 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import App from "./App";
-import { applyStoredTheme } from "./lib/appTheme";
-import { isDesktopApp } from "./lib/desktop";
-import { applyStoredLanguage } from "./lib/i18n";
-import "./styles/global.css";
-import "./styles/themes.css";
+import App from "@/app/App";
+import { applyStoredTheme } from "@/shared/lib/appTheme";
+import { isDesktopApp } from "@/shared/lib/desktop";
+import { applyStoredLanguage } from "@/shared/i18n";
+import "@/shared/styles/global.css";
+import "@/shared/styles/themes.css";
 
 applyStoredTheme();
 applyStoredLanguage();
