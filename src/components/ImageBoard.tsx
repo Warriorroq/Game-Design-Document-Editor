@@ -67,6 +67,7 @@ import type {
 import "./Board.css";
 
 interface ImageBoardProps {
+  projectId: string;
   sectionId: string;
   items: BoardItem[];
   shapes: BoardShape[];
@@ -150,6 +151,7 @@ function shapeLongEnough(
 }
 
 export function ImageBoard({
+  projectId,
   sectionId,
   items,
   shapes,
@@ -817,7 +819,7 @@ export function ImageBoard({
       )
     );
     clearSelection();
-  }, [sectionId, canvasWidth, canvasHeight, clearSelection]);
+  }, [projectId, sectionId, canvasWidth, canvasHeight, clearSelection]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {

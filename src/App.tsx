@@ -356,6 +356,7 @@ function AppMain({
                 (activeSection ? (
                   <ImageBoard
                     key={activeSection.id}
+                    projectId={doc.id}
                     sectionId={activeSection.id}
                     items={activeSection.board}
                     shapes={activeSection.shapes}

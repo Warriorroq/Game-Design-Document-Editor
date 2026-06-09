@@ -1,4 +1,5 @@
 export const BOARD_MAX_SCALE = 4;
+export const INITIAL_BOARD_SCALE = 1;
 
 export interface BoardViewport {
   scale: number;
@@ -61,8 +62,16 @@ export function fitBoardViewport(
   canvasW: number,
   canvasH: number
 ): BoardViewport {
+  const scale = Math.max(
+    minBoardScale(viewW, viewH, canvasW, canvasH),
+    INITIAL_BOARD_SCALE
+  );
   return constrainBoardViewport(
-    { scale: 1, panX: 0, panY: 0 },
+    {
+      scale,
+      panX: viewW / 2 - (canvasW / 2) * scale,
+      panY: viewH / 2 - (canvasH / 2) * scale,
+    },
     viewW,
     viewH,
     canvasW,
