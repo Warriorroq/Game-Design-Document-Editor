@@ -174,6 +174,7 @@ const en = {
   "search.where.folderTitle": "Folder · title",
   "search.where.anchor": "Editor · block",
   "search.where.deskText": "Desk · label",
+  "search.where.boardImage": "Desk · image",
 
   "sidebar.sections": "Sections",
   "sidebar.addSection": "Add section",
@@ -485,6 +486,7 @@ const ru: Record<keyof typeof en, string> = {
   "search.where.folderTitle": "Папка · название",
   "search.where.anchor": "Редактор · блок",
   "search.where.deskText": "Доска · подпись",
+  "search.where.boardImage": "Доска · изображение",
 
   "sidebar.sections": "Секции",
   "sidebar.addSection": "Добавить секцию",

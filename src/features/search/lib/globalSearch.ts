@@ -1,7 +1,12 @@
+import {
+  displayBoardImageAssetName,
+  listBoardImageAssetDesks,
+} from "@/features/board/lib/boardImageRegistry";
 import type { MessageKey } from "@/shared/i18n";
 import { translate, type AppLanguage } from "@/shared/i18n";
 import {
   buildAnchorHref,
+  buildMediaHref,
   buildSectionHref,
   buildTextHref,
 } from "@/features/links/lib/links";
@@ -13,7 +18,8 @@ export type GlobalSearchMatchKind =
   | "section-content"
   | "folder-title"
   | "anchor"
-  | "desk-text";
+  | "desk-text"
+  | "board-image";
 
 export interface GlobalSearchResult {
   key: string;
@@ -26,6 +32,7 @@ export interface GlobalSearchResult {
   snippet: string;
   anchorId?: string;
   textId?: string;
+  mediaId?: string;
 }
 
 function normalizeWhitespace(text: string): string {
@@ -73,6 +80,7 @@ const SEARCH_WHERE_KEYS: Record<GlobalSearchMatchKind, MessageKey> = {
   "folder-title": "search.where.folderTitle",
   anchor: "search.where.anchor",
   "desk-text": "search.where.deskText",
+  "board-image": "search.where.boardImage",
 };
 
 function searchSection(
@@ -156,6 +164,45 @@ function searchSection(
   }
 }
 
+function searchBoardImages(
+  doc: GddDocument,
+  query: string,
+  results: GlobalSearchResult[],
+  lang: AppLanguage
+) {
+  for (const asset of Object.values(doc.boardImages ?? {})) {
+    const displayName = displayBoardImageAssetName(asset);
+    if (!matches(displayName, query)) continue;
+
+    const desks = listBoardImageAssetDesks(doc, asset.id);
+    if (desks.length === 0) {
+      pushResult(results, {
+        key: `board-image:${asset.id}:unused`,
+        href: "",
+        sectionId: "",
+        sectionTitle: displayName,
+        kind: "board-image",
+        where: translate(lang, SEARCH_WHERE_KEYS["board-image"]),
+        snippet: snippetAround(displayName, query),
+      });
+      continue;
+    }
+
+    for (const desk of desks) {
+      pushResult(results, {
+        key: `board-image:${asset.id}:${desk.sectionId}`,
+        href: buildMediaHref(desk.sectionId, desk.itemId),
+        sectionId: desk.sectionId,
+        sectionTitle: desk.sectionTitle,
+        kind: "board-image",
+        where: translate(lang, SEARCH_WHERE_KEYS["board-image"]),
+        snippet: snippetAround(displayName, query),
+        mediaId: desk.itemId,
+      });
+    }
+  }
+}
+
 function searchFolders(
   doc: GddDocument,
   query: string,
@@ -196,6 +243,7 @@ export function searchDocument(
   if (!q) return [];
 
   const results: GlobalSearchResult[] = [];
+  searchBoardImages(doc, q, results, lang);
   searchFolders(doc, q, results, lang);
   const sorted = [...doc.sections].sort((a, b) => a.order - b.order);
   for (const section of sorted) {
