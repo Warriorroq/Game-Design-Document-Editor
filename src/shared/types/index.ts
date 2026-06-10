@@ -91,6 +91,8 @@ export interface GddSection {
 export interface BoardImageAsset {
   id: string;
   src: string;
+  /** Display name; `id` is the stable internal key. */
+  name?: string;
 }
 
 export interface BoardItem {

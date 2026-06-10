@@ -22,6 +22,7 @@ interface ProjectMenuProps {
   onRefreshGitStatus?: () => void;
   onAfterGitPull?: () => void;
   onFlushProject?: () => Promise<void>;
+  onOpenImageAssets?: () => void;
 }
 
 export function ProjectMenu({
@@ -36,6 +37,7 @@ export function ProjectMenu({
   onRefreshGitStatus,
   onAfterGitPull,
   onFlushProject,
+  onOpenImageAssets,
 }: ProjectMenuProps) {
   const { t } = useLocale();
   const [open, setOpen] = useState(false);
@@ -91,6 +93,11 @@ export function ProjectMenu({
 
   const handleOpenFolder = () => {
     onOpenFolder?.();
+    setOpen(false);
+  };
+
+  const handleOpenImageAssets = () => {
+    onOpenImageAssets?.();
     setOpen(false);
   };
 
@@ -185,6 +192,16 @@ export function ProjectMenu({
             >
               {t("project.import")}
             </button>
+            {onOpenImageAssets && (
+              <button
+                type="button"
+                className="project-menu-item"
+                role="menuitem"
+                onClick={handleOpenImageAssets}
+              >
+                {t("project.imageAssets")}
+              </button>
+            )}
 
             {isDesktopApp && (
               <>

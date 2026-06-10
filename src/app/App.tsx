@@ -27,6 +27,7 @@ import {
 } from "@/features/search/lib/globalSearch";
 import { useSidebarVisible } from "@/shared/hooks/useSidebarVisible";
 import { restoreAppFocus } from "@/shared/lib/desktop";
+import { BoardAssetsDialog } from "@/features/board/components/BoardAssetsDialog";
 import { resolveBoardItemSrc } from "@/features/board/lib/boardImageRegistry";
 import { importAsNewProject } from "@/features/project/lib/document";
 import type { GddDocument } from "@/shared/types";
@@ -68,6 +69,8 @@ function AppMain({
   pasteDeskContent,
   reorderDeskLayerOrder,
   removeDeskSelection,
+  removeBoardImageAsset,
+  updateBoardImageAssetName,
   undo,
   beginTransient,
   endTransient,
@@ -75,6 +78,7 @@ function AppMain({
   newProject,
 }: GddState) {
   const [view, setView] = useState<AppView>("editor");
+  const [imageAssetsOpen, setImageAssetsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFocus, setSearchFocus] = useState<SearchFocusTarget | null>(null);
   const { language, t } = useLocale();
@@ -261,6 +265,7 @@ function AppMain({
         }
         onAfterGitPull={() => void handleAfterGitPull()}
         onFlushProject={() => projectFolder.saveDoc(doc)}
+        onOpenImageAssets={() => setImageAssetsOpen(true)}
       />
       {view === "settings" ? (
         <SettingsPage
@@ -441,6 +446,14 @@ function AppMain({
           <LinkContextMenu />
           <LinkPasteDialog />
           <LinkPreviewLayer />
+          <BoardAssetsDialog
+            open={imageAssetsOpen}
+            doc={doc}
+            onClose={() => setImageAssetsOpen(false)}
+            onDeleteAsset={removeBoardImageAsset}
+            onUpdateAssetName={updateBoardImageAssetName}
+            onCopyAsset={storeDeskClipboard}
+          />
         </>
       )}
     </div>

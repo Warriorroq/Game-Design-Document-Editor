@@ -28,6 +28,7 @@ interface ToolbarProps {
   onRefreshGitStatus?: () => void;
   onAfterGitPull?: () => void;
   onFlushProject?: () => Promise<void>;
+  onOpenImageAssets?: () => void;
 }
 
 export function Toolbar({
@@ -51,6 +52,7 @@ export function Toolbar({
   onRefreshGitStatus,
   onAfterGitPull,
   onFlushProject,
+  onOpenImageAssets,
 }: ToolbarProps) {
   const { t } = useLocale();
   const [isMaximized, setIsMaximized] = useState(false);
@@ -123,6 +125,7 @@ export function Toolbar({
               onRefreshGitStatus={() => onRefreshGitStatus?.()}
               onAfterGitPull={onAfterGitPull}
               onFlushProject={onFlushProject}
+              onOpenImageAssets={onOpenImageAssets}
             />
             {onOpenSettings && (
               <button

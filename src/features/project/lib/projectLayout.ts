@@ -51,6 +51,11 @@ interface ManifestFolderRef {
   collapsed?: boolean;
 }
 
+interface ManifestBoardImageMeta {
+  id: string;
+  name?: string;
+}
+
 interface ManifestFile {
   format: typeof FOLDER_FORMAT;
   version: number;
@@ -60,6 +65,7 @@ interface ManifestFile {
   lastModified: string;
   folders?: ManifestFolderRef[];
   sections: ManifestSectionRef[];
+  boardImages?: ManifestBoardImageMeta[];
 }
 
 interface SectionFileBoardItem {
@@ -230,6 +236,12 @@ export function documentToFolderPayload(doc: GddDocument): FolderProjectPayload 
     });
   }
 
+  const boardImageMeta: ManifestBoardImageMeta[] = [];
+  for (const asset of Object.values(updated.boardImages ?? {})) {
+    const name = asset.name?.trim();
+    if (name) boardImageMeta.push({ id: asset.id, name });
+  }
+
   const manifest: ManifestFile = {
     format: FOLDER_FORMAT,
     version: FOLDER_VERSION,
@@ -249,6 +261,7 @@ export function documentToFolderPayload(doc: GddDocument): FolderProjectPayload 
       file: sectionFilePath(section.id),
       order: section.order,
     })),
+    ...(boardImageMeta.length > 0 ? { boardImages: boardImageMeta } : {}),
   };
 
   return {
@@ -307,6 +320,12 @@ export function folderPayloadToDocument(payload: FolderProjectPayload): GddDocum
         groups: sectionFile.groups ?? [],
       };
     });
+
+  for (const meta of manifest.boardImages ?? []) {
+    const name = meta.name?.trim();
+    if (!name || !boardImages[meta.id]) continue;
+    boardImages[meta.id] = { ...boardImages[meta.id], name };
+  }
 
   return normalizeDocument({
     id: manifest.id,

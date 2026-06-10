@@ -57,6 +57,89 @@ export function getImageFromClipboard(clipboard: DataTransfer): Blob | null {
   return null;
 }
 
+function dataUrlToBlob(src: string): Blob {
+  const match = /^data:([^;,]+)(?:;charset=[^;,]+)?(;base64)?,(.*)$/s.exec(src);
+  if (!match) throw new Error("Invalid data URL");
+  const mime = match[1];
+  const data = match[3];
+  if (match[2]) {
+    const binary = atob(data);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return new Blob([bytes], { type: mime });
+  }
+  return new Blob([decodeURIComponent(data)], { type: mime });
+}
+
+async function blobToPng(blob: Blob): Promise<Blob> {
+  if (blob.type === "image/png") return blob;
+  const bitmap = await createImageBitmap(blob);
+  const canvas = document.createElement("canvas");
+  canvas.width = bitmap.width;
+  canvas.height = bitmap.height;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    bitmap.close();
+    throw new Error("Canvas unavailable");
+  }
+  ctx.drawImage(bitmap, 0, 0);
+  bitmap.close();
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((encoded) => {
+      if (encoded) resolve(encoded);
+      else reject(new Error("Failed to encode image"));
+    }, "image/png");
+  });
+}
+
+function imageElementToPngBlob(img: HTMLImageElement): Promise<Blob> {
+  const canvas = document.createElement("canvas");
+  canvas.width = img.naturalWidth;
+  canvas.height = img.naturalHeight;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return Promise.reject(new Error("Canvas unavailable"));
+  ctx.drawImage(img, 0, 0);
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((encoded) => {
+      if (encoded) resolve(encoded);
+      else reject(new Error("Failed to encode image"));
+    }, "image/png");
+  });
+}
+
+export async function imageSrcToBlob(src: string): Promise<Blob> {
+  if (src.startsWith("data:")) {
+    return dataUrlToBlob(src);
+  }
+
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      void imageElementToPngBlob(img).then(resolve).catch(reject);
+    };
+    img.onerror = () => reject(new Error("Failed to load image"));
+    img.src = src;
+  });
+}
+
+/** Clipboard write must start in the same user gesture — pass a Promise, do not await the blob first. */
+export function copyImageSrcToClipboard(src: string): Promise<void> {
+  if (!navigator.clipboard?.write || typeof ClipboardItem === "undefined") {
+    return Promise.reject(new Error("Clipboard unavailable"));
+  }
+
+  const pngPromise = (async () => {
+    const blob = await imageSrcToBlob(src);
+    return blobToPng(blob);
+  })();
+
+  return navigator.clipboard.write([
+    new ClipboardItem({
+      "image/png": pngPromise,
+    }),
+  ]);
+}
+
 export function loadImageDimensions(
   src: string
 ): Promise<{ width: number; height: number }> {

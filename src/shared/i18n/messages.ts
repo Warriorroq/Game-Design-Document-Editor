@@ -89,6 +89,7 @@ const en = {
     "This folder contains a GDD project. Load it into the editor? (Folder files will not be modified.)",
   "project.confirmSaveToEmptyFolder":
     "This folder is empty. Save the current project into it?",
+  "project.imageAssets": "Image assets",
 
   "git.menuTitle": "Git",
   "git.notAvailable": "Git is not installed or not on PATH.",
@@ -233,6 +234,17 @@ const en = {
   "desk.flipHorizontal": "Flip horizontal",
   "desk.flipVertical": "Flip vertical",
   "desk.rotate": "Rotate",
+  "desk.imageAssetsTitle": "Image assets",
+  "desk.imageAssetsEmpty": "No image assets in this project.",
+  "desk.imageAssetsUsage": "Used on desk {count} times",
+  "desk.imageAssetsUnused": "Not on desk",
+  "desk.imageAssetCopy": "Copy",
+  "desk.imageAssetCopied": "Copied",
+  "desk.imageAssetCopyFailed": "Could not prepare image for desk paste.",
+  "desk.imageAssetDelete": "Delete",
+  "desk.imageAssetInUse": "Still used on the desk — remove those images first.",
+  "desk.imageAssetRenameHint": "Double-click to rename",
+  "desk.imageAssetRenameInvalid": "Enter a name (up to 200 characters).",
 
   "menu.copy": "Copy",
   "menu.paste": "Paste",
@@ -388,6 +400,7 @@ const ru: Record<keyof typeof en, string> = {
     "В папке есть проект GDD. Загрузить в редактор? (Файлы в папке не будут изменены.)",
   "project.confirmSaveToEmptyFolder":
     "Папка пуста. Сохранить текущий проект в неё?",
+  "project.imageAssets": "Библиотека изображений",
 
   "git.menuTitle": "Git",
   "git.notAvailable": "Git не установлен или недоступен в PATH.",
@@ -532,6 +545,17 @@ const ru: Record<keyof typeof en, string> = {
   "desk.flipHorizontal": "Отразить по горизонтали",
   "desk.flipVertical": "Отразить по вертикали",
   "desk.rotate": "Поворот",
+  "desk.imageAssetsTitle": "Библиотека изображений",
+  "desk.imageAssetsEmpty": "В проекте нет сохранённых изображений.",
+  "desk.imageAssetsUsage": "На доске: {count}",
+  "desk.imageAssetsUnused": "Не на доске",
+  "desk.imageAssetCopy": "Копировать",
+  "desk.imageAssetCopied": "Скопировано",
+  "desk.imageAssetCopyFailed": "Не удалось подготовить изображение для вставки.",
+  "desk.imageAssetDelete": "Удалить",
+  "desk.imageAssetInUse": "Используется на доске — сначала удалите объекты.",
+  "desk.imageAssetRenameHint": "Двойной клик — переименовать",
+  "desk.imageAssetRenameInvalid": "Введите имя (до 200 символов).",
 
   "menu.copy": "Копировать",
   "menu.paste": "Вставить",

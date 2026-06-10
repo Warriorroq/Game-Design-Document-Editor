@@ -23,6 +23,33 @@ export interface DeskSelection {
 }
 
 const PASTE_OFFSET = 28;
+const PASTE_MAX_WIDTH = 420;
+
+export function buildAssetDeskClipboard(
+  assetId: string,
+  dimensions: { width: number; height: number }
+): DeskClipboard {
+  const scale = Math.min(1, PASTE_MAX_WIDTH / dimensions.width);
+  const width = Math.round(dimensions.width * scale);
+  const height = Math.round(dimensions.height * scale);
+
+  return {
+    items: [
+      {
+        id: crypto.randomUUID(),
+        assetId,
+        x: 0,
+        y: 0,
+        width,
+        height,
+      },
+    ],
+    shapes: [],
+    texts: [],
+    strokes: [],
+    groups: [],
+  };
+}
 
 function clonePoint(
   point: BoardPoint,

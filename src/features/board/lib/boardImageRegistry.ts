@@ -127,6 +127,113 @@ export function migrateBoardImages(doc: GddDocument): GddDocument {
   return { ...doc, boardImages: images, sections };
 }
 
+export interface BoardImageAssetReference {
+  sectionId: string;
+  sectionTitle: string;
+  itemId: string;
+}
+
+/** One entry per desk (section); `itemId` is the first matching board item. */
+export interface BoardImageAssetDeskReference {
+  sectionId: string;
+  sectionTitle: string;
+  itemId: string;
+}
+
+export function displayBoardImageAssetName(asset: BoardImageAsset): string {
+  const name = asset.name?.trim();
+  return name || asset.id;
+}
+
+export function normalizeAssetName(input: string): string | null {
+  const name = input.trim();
+  if (!name || name.length > 200) return null;
+  return name;
+}
+
+export function listBoardImageAssetReferences(
+  doc: GddDocument,
+  assetId: string
+): BoardImageAssetReference[] {
+  const refs: BoardImageAssetReference[] = [];
+  for (const section of doc.sections) {
+    for (const item of section.board) {
+      if (item.assetId === assetId) {
+        refs.push({
+          sectionId: section.id,
+          sectionTitle: section.title.trim() || section.id,
+          itemId: item.id,
+        });
+      }
+    }
+  }
+  return refs;
+}
+
+export function listBoardImageAssetDesks(
+  doc: GddDocument,
+  assetId: string
+): BoardImageAssetDeskReference[] {
+  const bySection = new Map<string, BoardImageAssetDeskReference>();
+  for (const section of doc.sections) {
+    for (const item of section.board) {
+      if (item.assetId !== assetId) continue;
+      if (!bySection.has(section.id)) {
+        bySection.set(section.id, {
+          sectionId: section.id,
+          sectionTitle: section.title.trim() || section.id,
+          itemId: item.id,
+        });
+      }
+    }
+  }
+  return Array.from(bySection.values());
+}
+
+export function countBoardImageAssetUsage(doc: GddDocument, assetId: string): number {
+  return listBoardImageAssetReferences(doc, assetId).length;
+}
+
+export function updateBoardImageAssetName(
+  doc: GddDocument,
+  assetId: string,
+  name: string
+): GddDocument {
+  const trimmed = name.trim();
+  if (trimmed.length > 200) {
+    throw new Error("INVALID_ASSET_NAME");
+  }
+
+  const images = doc.boardImages;
+  if (!images?.[assetId]) return doc;
+
+  const asset = images[assetId];
+  const nextName = trimmed && trimmed !== asset.id ? trimmed : undefined;
+
+  return {
+    ...doc,
+    boardImages: {
+      ...images,
+      [assetId]: {
+        ...asset,
+        name: nextName,
+      },
+    },
+  };
+}
+
+export function deleteBoardImageAsset(doc: GddDocument, assetId: string): GddDocument {
+  const images = doc.boardImages;
+  if (!images?.[assetId]) return doc;
+
+  const nextImages = { ...images };
+  delete nextImages[assetId];
+  return {
+    ...doc,
+    boardImages: Object.keys(nextImages).length > 0 ? nextImages : undefined,
+  };
+}
+
 export function pruneUnusedBoardImages(doc: GddDocument): GddDocument {
   const images = doc.boardImages;
   if (!images || Object.keys(images).length === 0) return doc;
