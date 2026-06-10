@@ -110,6 +110,7 @@ export function Toolbar({
           />
         </div>
       )}
+      <div className="toolbar-drag" aria-hidden />
       <div className="toolbar-right">
         {!settingsOpen && (
           <div className="toolbar-actions">

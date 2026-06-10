@@ -616,6 +616,52 @@ async function hasRemote(dir) {
 
 const PROJECT_PATHS = ["gdd.json", ".gitignore", "sections", "assets"];
 
+function isPathspecMismatchError(error) {
+  return /pathspec .+ did not match any file/i.test(String(error));
+}
+
+async function listTrackedProjectFiles(dir) {
+  const result = await runGit(dir, ["ls-files", "--", ...PROJECT_PATHS]);
+  if (!result.ok) return [];
+  return result.stdout
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+async function restoreTrackedProjectFiles(dir) {
+  const tracked = await listTrackedProjectFiles(dir);
+  if (tracked.length === 0) return { ok: true };
+
+  let restore = await runGit(dir, [
+    "restore",
+    "--staged",
+    "--worktree",
+    "--",
+    ...tracked,
+  ]);
+  if (!restore.ok && isPathspecMismatchError(restore.error)) {
+    restore = await runGit(dir, ["checkout", "HEAD", "--", ...tracked]);
+  }
+  if (!restore.ok && isPathspecMismatchError(restore.error)) {
+    return { ok: true };
+  }
+  return restore;
+}
+
+async function cleanUntrackedProjectFiles(dir) {
+  for (const projectPath of PROJECT_PATHS) {
+    const fullPath = path.join(dir, projectPath);
+    if (!fs.existsSync(fullPath)) continue;
+
+    const clean = await runGit(dir, ["clean", "-fd", "--", projectPath]);
+    if (!clean.ok && !isPathspecMismatchError(clean.error)) {
+      return clean;
+    }
+  }
+  return { ok: true };
+}
+
 async function syncProjectFromRemote(dir, branchName, onProgress) {
   const remoteRef = `origin/${branchName}`;
 
@@ -695,17 +741,34 @@ async function stashChanges(dir, onProgress) {
     return { ok: true, stashed: Boolean(saved.committed) };
   }
 
-  const result = await runGit(dir, [
+  const tracked = await listTrackedProjectFiles(dir);
+  const stashArgs = [
     "stash",
     "push",
     "-m",
     "GDD Editor: before pull",
-    "--",
-    ...PROJECT_PATHS,
-  ]);
+    ...(tracked.length > 0 ? ["--", ...tracked] : ["-u"]),
+  ];
+  const result = await runGit(dir, stashArgs);
   if (!result.ok) {
     if (/No local changes to save/i.test(result.error)) {
       return { ok: true, stashed: false };
+    }
+    if (isPathspecMismatchError(result.error)) {
+      const fallback = await runGit(dir, [
+        "stash",
+        "push",
+        "-u",
+        "-m",
+        "GDD Editor: before pull",
+      ]);
+      if (!fallback.ok) {
+        if (/No local changes to save/i.test(fallback.error)) {
+          return { ok: true, stashed: false };
+        }
+        return { ok: false, error: fallback.error };
+      }
+      return { ok: true, stashed: true };
     }
     return { ok: false, error: result.error };
   }
@@ -716,13 +779,7 @@ async function discardProjectChanges(dir, onProgress) {
   emitProgress(onProgress, "pull", "Discarding local project changes");
 
   if (await repoHasCommits(dir)) {
-    const restore = await runGit(dir, [
-      "restore",
-      "--staged",
-      "--worktree",
-      "--",
-      ...PROJECT_PATHS,
-    ]);
+    const restore = await restoreTrackedProjectFiles(dir);
     if (!restore.ok) return restore;
   } else {
     for (const projectPath of PROJECT_PATHS) {
@@ -738,7 +795,7 @@ async function discardProjectChanges(dir, onProgress) {
     }
   }
 
-  const clean = await runGit(dir, ["clean", "-fd", "--", ...PROJECT_PATHS]);
+  const clean = await cleanUntrackedProjectFiles(dir);
   if (!clean.ok) return clean;
 
   return { ok: true };

@@ -14,6 +14,11 @@ contextBridge.exposeInMainWorld("gddDesktop", {
       ipcRenderer.on("window:maximized-changed", handler);
       return () => ipcRenderer.removeListener("window:maximized-changed", handler);
     },
+    onReady: (listener) => {
+      const handler = () => listener();
+      ipcRenderer.on("window:ready", handler);
+      return () => ipcRenderer.removeListener("window:ready", handler);
+    },
   },
   project: {
     pickFolder: () => ipcRenderer.invoke("project:pick-folder"),

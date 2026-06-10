@@ -1557,6 +1557,7 @@ export function ImageBoard({
   };
 
   const onSurfacePointerDown = (e: React.PointerEvent) => {
+    surfaceRef.current?.focus({ preventScroll: true });
     const target = e.target as HTMLElement;
     const onCanvas = Boolean(target.closest(".board-canvas"));
 
@@ -1752,7 +1753,7 @@ export function ImageBoard({
       <div
         ref={surfaceRef}
         className={`board-surface ${pasteHint ? "paste-ready" : ""} ${isDrawing ? "board-surface--draw" : ""}`}
-        tabIndex={0}
+        tabIndex={-1}
         onFocus={() => setPasteHint(true)}
         onBlur={() => setPasteHint(false)}
         onPointerDownCapture={onSurfacePointerDownCapture}

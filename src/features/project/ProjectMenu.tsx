@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { useLocale } from "@/shared/context/LocaleContext";
-import { isDesktopApp } from "@/shared/lib/desktop";
+import { isDesktopApp, restoreAppFocus } from "@/shared/lib/desktop";
 import { downloadGdeArchive, parseGdeArchive } from "@/features/project/lib/gdeArchive";
 import type { GitStatus } from "@/features/git/lib/git";
 import type { GddDocument } from "@/shared/types";
@@ -108,18 +108,24 @@ export function ProjectMenu({
 
     if (!file.name.toLowerCase().endsWith(".gde")) {
       window.alert(t("project.invalidFile"));
+      restoreAppFocus();
       return;
     }
 
     try {
       const imported = await parseGdeArchive(file);
       const ok = window.confirm(t("project.confirmImport"));
-      if (!ok) return;
+      if (!ok) {
+        restoreAppFocus();
+        return;
+      }
       onImport(imported);
+      restoreAppFocus();
     } catch (err) {
       const message =
         err instanceof Error ? err.message : t("project.readError");
       window.alert(message);
+      restoreAppFocus();
     }
   };
 
@@ -309,7 +315,10 @@ export function ProjectMenu({
       />
       <GitProgressDialog
         state={git.syncProgress}
-        onClose={() => git.setSyncProgress(null)}
+        onClose={() => {
+          git.setSyncProgress(null);
+          restoreAppFocus();
+        }}
       />
     </>
   );

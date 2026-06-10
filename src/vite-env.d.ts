@@ -22,6 +22,7 @@ interface Window {
       isMaximized: () => Promise<boolean>;
       focus: () => Promise<void>;
       onMaximizedChanged: (listener: (maximized: boolean) => void) => () => void;
+      onReady: (listener: () => void) => () => void;
     };
     project?: {
       pickFolder: () => Promise<{

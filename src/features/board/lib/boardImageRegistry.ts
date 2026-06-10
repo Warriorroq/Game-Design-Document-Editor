@@ -22,11 +22,14 @@ export function boardImageContentKey(src: string): string {
   return src;
 }
 
+const MISSING_BOARD_IMAGE_SRC =
+  "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+
 export function resolveBoardItemSrc(doc: GddDocument, item: BoardItem): string {
   const asset = item.assetId ? doc.boardImages?.[item.assetId] : undefined;
   if (asset) return asset.src;
   if (item.src) return item.src;
-  throw new Error(`Missing board image asset for item ${item.id}`);
+  return MISSING_BOARD_IMAGE_SRC;
 }
 
 export function registerBoardImage(

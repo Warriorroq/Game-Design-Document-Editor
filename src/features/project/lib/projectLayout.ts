@@ -124,6 +124,32 @@ function assetFilePath(assetId: string, mime: string): string {
   return `${ASSETS_DIR}/${assetId}.${extensionForMime(mime)}`;
 }
 
+function registryAssetToFolder(
+  asset: BoardImageAsset,
+  assets: Map<string, FolderAsset>
+): void {
+  const parsed = parseDataUrl(asset.src);
+  if (!parsed) return;
+
+  const path = assetFilePath(asset.id, parsed.mime);
+  if (assets.has(path)) return;
+
+  assets.set(path, {
+    path,
+    mime: parsed.mime,
+    dataBase64: parsed.dataBase64,
+  });
+}
+
+function collectBoardImageRegistryAssets(
+  doc: GddDocument,
+  assets: Map<string, FolderAsset>
+): void {
+  for (const asset of Object.values(doc.boardImages ?? {})) {
+    registryAssetToFolder(asset, assets);
+  }
+}
+
 function boardItemToFile(
   doc: GddDocument,
   item: BoardItem,
@@ -183,10 +209,10 @@ function boardItemFromFile(
   item: SectionFileBoardItem,
   assetMap: Map<string, FolderAsset>,
   registry: Record<string, BoardImageAsset>
-): BoardItem {
+): BoardItem | null {
   const asset = assetMap.get(item.asset);
   if (!asset) {
-    throw new Error(`Missing asset file: ${item.asset}`);
+    return null;
   }
   const assetId = assetIdFromAssetPath(item.asset);
   const src = dataUrlFromBase64(asset.mime, asset.dataBase64);
@@ -235,6 +261,8 @@ export function documentToFolderPayload(doc: GddDocument): FolderProjectPayload 
       content: JSON.stringify(sectionFile, null, 2),
     });
   }
+
+  collectBoardImageRegistryAssets(updated, assets);
 
   const boardImageMeta: ManifestBoardImageMeta[] = [];
   for (const asset of Object.values(updated.boardImages ?? {})) {
@@ -311,15 +339,21 @@ export function folderPayloadToDocument(payload: FolderProjectPayload): GddDocum
         content: sectionFile.content,
         order: sectionFile.order,
         folderId: sectionFile.folderId,
-        board: sectionFile.board.map((item) =>
-          boardItemFromFile(item, assetMap, boardImages)
-        ),
+        board: sectionFile.board
+          .map((item) => boardItemFromFile(item, assetMap, boardImages))
+          .filter((item): item is BoardItem => item !== null),
         shapes: sectionFile.shapes ?? [],
         strokes: sectionFile.strokes ?? [],
         texts: sectionFile.texts ?? [],
         groups: sectionFile.groups ?? [],
       };
     });
+
+  for (const folderAsset of assetMap.values()) {
+    const assetId = assetIdFromAssetPath(folderAsset.path);
+    const src = dataUrlFromBase64(folderAsset.mime, folderAsset.dataBase64);
+    collectBoardImageAsset(boardImages, assetId, src);
+  }
 
   for (const meta of manifest.boardImages ?? []) {
     const name = meta.name?.trim();

@@ -953,18 +953,27 @@ html.desktop-app body {
   overflow: hidden;
 }
 
-html.desktop-app .toolbar {
+html.desktop-app .toolbar-brand,
+html.desktop-app .toolbar-drag {
   -webkit-app-region: drag;
 }
 
 html.desktop-app .toolbar .btn,
 html.desktop-app .toolbar button,
+html.desktop-app .toolbar .toolbar-search,
+html.desktop-app .toolbar .toolbar-right,
 html.desktop-app .toolbar .project-menu-dropdown,
 html.desktop-app .toolbar .global-search-input,
 html.desktop-app .toolbar .global-search-clear,
 html.desktop-app .toolbar .global-search-dropdown,
 html.desktop-app .toolbar .global-search-item {
   -webkit-app-region: no-drag;
+}
+
+html.desktop-app .toolbar-drag {
+  flex: 1;
+  min-width: 24px;
+  height: 100%;
 }
 
 body.panel-resizing {

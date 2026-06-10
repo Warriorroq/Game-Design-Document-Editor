@@ -29,6 +29,7 @@ import {
   highlightQueryInElement,
   stripEphemeralEditorMarkup,
 } from "@/shared/lib/searchHighlight";
+import { ensureDesktopWindowActive } from "@/shared/lib/desktop";
 import type { GddSection } from "@/shared/types";
 import { FormatToolbar } from "./FormatToolbar";
 
@@ -420,6 +421,7 @@ export function SectionEditor({
           ref={titleRef}
           className="section-title-input"
           value={section.title}
+          onPointerDownCapture={ensureDesktopWindowActive}
           onChange={(e) => onChange({ title: e.target.value })}
           aria-label={t("editor.sectionTitleAria")}
         />
@@ -427,6 +429,7 @@ export function SectionEditor({
           ref={descRef}
           className="section-desc-input"
           value={section.description}
+          onPointerDownCapture={ensureDesktopWindowActive}
           onChange={(e) => onChange({ description: e.target.value })}
           placeholder={t("editor.sectionDescPlaceholder")}
           aria-label={t("editor.sectionDescAria")}
@@ -444,6 +447,7 @@ export function SectionEditor({
           className="markdown-preview markdown-preview--editable"
           contentEditable
           suppressContentEditableWarning
+          onPointerDownCapture={ensureDesktopWindowActive}
           onInput={handleEditorInput}
           onBlur={syncContent}
           onCopy={handleEditorCopy}
