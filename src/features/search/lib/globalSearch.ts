@@ -30,6 +30,7 @@ export interface GlobalSearchResult {
   kind: GlobalSearchMatchKind;
   where: string;
   snippet: string;
+  matchCount: number;
   anchorId?: string;
   textId?: string;
   mediaId?: string;
@@ -47,6 +48,22 @@ function plainTextFromHtml(html: string): string {
 
 function matches(haystack: string, needle: string): boolean {
   return haystack.toLowerCase().includes(needle.toLowerCase());
+}
+
+export function countMatches(haystack: string, needle: string): number {
+  const n = needle.trim();
+  if (!n || !haystack) return 0;
+  const lowerHay = haystack.toLowerCase();
+  const lowerNeedle = n.toLowerCase();
+  let count = 0;
+  let pos = 0;
+  while (pos < lowerHay.length) {
+    const idx = lowerHay.indexOf(lowerNeedle, pos);
+    if (idx < 0) break;
+    count++;
+    pos = idx + lowerNeedle.length;
+  }
+  return count;
 }
 
 export function snippetAround(
@@ -99,6 +116,7 @@ function searchSection(
       kind: "section-title",
       where: translate(lang, SEARCH_WHERE_KEYS["section-title"]),
       snippet: snippetAround(section.title, query),
+      matchCount: countMatches(section.title, query),
     });
   }
 
@@ -110,6 +128,7 @@ function searchSection(
       kind: "section-description",
       where: translate(lang, SEARCH_WHERE_KEYS["section-description"]),
       snippet: snippetAround(section.description, query),
+      matchCount: countMatches(section.description, query),
     });
   }
 
@@ -122,6 +141,7 @@ function searchSection(
       kind: "section-content",
       where: translate(lang, SEARCH_WHERE_KEYS["section-content"]),
       snippet: snippetAround(bodyText, query),
+      matchCount: countMatches(bodyText, query),
     });
   }
 
@@ -143,6 +163,7 @@ function searchSection(
         kind: "anchor",
         where: translate(lang, SEARCH_WHERE_KEYS.anchor),
         snippet: snippetAround(text, query),
+        matchCount: countMatches(text, query),
         anchorId,
       });
     });
@@ -159,6 +180,7 @@ function searchSection(
       kind: "desk-text",
       where: translate(lang, SEARCH_WHERE_KEYS["desk-text"]),
       snippet: snippetAround(content, query),
+      matchCount: countMatches(content, query),
       textId: text.id,
     });
   }
@@ -184,6 +206,7 @@ function searchBoardImages(
         kind: "board-image",
         where: translate(lang, SEARCH_WHERE_KEYS["board-image"]),
         snippet: snippetAround(displayName, query),
+        matchCount: countMatches(displayName, query),
       });
       continue;
     }
@@ -197,6 +220,7 @@ function searchBoardImages(
         kind: "board-image",
         where: translate(lang, SEARCH_WHERE_KEYS["board-image"]),
         snippet: snippetAround(displayName, query),
+        matchCount: countMatches(displayName, query),
         mediaId: desk.itemId,
       });
     }
@@ -223,6 +247,7 @@ function searchFolders(
       kind: "folder-title",
       where: translate(lang, SEARCH_WHERE_KEYS["folder-title"]),
       snippet: snippetAround(folder.title, query),
+      matchCount: countMatches(folder.title, query),
     });
   }
 }
@@ -231,6 +256,8 @@ export interface SearchFocusTarget {
   sectionId: string;
   query: string;
   kind: GlobalSearchMatchKind;
+  matchIndex: number;
+  matchCount: number;
   anchorId?: string;
 }
 

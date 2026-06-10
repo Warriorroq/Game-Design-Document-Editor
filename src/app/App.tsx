@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./App.css";
 import { DocumentMeta } from "@/features/editor/DocumentMeta";
 import { ImageBoard } from "@/features/board/ImageBoard";
@@ -81,6 +81,9 @@ function AppMain({
   const [imageAssetsOpen, setImageAssetsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFocus, setSearchFocus] = useState<SearchFocusTarget | null>(null);
+  const lastSearchResultRef = useRef<{ key: string; matchIndex: number } | null>(
+    null
+  );
   const { language, t } = useLocale();
   const projectFolder = useProjectFolder();
   const { matches: shortcutMatches } = useShortcuts();
@@ -105,16 +108,22 @@ function AppMain({
 
   const { linkTarget, clearLinkTarget, navigateToHref } = useLinkContext();
 
+  useEffect(() => {
+    lastSearchResultRef.current = null;
+  }, [searchQuery]);
+
   const handleSelectSearchResult = useCallback(
     (result: GlobalSearchResult) => {
       const q = searchQuery.trim();
       if (!result.sectionId) {
         setSearchFocus(null);
+        lastSearchResultRef.current = null;
         return;
       }
       navigateToHref(result.href);
       if (!q) {
         setSearchFocus(null);
+        lastSearchResultRef.current = null;
         return;
       }
       if (
@@ -123,14 +132,24 @@ function AppMain({
         result.kind === "section-content" ||
         result.kind === "anchor"
       ) {
+        const matchCount = Math.max(1, result.matchCount);
+        let matchIndex = 0;
+        if (lastSearchResultRef.current?.key === result.key) {
+          matchIndex =
+            (lastSearchResultRef.current.matchIndex + 1) % matchCount;
+        }
+        lastSearchResultRef.current = { key: result.key, matchIndex };
         setSearchFocus({
           sectionId: result.sectionId,
           query: q,
           kind: result.kind,
+          matchIndex,
+          matchCount,
           anchorId: result.anchorId,
         });
       } else {
         setSearchFocus(null);
+        lastSearchResultRef.current = null;
       }
     },
     [navigateToHref, searchQuery]

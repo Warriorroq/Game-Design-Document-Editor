@@ -38,16 +38,21 @@ export function stripEphemeralFromHtml(html: string): string {
   stripEphemeralEditorMarkup(doc.body);
   return doc.body.innerHTML;
 }
+interface TextMatchPosition {
+  textNode: Text;
+  idx: number;
+}
+
 export function highlightQueryInElement(
   root: HTMLElement,
-  query: string
+  query: string,
+  focusIndex = 0
 ): () => void {
   stripEphemeralEditorMarkup(root);
 
   const q = query.trim();
   if (!q) return () => undefined;
 
-  const marks: HTMLElement[] = [];
   const needle = q.toLowerCase();
   const textNodes: Text[] = [];
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
@@ -57,16 +62,28 @@ export function highlightQueryInElement(
     node = walker.nextNode();
   }
 
+  const positions: TextMatchPosition[] = [];
   for (const textNode of textNodes) {
-    const text = textNode.textContent ?? "";
-    const idx = text.toLowerCase().indexOf(needle);
     if (
-      idx < 0 ||
       !textNode.parentElement ||
       textNode.parentElement.closest("mark.gdd-search-hit")
     ) {
       continue;
     }
+    const text = textNode.textContent ?? "";
+    let pos = 0;
+    while (pos < text.length) {
+      const idx = text.toLowerCase().indexOf(needle, pos);
+      if (idx < 0) break;
+      positions.push({ textNode, idx });
+      pos = idx + q.length;
+    }
+  }
+
+  const marks: HTMLElement[] = [];
+  for (let i = positions.length - 1; i >= 0; i--) {
+    const { textNode, idx } = positions[i];
+    const text = textNode.textContent ?? "";
     const range = document.createRange();
     range.setStart(textNode, idx);
     range.setEnd(textNode, Math.min(idx + q.length, text.length));
@@ -74,15 +91,18 @@ export function highlightQueryInElement(
     mark.className = "gdd-search-hit";
     try {
       range.surroundContents(mark);
-      marks.push(mark);
+      marks.unshift(mark);
     } catch {
       /* split across elements — skip */
     }
   }
 
-  const first = marks[0];
-  if (first) {
-    first.scrollIntoView({ behavior: "smooth", block: "center" });
+  if (marks.length > 0) {
+    const safeIndex = Math.min(Math.max(0, focusIndex), marks.length - 1);
+    marks.forEach((mark, i) => {
+      if (i === safeIndex) mark.classList.add("gdd-search-hit-active");
+    });
+    marks[safeIndex]?.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
   return () => {

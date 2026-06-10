@@ -106,7 +106,14 @@ export function GlobalSearch({
                 className="global-search-item"
                 onClick={() => onSelectResult(result)}
               >
-                <span className="global-search-item-where">{result.where}</span>
+                <span className="global-search-item-where">
+                  {result.where}
+                  {result.matchCount > 0 && (
+                    <span className="global-search-item-count">
+                      {t("search.matchCount", { count: result.matchCount })}
+                    </span>
+                  )}
+                </span>
                 <span className="global-search-item-section">
                   {result.folderTitle &&
                   result.kind !== "folder-title" &&

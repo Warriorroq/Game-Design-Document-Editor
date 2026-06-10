@@ -115,19 +115,23 @@ export function SectionEditor({
     }, HIGHLIGHT_FLASH_MS);
 
     requestAnimationFrame(() => {
-      const { query, kind } = searchFocus;
+      const { query, kind, matchIndex } = searchFocus;
       if (kind === "section-title") {
         flashElement(titleRef.current);
       } else if (kind === "section-description") {
         flashElement(descRef.current);
       } else if (kind === "section-content" && editorRef.current) {
-        cleanupHighlights = highlightQueryInElement(editorRef.current, query);
+        cleanupHighlights = highlightQueryInElement(
+          editorRef.current,
+          query,
+          matchIndex
+        );
       } else if (kind === "anchor" && searchFocus.anchorId && editorRef.current) {
         const target = editorRef.current.querySelector(
           `#${CSS.escape(searchFocus.anchorId)}`
         );
         if (target instanceof HTMLElement) {
-          cleanupHighlights = highlightQueryInElement(target, query);
+          cleanupHighlights = highlightQueryInElement(target, query, matchIndex);
           flashElement(target, "gdd-anchor-flash");
         }
       }
