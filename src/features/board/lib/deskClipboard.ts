@@ -27,6 +27,7 @@ const PASTE_MAX_WIDTH = 420;
 
 export function buildAssetDeskClipboard(
   assetId: string,
+  src: string,
   dimensions: { width: number; height: number }
 ): DeskClipboard {
   const scale = Math.min(1, PASTE_MAX_WIDTH / dimensions.width);
@@ -38,6 +39,7 @@ export function buildAssetDeskClipboard(
       {
         id: crypto.randomUUID(),
         assetId,
+        src,
         x: 0,
         y: 0,
         width,

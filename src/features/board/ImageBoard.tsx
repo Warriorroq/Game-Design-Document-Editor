@@ -335,10 +335,25 @@ export function ImageBoard({
       selection
     );
     if (!clip) return;
-    onStoreDeskClipboard(clip);
+    onStoreDeskClipboard({
+      ...clip,
+      items: clip.items.map((item) => ({
+        ...item,
+        src: resolveItemSrc(item),
+      })),
+    });
     // Replace any stale image in the system clipboard so paste prefers desk content.
     void navigator.clipboard.writeText("").catch(() => {});
-  }, [items, shapes, texts, strokes, groups, selection, onStoreDeskClipboard]);
+  }, [
+    items,
+    shapes,
+    texts,
+    strokes,
+    groups,
+    selection,
+    onStoreDeskClipboard,
+    resolveItemSrc,
+  ]);
 
   const pasteDesk = useCallback(() => {
     if (!deskClipboard) return;

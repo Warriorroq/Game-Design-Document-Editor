@@ -99,7 +99,7 @@ export function BoardAssetsDialog({
     setCopyError(null);
     loadImageDimensions(src)
       .then((dims) => {
-        onCopyAsset(buildAssetDeskClipboard(assetId, dims));
+        onCopyAsset(buildAssetDeskClipboard(assetId, src, dims));
         void navigator.clipboard.writeText("").catch(() => {});
         setCopiedId(assetId);
         window.setTimeout(() => {
