@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 import { useLocale } from "@/shared/context/LocaleContext";
-import { ensureDesktopWindowActive } from "@/shared/lib/desktop";
 import type { GlobalSearchResult } from "@/features/search/lib/globalSearch";
 
 interface GlobalSearchProps {
@@ -64,7 +63,6 @@ export function GlobalSearch({
         type="search"
         className="global-search-input"
         value={query}
-        onPointerDownCapture={ensureDesktopWindowActive}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={(e) => {
           if (e.key === "Escape") {

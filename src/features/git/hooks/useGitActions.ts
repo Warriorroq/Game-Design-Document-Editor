@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useLocale } from "@/shared/context/LocaleContext";
-import { restoreAppFocus } from "@/shared/lib/desktop";
 import {
   applyGitIdentity,
   commitGitChanges,
@@ -29,7 +28,7 @@ interface UseGitActionsOptions {
   gitStatus: GitStatus | null;
   gitAvailable: boolean;
   onRefreshStatus: () => void;
-  onAfterPull?: () => void | Promise<void>;
+  onAfterPull?: () => void;
   onFlushProject?: () => Promise<void>;
   onCloseMenu?: () => void;
 }
@@ -100,12 +99,13 @@ export function useGitActions({
         : await pullGitChanges(folderPath, onProgress);
 
     if (result.ok) {
+      setSyncProgress((prev) =>
+        prev ? { ...prev, status: "success", percent: 100 } : prev
+      );
       onRefreshStatus();
       if (operation === "pull") {
-        await onAfterPull?.();
+        onAfterPull?.();
       }
-      setSyncProgress(null);
-      restoreAppFocus();
       return;
     }
 
@@ -216,7 +216,6 @@ export function useGitActions({
 
       if (!prep.ok) {
         window.alert(formatGitError(prep.error, t));
-        restoreAppFocus();
         if (files) setPullConfirmFiles(files);
         return;
       }
@@ -229,7 +228,6 @@ export function useGitActions({
   const handlePullConfirmClose = () => {
     if (busy || syncProgress?.status === "running") return;
     setPullConfirmFiles(null);
-    restoreAppFocus();
   };
 
   return {

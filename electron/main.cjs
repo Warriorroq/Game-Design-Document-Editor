@@ -2,7 +2,6 @@ const { app, BrowserWindow, Menu, ipcMain, dialog } = require("electron");
 const path = require("path");
 const git = require("./git.cjs");
 const project = require("./project.cjs");
-const { focusBrowserWindow, forceForegroundWindow } = require("./winFocus.cjs");
 
 const BG = "#0f1117";
 const APP_ICON = path.join(__dirname, "icon.png");
@@ -33,7 +32,8 @@ function createWindow() {
   ipcMain.handle("window:close", () => win.close());
   ipcMain.handle("window:is-maximized", () => win.isMaximized());
   ipcMain.handle("window:focus", () => {
-    forceForegroundWindow(win);
+    win.focus();
+    win.webContents.focus();
   });
 
   ipcMain.handle("project:pick-folder", async () => {
@@ -197,29 +197,11 @@ function createWindow() {
   win.on("maximize", emitMaxChanged);
   win.on("unmaximize", emitMaxChanged);
 
-  const focusMainWindow = () => forceForegroundWindow(win);
-
-  win.once("ready-to-show", focusMainWindow);
-
-  win.webContents.on("did-finish-load", () => {
-    for (const delay of [0, 50, 200, 500]) {
-      setTimeout(focusMainWindow, delay);
-    }
-    win.webContents.send("window:ready");
-  });
-
-  win.on("focus", () => {
-    if (!win.isDestroyed()) focusBrowserWindow(win);
-  });
+  win.once("ready-to-show", () => win.show());
 
   if (process.env.VITE_DEV_SERVER_URL) {
     win.loadURL(process.env.VITE_DEV_SERVER_URL);
-    if (process.env.GDD_DEVTOOLS === "1") {
-      win.webContents.openDevTools({ mode: "detach" });
-    }
-    for (const delay of [150, 400, 800]) {
-      setTimeout(focusMainWindow, delay);
-    }
+    win.webContents.openDevTools({ mode: "detach" });
   } else {
     win.loadFile(path.join(__dirname, "../dist/index.html"));
   }

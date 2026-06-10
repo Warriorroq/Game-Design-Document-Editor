@@ -142,10 +142,7 @@ function AppMain({
 
   const handleNewProject = useCallback(() => {
     const ok = window.confirm(t("project.confirmNew"));
-    if (!ok) {
-      restoreAppFocus();
-      return;
-    }
+    if (!ok) return;
     projectFolder.closeFolder();
     newProject();
   }, [newProject, projectFolder, t]);
@@ -166,52 +163,38 @@ function AppMain({
         const message =
           err instanceof Error ? err.message : t("project.readError");
         window.alert(message);
-        restoreAppFocus();
         return;
       }
     }
 
     const picked = await projectFolder.pickFolder();
-    if (!picked) {
-      restoreAppFocus();
-      return;
-    }
+    if (!picked) return;
 
     if (picked.hasProject) {
       const ok = window.confirm(t("project.confirmLoadFolder"));
-      if (!ok) {
-        restoreAppFocus();
-        return;
-      }
+      if (!ok) return;
       try {
         projectFolder.bindProjectFolder(picked.folderPath);
         const imported = await projectFolder.loadFromFolder(picked.folderPath);
         replaceDocument(imported);
-        restoreAppFocus();
       } catch (err) {
         const message =
           err instanceof Error ? err.message : t("project.readError");
         window.alert(message);
-        restoreAppFocus();
       }
       return;
     }
 
     const ok = window.confirm(t("project.confirmSaveToEmptyFolder"));
-    if (!ok) {
-      restoreAppFocus();
-      return;
-    }
+    if (!ok) return;
 
     try {
       projectFolder.bindProjectFolder(picked.folderPath);
       await projectFolder.saveDocTo(picked.folderPath, doc);
-      restoreAppFocus();
     } catch (err) {
       const message =
         err instanceof Error ? err.message : t("project.readError");
       window.alert(message);
-      restoreAppFocus();
     }
   }, [doc, projectFolder, replaceDocument, t]);
 
@@ -220,12 +203,10 @@ function AppMain({
     try {
       const imported = await projectFolder.loadFromFolder(projectFolder.folderPath);
       replaceDocument(imported);
-      restoreAppFocus();
     } catch (err) {
       const message =
         err instanceof Error ? err.message : t("project.readError");
       window.alert(message);
-      restoreAppFocus();
     }
   }, [projectFolder, replaceDocument, t]);
 
