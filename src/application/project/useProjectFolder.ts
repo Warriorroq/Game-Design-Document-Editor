@@ -7,7 +7,7 @@ import {
   saveProjectToFolder,
   setStoredProjectFolder,
 } from "@/infrastructure/project/projectFolder";
-import { getGitStatus, type GitStatus } from "@/infrastructure/git/git";
+import { getGitStatus, type GitStatus } from "@/infrastructure/git";
 import { isDesktopApp } from "@/infrastructure/desktop/desktop";
 import type { GddDocument } from "@/domain/types";
 
