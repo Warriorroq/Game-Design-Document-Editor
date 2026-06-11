@@ -32,6 +32,10 @@ export function AppMain(props: DocumentStore) {
     updateDoc,
     updateSection,
     addSection,
+    addSpace3DSection,
+    addSpace3DModel,
+    removeSpace3DModelAsset,
+    updateSpace3DModelAssetName,
     addFolder,
     updateFolder,
     toggleFolderCollapsed,
@@ -223,6 +227,11 @@ export function AppMain(props: DocumentStore) {
       if (view !== "editor") return;
       if (!shortcutMatches("undo", e)) return;
       const target = e.target as HTMLElement;
+      if (target.closest(".space3d-inspector")) {
+        e.preventDefault();
+        undo();
+        return;
+      }
       if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") return;
       if (target.closest(".board-text-editor")) return;
       e.preventDefault();
@@ -306,6 +315,7 @@ export function AppMain(props: DocumentStore) {
           addSectionLabel={t("editor.addSection")}
           onSelectSection={setActiveSectionId}
           onAddSection={addSection}
+          onAddSpace3DSection={addSpace3DSection}
           onAddFolder={addFolder}
           onRemoveSection={removeSection}
           onRemoveFolder={removeFolder}
@@ -341,6 +351,9 @@ export function AppMain(props: DocumentStore) {
           onStoreDeskClipboard={storeDeskClipboard}
           onBeginTransientEdit={beginTransient}
           onEndTransientEdit={endTransient}
+          onAddSpace3DModel={addSpace3DModel}
+          onRemoveSpace3DModelAsset={removeSpace3DModelAsset}
+          onRenameSpace3DModelAsset={updateSpace3DModelAssetName}
         />
       )}
 

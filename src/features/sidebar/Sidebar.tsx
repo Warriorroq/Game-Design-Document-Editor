@@ -9,6 +9,7 @@ import {
   type SidebarDropTarget,
 } from "@/features/sidebar/lib/sidebarOrder";
 import type { GddSection, GddSectionFolder } from "@/shared/types";
+import { isSpace3DSection } from "@/domain/space3d/space3d";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
 
 interface SidebarProps {
@@ -18,6 +19,7 @@ interface SidebarProps {
   activeId: string;
   onSelect: (id: string) => void;
   onAddSection: (folderId?: string) => void;
+  onAddSpace3DSection: (folderId?: string) => void;
   onAddFolder: (parentFolderId?: string) => void;
   onRemove: (id: string) => void;
   onRemoveFolder: (id: string) => void;
@@ -36,6 +38,9 @@ type PendingRemove =
   | { kind: "folder"; id: string; title: string };
 
 function sectionHasContent(section: GddSection): boolean {
+  if (isSpace3DSection(section)) {
+    return (section.space3d?.objects.length ?? 0) > 0;
+  }
   return section.content.trim().length > 40 || section.board.length > 0;
 }
 
@@ -78,11 +83,13 @@ function parseDragPayload(raw: string): DragPayload | null {
 function SidebarCreateMenu({
   parentFolderId,
   onAddSection,
+  onAddSpace3DSection,
   onAddFolder,
   onClose,
 }: {
   parentFolderId: string | null;
   onAddSection: (folderId?: string) => void;
+  onAddSpace3DSection: (folderId?: string) => void;
   onAddFolder: (parentFolderId?: string) => void;
   onClose: () => void;
 }) {
@@ -90,6 +97,12 @@ function SidebarCreateMenu({
 
   const pickSection = () => {
     onAddSection(parentFolderId ?? undefined);
+    onClose();
+    restoreAppFocus();
+  };
+
+  const pickSpace3D = () => {
+    onAddSpace3DSection(parentFolderId ?? undefined);
     onClose();
     restoreAppFocus();
   };
@@ -114,6 +127,14 @@ function SidebarCreateMenu({
         type="button"
         className="sidebar-create-menu-item"
         role="menuitem"
+        onClick={pickSpace3D}
+      >
+        {t("sidebar.createSpace3D")}
+      </button>
+      <button
+        type="button"
+        className="sidebar-create-menu-item"
+        role="menuitem"
         onClick={pickFolder}
       >
         {t("sidebar.createFolder")}
@@ -129,6 +150,7 @@ export function Sidebar({
   activeId,
   onSelect,
   onAddSection,
+  onAddSpace3DSection,
   onAddFolder,
   onRemove,
   onRemoveFolder,
@@ -265,6 +287,7 @@ export function Sidebar({
           <SidebarCreateMenu
             parentFolderId={parentFolderId}
             onAddSection={onAddSection}
+            onAddSpace3DSection={onAddSpace3DSection}
             onAddFolder={onAddFolder}
             onClose={() => setCreateMenuParent(false)}
           />
@@ -276,6 +299,7 @@ export function Sidebar({
   const renderSectionRow = (section: GddSection, depth: number) => {
     const filled = sectionHasContent(section);
     const active = section.id === activeId;
+    const space3d = isSpace3DSection(section);
     const isDragging = dragging?.kind === "section" && dragging.id === section.id;
     const dropBefore =
       dropTarget?.kind === "section" &&
@@ -292,6 +316,7 @@ export function Sidebar({
         className={[
           "sidebar-row",
           "section-item",
+          space3d ? "section-item--space3d" : "",
           depth > 0 ? "section-item--nested" : "",
           active ? "active" : "",
           isDragging ? "section-item--dragging" : "",
@@ -365,7 +390,12 @@ export function Sidebar({
               <span className="section-desc">{section.description}</span>
             )}
           </span>
-          {section.board.length > 0 && (
+          {space3d && (
+            <span className="section-kind-badge" title={t("sidebar.space3dBadge")}>
+              {t("sidebar.space3dBadgeLabel")}
+            </span>
+          )}
+          {!space3d && section.board.length > 0 && (
             <span className="section-image-count">{section.board.length}</span>
           )}
         </button>

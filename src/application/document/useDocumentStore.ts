@@ -156,6 +156,19 @@ export function useDocumentStore() {
     [mutateDoc]
   );
 
+  const addSpace3DSection = useCallback(
+    (folderId?: string) => {
+      const { doc: next, sectionId } = mutations.addSection(
+        docRef.current,
+        folderId,
+        "space3d"
+      );
+      mutateDoc(() => next);
+      setActiveSectionId(sectionId);
+    },
+    [mutateDoc]
+  );
+
   const addFolder = useCallback(
     (parentFolderId?: string) => {
       mutateDoc((prev) => mutations.addFolder(prev, parentFolderId));
@@ -383,6 +396,33 @@ export function useDocumentStore() {
     [mutateDoc]
   );
 
+  const addSpace3DModel = useCallback(
+    (src: string, name?: string): string => {
+      let assetId = "";
+      mutateDoc((prev) => {
+        const result = mutations.addSpace3DModel(prev, src, name);
+        assetId = result.assetId;
+        return result.doc;
+      });
+      return assetId;
+    },
+    [mutateDoc]
+  );
+
+  const removeSpace3DModelAsset = useCallback(
+    (assetId: string) => {
+      mutateDoc((prev) => mutations.removeSpace3DModelAsset(prev, assetId));
+    },
+    [mutateDoc]
+  );
+
+  const updateSpace3DModelAssetName = useCallback(
+    (assetId: string, name: string) => {
+      mutateDoc((prev) => mutations.renameSpace3DModelAsset(prev, assetId, name));
+    },
+    [mutateDoc]
+  );
+
   const replaceDocument = useCallback(
     (incoming: GddDocument) => {
       if (saveTimer.current) {
@@ -436,6 +476,7 @@ export function useDocumentStore() {
     updateDoc,
     updateSection,
     addSection,
+    addSpace3DSection,
     addFolder,
     updateFolder,
     toggleFolderCollapsed,
@@ -463,6 +504,9 @@ export function useDocumentStore() {
     removeDeskSelection,
     removeBoardImageAsset,
     updateBoardImageAssetName,
+    addSpace3DModel,
+    removeSpace3DModelAsset,
+    updateSpace3DModelAssetName,
     undo,
     beginTransient,
     endTransient,

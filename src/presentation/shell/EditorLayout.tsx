@@ -4,6 +4,8 @@ import { ImageBoard } from "@/features/board/ImageBoard";
 import { PanelSplitter } from "@/shared/components/PanelSplitter";
 import { SectionEditor } from "@/features/editor/SectionEditor";
 import { Sidebar } from "@/features/sidebar/Sidebar";
+import { Space3DView } from "@/features/space3d/Space3DView";
+import { isSpace3DSection } from "@/domain/space3d/space3d";
 import { resolveBoardItemSrc } from "@/domain/board/boardImageRegistry";
 import { restoreAppFocus } from "@/infrastructure/desktop/desktop";
 import { panelFlexStyle } from "@/shared/hooks/useResizablePanels";
@@ -11,6 +13,7 @@ import type { DocumentStore } from "@/application/document/useDocumentStore";
 import type { SearchFocusTarget } from "@/features/search/lib/globalSearch";
 import type { GddSection, GddSectionFolder } from "@/domain/types";
 import type { DeskClipboard } from "@/domain/board/deskClipboard";
+import "@/features/space3d/Space3D.css";
 
 export interface EditorLayoutProps {
   doc: DocumentStore["doc"];
@@ -34,6 +37,7 @@ export interface EditorLayoutProps {
   addSectionLabel: string;
   onSelectSection: (id: string) => void;
   onAddSection: (folderId?: string) => void;
+  onAddSpace3DSection: (folderId?: string) => void;
   onAddFolder: (parentFolderId?: string) => void;
   onRemoveSection: (id: string) => void;
   onRemoveFolder: (id: string) => void;
@@ -69,6 +73,9 @@ export interface EditorLayoutProps {
   onStoreDeskClipboard: DocumentStore["storeDeskClipboard"];
   onBeginTransientEdit: DocumentStore["beginTransient"];
   onEndTransientEdit: DocumentStore["endTransient"];
+  onAddSpace3DModel: DocumentStore["addSpace3DModel"];
+  onRemoveSpace3DModelAsset: DocumentStore["removeSpace3DModelAsset"];
+  onRenameSpace3DModelAsset: DocumentStore["updateSpace3DModelAssetName"];
 }
 
 export function EditorLayout({
@@ -93,6 +100,7 @@ export function EditorLayout({
   addSectionLabel,
   onSelectSection,
   onAddSection,
+  onAddSpace3DSection,
   onAddFolder,
   onRemoveSection,
   onRemoveFolder,
@@ -128,7 +136,12 @@ export function EditorLayout({
   onStoreDeskClipboard,
   onBeginTransientEdit,
   onEndTransientEdit,
+  onAddSpace3DModel,
+  onRemoveSpace3DModelAsset,
+  onRenameSpace3DModelAsset,
 }: EditorLayoutProps) {
+  const isSpace3D = activeSection ? isSpace3DSection(activeSection) : false;
+
   return (
     <div className="app-body">
       <Sidebar
@@ -138,6 +151,7 @@ export function EditorLayout({
         activeId={activeSectionId}
         onSelect={onSelectSection}
         onAddSection={onAddSection}
+        onAddSpace3DSection={onAddSpace3DSection}
         onAddFolder={onAddFolder}
         onRemove={onRemoveSection}
         onRemoveFolder={onRemoveFolder}
@@ -145,7 +159,12 @@ export function EditorLayout({
         onToggleFolder={onToggleFolder}
         onReorder={onReorderSidebar}
       />
-      <div ref={mainRef} className="main-panel">
+      <div
+        ref={mainRef}
+        className={`main-panel ${isSpace3D ? "main-panel--space3d" : ""}`}
+      >
+        {!isSpace3D && (
+          <>
         <PanelSplitter
           edge="start"
           hidden={editorHidden}
@@ -195,7 +214,10 @@ export function EditorLayout({
             </div>
           )}
         </div>
+          </>
+        )}
 
+        {!isSpace3D && (
         <PanelSplitter
           edge="end"
           hidden={boardHidden}
@@ -203,13 +225,27 @@ export function EditorLayout({
           onPointerDown={onBoardSplitterDown}
           onDoubleClick={onBoardSplitterDoubleClick}
         />
+        )}
 
         <div
-          className={`board-pane ${boardHidden ? "board-pane--hidden" : ""}`}
-          style={panelFlexStyle(boardHidden, boardWidth, 160)}
+          className={`board-pane ${boardHidden && !isSpace3D ? "board-pane--hidden" : ""}`}
+          style={isSpace3D ? { flex: "1 1 auto", width: "100%" } : panelFlexStyle(boardHidden, boardWidth, 160)}
         >
-          {!boardHidden &&
+          {(isSpace3D || !boardHidden) &&
             (activeSection ? (
+              isSpace3D ? (
+                <Space3DView
+                  key={activeSection.id}
+                  doc={doc}
+                  section={activeSection}
+                  onChange={(patch) => onUpdateSection(activeSection.id, patch)}
+                  onAddModel={onAddSpace3DModel}
+                  onRemoveModelAsset={onRemoveSpace3DModelAsset}
+                  onRenameModelAsset={onRenameSpace3DModelAsset}
+                  onBeginTransientEdit={onBeginTransientEdit}
+                  onEndTransientEdit={onEndTransientEdit}
+                />
+              ) : (
               <ImageBoard
                 key={activeSection.id}
                 projectId={doc.id}
@@ -269,6 +305,7 @@ export function EditorLayout({
                 onBeginTransientEdit={onBeginTransientEdit}
                 onEndTransientEdit={onEndTransientEdit}
               />
+              )
             ) : (
               <div className="board-empty" aria-hidden />
             ))}

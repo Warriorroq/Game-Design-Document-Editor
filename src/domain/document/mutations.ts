@@ -7,6 +7,11 @@ import {
   updateBoardImageAssetName,
 } from "@/domain/board/boardImageRegistry";
 import {
+  deleteSpace3DModelAsset,
+  registerSpace3DModel,
+  updateSpace3DModelAssetName,
+} from "@/domain/space3d/modelRegistry";
+import {
   applySidebarDrop,
   nextChildOrder,
   removeFolderFromDoc,
@@ -45,10 +50,12 @@ export function patchSection(
 
 export function addSection(
   doc: GddDocument,
-  folderId?: string
+  folderId?: string,
+  kind: GddSection["kind"] = "document"
 ): { doc: GddDocument; sectionId: string } {
   const id = crypto.randomUUID();
   const order = nextChildOrder(doc, folderId ?? null);
+  const isSpace3D = kind === "space3d";
   return {
     sectionId: id,
     doc: {
@@ -57,11 +64,13 @@ export function addSection(
         ...doc.sections,
         {
           id,
-          title: "New Section",
+          title: isSpace3D ? "3D Space" : "New Section",
           description: "",
           content: "",
           order,
           folderId,
+          kind: isSpace3D ? "space3d" : undefined,
+          space3d: isSpace3D ? { objects: [] } : undefined,
           board: [],
           shapes: [],
           strokes: [],
@@ -513,6 +522,26 @@ export function renameBoardImageAsset(
   name: string
 ): GddDocument {
   return updateBoardImageAssetName(doc, assetId, name);
+}
+
+export function addSpace3DModel(
+  doc: GddDocument,
+  src: string,
+  name?: string
+): { doc: GddDocument; assetId: string } {
+  return registerSpace3DModel(doc, src, name);
+}
+
+export function removeSpace3DModelAsset(doc: GddDocument, assetId: string): GddDocument {
+  return deleteSpace3DModelAsset(doc, assetId);
+}
+
+export function renameSpace3DModelAsset(
+  doc: GddDocument,
+  assetId: string,
+  name: string
+): GddDocument {
+  return updateSpace3DModelAssetName(doc, assetId, name);
 }
 
 export type { DeskClipboard, DeskSelection };

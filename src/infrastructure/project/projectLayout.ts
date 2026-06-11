@@ -5,6 +5,7 @@ import {
   migrateBoardImages,
   resolveBoardItemSrc,
 } from "@/domain/board/boardImageRegistry";
+import { collectSpace3DModelRegistryAssets } from "@/domain/space3d/modelRegistry";
 import { normalizeDocument } from "@/domain/document/document";
 import type {
   BoardImageAsset,
@@ -12,6 +13,7 @@ import type {
   GddDocument,
   GddSection,
   GddSectionFolder,
+  Space3DModelAsset,
 } from "@/domain/types";
 
 export const FOLDER_FORMAT = "gdd-editor-folder" as const;
@@ -57,6 +59,11 @@ interface ManifestBoardImageMeta {
   name?: string;
 }
 
+interface ManifestSpace3DModelMeta {
+  id: string;
+  name?: string;
+}
+
 interface ManifestFile {
   format: typeof FOLDER_FORMAT;
   version: number;
@@ -67,6 +74,7 @@ interface ManifestFile {
   folders?: ManifestFolderRef[];
   sections: ManifestSectionRef[];
   boardImages?: ManifestBoardImageMeta[];
+  space3DModels?: ManifestSpace3DModelMeta[];
 }
 
 interface SectionFileBoardItem {
@@ -93,6 +101,8 @@ interface SectionFile {
   content: string;
   order: number;
   folderId?: string;
+  kind?: GddSection["kind"];
+  space3d?: GddSection["space3d"];
   board: SectionFileBoardItem[];
   shapes: GddSection["shapes"];
   strokes: GddSection["strokes"];
@@ -105,6 +115,10 @@ const MIME_EXT: Record<string, string> = {
   "image/png": "png",
   "image/webp": "webp",
   "image/gif": "gif",
+  "model/gltf-binary": "glb",
+  "model/gltf+json": "gltf",
+  "model/fbx": "fbx",
+  "model/obj": "obj",
 };
 
 function extensionForMime(mime: string): string {
@@ -130,7 +144,7 @@ function assetFilePath(assetId: string, mime: string): string {
 }
 
 function registryAssetToFolder(
-  asset: BoardImageAsset,
+  asset: { id: string; src: string },
   assets: Map<string, FolderAsset>
 ): void {
   const parsed = parseDataUrl(asset.src);
@@ -151,6 +165,15 @@ function collectBoardImageRegistryAssets(
   assets: Map<string, FolderAsset>
 ): void {
   for (const asset of Object.values(doc.boardImages ?? {})) {
+    registryAssetToFolder(asset, assets);
+  }
+}
+
+function collectSpace3DModelRegistryAssetsToFolder(
+  doc: GddDocument,
+  assets: Map<string, FolderAsset>
+): void {
+  for (const asset of collectSpace3DModelRegistryAssets(doc)) {
     registryAssetToFolder(asset, assets);
   }
 }
@@ -289,6 +312,8 @@ export function documentToFolderPayload(doc: GddDocument): FolderProjectPayload 
       content: section.content,
       order: section.order,
       folderId: section.folderId,
+      kind: section.kind,
+      space3d: section.space3d,
       board: section.board.map((item) => boardItemToFile(updated, item, assets)),
       shapes: section.shapes,
       strokes: section.strokes,
@@ -304,11 +329,19 @@ export function documentToFolderPayload(doc: GddDocument): FolderProjectPayload 
   }
 
   collectBoardImageRegistryAssets(updated, assets);
+  collectSpace3DModelRegistryAssetsToFolder(updated, assets);
 
   const boardImageMeta: ManifestBoardImageMeta[] = [];
   for (const asset of Object.values(updated.boardImages ?? {})) {
     const name = asset.name?.trim();
     if (name) boardImageMeta.push({ id: asset.id, name });
+  }
+
+  const space3DModelMeta: ManifestSpace3DModelMeta[] = [];
+  for (const asset of Object.values(updated.space3DModels ?? {})) {
+    const name = asset.name?.trim();
+    if (name) space3DModelMeta.push({ id: asset.id, name });
+    else space3DModelMeta.push({ id: asset.id });
   }
 
   const manifest: ManifestFile = {
@@ -331,6 +364,7 @@ export function documentToFolderPayload(doc: GddDocument): FolderProjectPayload 
       order: section.order,
     })),
     ...(boardImageMeta.length > 0 ? { boardImages: boardImageMeta } : {}),
+    ...(space3DModelMeta.length > 0 ? { space3DModels: space3DModelMeta } : {}),
   };
 
   return {
@@ -354,6 +388,8 @@ export function folderPayloadToDocument(payload: FolderProjectPayload): GddDocum
 
   const assetMap = new Map(payload.assets.map((asset) => [asset.path, asset]));
   const boardImages: Record<string, BoardImageAsset> = {};
+  const space3DModels: Record<string, Space3DModelAsset> = {};
+  const modelMetaIds = new Set((manifest.space3DModels ?? []).map((meta) => meta.id));
   const sectionById = new Map(
     payload.sections.map((entry) => [entry.id, entry.content])
   );
@@ -380,6 +416,8 @@ export function folderPayloadToDocument(payload: FolderProjectPayload): GddDocum
         content: sectionFile.content,
         order: sectionFile.order,
         folderId: sectionFile.folderId,
+        kind: sectionFile.kind,
+        space3d: sectionFile.space3d,
         board: sectionFile.board
           .map((item) => boardItemFromFile(item, assetMap, boardImages))
           .filter((item): item is BoardItem => item !== null),
@@ -393,7 +431,11 @@ export function folderPayloadToDocument(payload: FolderProjectPayload): GddDocum
   for (const folderAsset of assetMap.values()) {
     const assetId = assetIdFromAssetPath(folderAsset.path);
     const src = dataUrlFromBase64(folderAsset.mime, folderAsset.dataBase64);
-    collectBoardImageAsset(boardImages, assetId, src);
+    if (folderAsset.mime.startsWith("model/") || modelMetaIds.has(assetId)) {
+      space3DModels[assetId] = { id: assetId, src };
+    } else {
+      collectBoardImageAsset(boardImages, assetId, src);
+    }
   }
 
   for (const meta of manifest.boardImages ?? []) {
@@ -402,12 +444,22 @@ export function folderPayloadToDocument(payload: FolderProjectPayload): GddDocum
     boardImages[meta.id] = { ...boardImages[meta.id], name };
   }
 
+  for (const meta of manifest.space3DModels ?? []) {
+    const name = meta.name?.trim();
+    if (!space3DModels[meta.id]) continue;
+    space3DModels[meta.id] = {
+      ...space3DModels[meta.id],
+      ...(name ? { name } : {}),
+    };
+  }
+
   return normalizeDocument({
     id: manifest.id,
     title: manifest.title,
     subtitle: manifest.subtitle,
     lastModified: manifest.lastModified,
     boardImages,
+    space3DModels: Object.keys(space3DModels).length > 0 ? space3DModels : undefined,
     folders: (manifest.folders ?? []).map(
       (folder): GddSectionFolder => ({
         id: folder.id,

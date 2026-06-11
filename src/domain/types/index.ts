@@ -77,6 +77,56 @@ export interface GddSectionFolder {
   collapsed?: boolean;
 }
 
+export type SectionKind = "document" | "space3d";
+
+export type Space3DObjectType = "box" | "sphere" | "model";
+
+export type Space3DEditMode = "move" | "scale" | "rotate";
+
+export interface Space3DObject {
+  id: string;
+  type: Space3DObjectType;
+  x: number;
+  y: number;
+  z: number;
+  /** Primitive color. Ignored for models. */
+  color?: string;
+  scaleX?: number;
+  scaleY?: number;
+  scaleZ?: number;
+  rotationX?: number;
+  rotationY?: number;
+  rotationZ?: number;
+  /** Reference to `GddDocument.space3DModels` when `type` is `model`. */
+  assetId?: string;
+}
+
+export interface Space3DCamera {
+  position: { x: number; y: number; z: number };
+  target: { x: number; y: number; z: number };
+}
+
+export interface Space3DGrid {
+  /** When true, step snapping and visual grid lines are active. */
+  enabled?: boolean;
+  /** Snap step for move and scale (world units). */
+  step?: number;
+  /** Visual grid extent (world units). */
+  size?: number;
+  /** Hex color for center axis lines. */
+  centerColor?: string;
+  /** Hex color for grid lines. */
+  lineColor?: string;
+  /** @deprecated Use `enabled`. Kept for older saved projects. */
+  visible?: boolean;
+}
+
+export interface Space3DData {
+  objects: Space3DObject[];
+  camera?: Space3DCamera;
+  grid?: Space3DGrid;
+}
+
 export interface GddSection {
   id: string;
   title: string;
@@ -84,6 +134,9 @@ export interface GddSection {
   content: string;
   order: number;
   folderId?: string;
+  /** Defaults to `"document"` when omitted. */
+  kind?: SectionKind;
+  space3d?: Space3DData;
   board: BoardItem[];
   shapes: BoardShape[];
   strokes: BoardStroke[];
@@ -124,6 +177,14 @@ export interface BoardItem {
   flipV?: boolean;
 }
 
+/** Shared 3D model in the document flyweight registry (`GddDocument.space3DModels`). */
+export interface Space3DModelAsset {
+  id: string;
+  src: string;
+  /** Display name; `id` is the stable internal key. */
+  name?: string;
+}
+
 export interface GddDocument {
   id: string;
   title: string;
@@ -132,5 +193,7 @@ export interface GddDocument {
   folders?: GddSectionFolder[];
   /** Shared board image registry keyed by asset id. */
   boardImages?: Record<string, BoardImageAsset>;
+  /** Shared 3D model registry keyed by asset id. */
+  space3DModels?: Record<string, Space3DModelAsset>;
   sections: GddSection[];
 }
