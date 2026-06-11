@@ -388,6 +388,15 @@ export function useImageBoard({
     [onUpdateText]
   );
 
+  const applyTextAlign = useCallback(
+    (textIds: string[], textAlign: BoardText["textAlign"]) => {
+      for (const id of textIds) {
+        onUpdateText(id, { textAlign }, { recordHistory: true });
+      }
+    },
+    [onUpdateText]
+  );
+
   const deleteSelection = useCallback(() => {
     if (selectionSize === 0) return;
     const itemIds = selection.itemIds.filter((id) => !isSelectionLocked.item(id));
@@ -1814,6 +1823,7 @@ export function useImageBoard({
     setPenWidth,
     applyTextColor,
     applyTextStyle,
+    applyTextAlign,
     drawPreview,
     setPasteHint,
     pickDeskTool,

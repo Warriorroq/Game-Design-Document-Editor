@@ -42,6 +42,8 @@ export interface BoardStroke {
   locked?: boolean;
 }
 
+export type BoardTextAlign = "left" | "center" | "right";
+
 export interface BoardText {
   id: string;
   content: string;
@@ -55,6 +57,8 @@ export interface BoardText {
   bold?: boolean;
   italic?: boolean;
   strikethrough?: boolean;
+  /** Horizontal alignment. Defaults to left when omitted. */
+  textAlign?: BoardTextAlign;
 }
 
 export interface BoardGroup {

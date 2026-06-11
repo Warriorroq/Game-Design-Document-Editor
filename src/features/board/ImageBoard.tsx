@@ -99,6 +99,7 @@ export function ImageBoard(props: ImageBoardProps) {
     setPenWidth,
     applyTextColor,
     applyTextStyle,
+    applyTextAlign,
     drawPreview,
     pickDeskTool,
     placeVideo,
@@ -425,6 +426,7 @@ export function ImageBoard(props: ImageBoardProps) {
         texts={texts}
         onTextColorChange={applyTextColor}
         onTextStyleChange={applyTextStyle}
+        onTextAlignChange={applyTextAlign}
       />
 
       <VideoInsertDialog

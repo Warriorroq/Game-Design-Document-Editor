@@ -475,6 +475,74 @@
   text-decoration: line-through;
 }
 
+.board-text-align-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-right: 12px;
+  border-right: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.board-text-align-btn {
+  min-width: 32px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s, color 0.12s;
+}
+
+.board-text-align-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.board-text-align-btn.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.board-text-align-icon {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 14px;
+}
+
+.board-text-align-icon > span {
+  display: block;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+}
+
+.board-text-align-icon--left > span {
+  width: 100%;
+}
+
+.board-text-align-icon--center > span {
+  width: 100%;
+  margin-inline: auto;
+}
+
+.board-text-align-icon--center > span:nth-child(2) {
+  width: 80%;
+}
+
+.board-text-align-icon--right > span {
+  width: 100%;
+  margin-left: auto;
+}
+
+.board-text-align-icon--right > span:nth-child(3) {
+  width: 70%;
+}
+
 .board-toolbar .text-color-toolbar {
   flex: 1;
   min-width: 0;

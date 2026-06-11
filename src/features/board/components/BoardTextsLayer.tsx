@@ -95,12 +95,6 @@ export function BoardTextsLayer({
                     e.preventDefault();
                     onTextCommit(text.id, plainTextFromEditable(e.currentTarget));
                     onEditEnd();
-                    return;
-                  }
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    onTextCommit(text.id, plainTextFromEditable(e.currentTarget));
-                    onEditEnd();
                   }
                 }}
                 onPointerDown={(e) => e.stopPropagation()}

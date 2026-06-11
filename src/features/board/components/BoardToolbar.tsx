@@ -5,9 +5,13 @@ import {
   BOARD_PEN_WIDTHS,
   type BoardPenWidth,
 } from "@/features/board/lib/boardPen";
-import { nextUniformFlag, uniformFlag } from "@/features/board/lib/boardTextStyle";
+import {
+  nextUniformFlag,
+  uniformFlag,
+  uniformTextAlign,
+} from "@/features/board/lib/boardTextStyle";
 import { resolveBoardTextColor } from "@/shared/lib/textColorUtils";
-import type { BoardText } from "@/shared/types";
+import type { BoardText, BoardTextAlign } from "@/shared/types";
 import { TextColorSwatches } from "@/shared/components/TextColorSwatches";
 
 interface BoardToolbarProps {
@@ -24,6 +28,7 @@ interface BoardToolbarProps {
     textIds: string[],
     patch: Pick<BoardText, "bold" | "italic" | "strikethrough">
   ) => void;
+  onTextAlignChange: (textIds: string[], align: BoardTextAlign) => void;
 }
 
 export function BoardToolbar({
@@ -37,6 +42,7 @@ export function BoardToolbar({
   texts,
   onTextColorChange,
   onTextStyleChange,
+  onTextAlignChange,
 }: BoardToolbarProps) {
   const { t } = useLocale();
   const hasTextSelection = selectedTextIds.length > 0;
@@ -56,6 +62,7 @@ export function BoardToolbar({
   const boldState = uniformFlag(selectedTexts, "bold");
   const italicState = uniformFlag(selectedTexts, "italic");
   const strikeState = uniformFlag(selectedTexts, "strikethrough");
+  const alignState = uniformTextAlign(selectedTexts);
 
   return (
     <footer className="board-toolbar">
@@ -180,6 +187,38 @@ export function BoardToolbar({
               >
                 <span className="board-text-style-btn-strike">S</span>
               </button>
+            </div>
+            <div
+              className="board-text-align-group"
+              role="group"
+              aria-label={t("desk.textAlignAria")}
+            >
+              {(
+                [
+                  ["left", "desk.textAlignLeft"],
+                  ["center", "desk.textAlignCenter"],
+                  ["right", "desk.textAlignRight"],
+                ] as const
+              ).map(([align, labelKey]) => (
+                <button
+                  key={align}
+                  type="button"
+                  className={`board-text-align-btn ${alignState === align ? "active" : ""}`}
+                  title={t(labelKey)}
+                  aria-label={t(labelKey)}
+                  aria-pressed={alignState === align}
+                  onClick={() => onTextAlignChange(selectedTextIds, align)}
+                >
+                  <span
+                    className={`board-text-align-icon board-text-align-icon--${align}`}
+                    aria-hidden
+                  >
+                    <span />
+                    <span />
+                    <span />
+                  </span>
+                </button>
+              ))}
             </div>
             <TextColorSwatches
               activeColor={activeTextColor}
