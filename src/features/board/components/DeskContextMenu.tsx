@@ -19,6 +19,7 @@ interface DeskContextMenuProps {
   canFlipVertical: boolean;
   onPick: (type: BoardDrawTool) => void;
   onAddText: () => void;
+  onInsertVideo: () => void;
   onGroup: () => void;
   onUngroup: () => void;
   onCopy: () => void;
@@ -47,6 +48,7 @@ export function DeskContextMenu({
   canFlipVertical,
   onPick,
   onAddText,
+  onInsertVideo,
   onGroup,
   onUngroup,
   onCopy,
@@ -116,6 +118,14 @@ export function DeskContextMenu({
         onClick={onAddText}
       >
         {t("menu.addText")}
+      </button>
+      <button
+        type="button"
+        className="link-menu-item"
+        role="menuitem"
+        onClick={onInsertVideo}
+      >
+        {t("menu.insertVideo")}
       </button>
       <div className="board-menu-sep" role="separator" />
       {canCopy && (

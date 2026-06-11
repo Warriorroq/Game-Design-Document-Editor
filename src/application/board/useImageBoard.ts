@@ -29,6 +29,12 @@ import {
   penStrokeLongEnough,
 } from "@/features/board/lib/boardPen";
 import {
+  DEFAULT_VIDEO_HEIGHT,
+  DEFAULT_VIDEO_WIDTH,
+  isBoardVideoItem,
+} from "@/domain/board/boardItem";
+import { parseVideoEmbed } from "@/domain/board/videoEmbed";
+import {
   blobToDataUrl,
   getImageFromClipboard,
   loadImageDimensions,
@@ -463,8 +469,10 @@ export function useImageBoard({
 
   const canFlipImages = useMemo(() => {
     if (!singleImageSelection) return false;
+    const item = items.find((i) => i.id === singleImageSelection);
+    if (!item || isBoardVideoItem(item)) return false;
     return !isSelectionLocked.item(singleImageSelection);
-  }, [isSelectionLocked, singleImageSelection]);
+  }, [isSelectionLocked, items, singleImageSelection]);
 
   const bringSelectionForward = useCallback(() => {
     if (!canBringForward || !singleImageSelection) return;
@@ -717,6 +725,34 @@ export function useImageBoard({
     [canvasWidth, canvasHeight, nextPastePosition, onAdd]
   );
 
+  const placeVideo = useCallback(
+    (rawUrl: string, at?: { x: number; y: number }) => {
+      const embed = parseVideoEmbed(rawUrl);
+      if (!embed) return false;
+
+      const pos = at ?? nextPastePosition();
+      const width = DEFAULT_VIDEO_WIDTH;
+      const height = DEFAULT_VIDEO_HEIGHT;
+      const id = crypto.randomUUID();
+
+      onAdd({
+        id,
+        kind: "video",
+        videoUrl: embed.originalUrl,
+        src: embed.src,
+        videoRender: embed.render,
+        x: Math.max(0, Math.min(pos.x, canvasWidth - width)),
+        y: Math.max(0, Math.min(pos.y, canvasHeight - height)),
+        width,
+        height,
+      });
+      setSelection({ itemIds: [id], shapeIds: [], textIds: [], strokeIds: [] });
+      setPasteHint(false);
+      return true;
+    },
+    [canvasWidth, canvasHeight, nextPastePosition, onAdd]
+  );
+
   const handlePaste = useCallback(
     async (e: ClipboardEvent) => {
       const blob = getImageFromClipboard(e.clipboardData!);
@@ -725,12 +761,20 @@ export function useImageBoard({
         await placeImage(blob);
         return;
       }
+
+      const text = e.clipboardData?.getData("text/plain")?.trim();
+      if (text && parseVideoEmbed(text)) {
+        e.preventDefault();
+        placeVideo(text);
+        return;
+      }
+
       if (isDeskFocused() && deskClipboard) {
         e.preventDefault();
         pasteDesk();
       }
     },
-    [deskClipboard, isDeskFocused, pasteDesk, placeImage]
+    [deskClipboard, isDeskFocused, pasteDesk, placeImage, placeVideo]
   );
 
   const handleDrop = useCallback(
@@ -1773,6 +1817,7 @@ export function useImageBoard({
     drawPreview,
     setPasteHint,
     pickDeskTool,
+    placeVideo,
   };
 }
 

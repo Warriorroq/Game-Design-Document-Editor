@@ -1,3 +1,4 @@
+import { isBoardVideoItem } from "@/domain/board/boardItem";
 import type { BoardImageAsset, BoardItem, GddDocument } from "@/domain/types";
 
 const ASSETS_DIR = "assets";
@@ -26,6 +27,9 @@ const MISSING_BOARD_IMAGE_SRC =
   "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
 export function resolveBoardItemSrc(doc: GddDocument, item: BoardItem): string {
+  if (isBoardVideoItem(item)) {
+    return item.src ?? MISSING_BOARD_IMAGE_SRC;
+  }
   const asset = item.assetId ? doc.boardImages?.[item.assetId] : undefined;
   if (asset) return asset.src;
   if (item.src) return item.src;
@@ -57,6 +61,13 @@ export function prepareBoardItemForDoc(
   doc: GddDocument,
   item: BoardItem
 ): { doc: GddDocument; item: BoardItem } {
+  if (isBoardVideoItem(item)) {
+    if (!item.src) {
+      throw new Error(`Board video ${item.id} has no embed source`);
+    }
+    return { doc, item };
+  }
+
   if (item.assetId && doc.boardImages?.[item.assetId]) {
     const { src: _legacy, ...rest } = item;
     return { doc, item: rest };
@@ -98,6 +109,10 @@ export function migrateBoardImages(doc: GddDocument): GddDocument {
   const sections = doc.sections.map((section) => ({
     ...section,
     board: section.board.map((item) => {
+      if (isBoardVideoItem(item)) {
+        return item;
+      }
+
       if (item.assetId && images[item.assetId]) {
         if (item.src) {
           changed = true;

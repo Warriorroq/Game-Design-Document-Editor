@@ -2,6 +2,8 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useLocale } from "@/shared/context/LocaleContext";
 import { useLinkContext } from "@/features/links/LinkContext";
+import { boardVideoEmbedSrc, boardVideoRenderMode, isBoardVideoItem } from "@/domain/board/boardItem";
+import { BoardVideoIframe } from "@/features/board/components/BoardVideoIframe";
 import { resolveBoardItemSrc } from "@/features/board/lib/boardImageRegistry";
 import {
   findBoardItem,
@@ -105,16 +107,40 @@ export function LinkPreviewLayer() {
           src={link.url}
           className="link-preview-iframe"
           sandbox="allow-scripts allow-same-origin"
+          referrerPolicy="strict-origin-when-cross-origin"
         />
       </div>
     );
   } else if (link.type === "media") {
     const item = findBoardItem(doc, link.sectionId, link.itemId);
-    body = item ? (
-      <img src={resolveBoardItemSrc(doc, item)} alt="" className="link-preview-image" />
-    ) : (
-      <p className="link-preview-fallback">{t("link.imageNotFound")}</p>
-    );
+    if (!item) {
+      body = <p className="link-preview-fallback">{t("link.imageNotFound")}</p>;
+    } else if (isBoardVideoItem(item)) {
+      const embedSrc = boardVideoEmbedSrc(item);
+      body = embedSrc ? (
+        boardVideoRenderMode(item) === "video" ? (
+          <video
+            className="link-preview-video"
+            src={embedSrc}
+            controls
+            playsInline
+            preload="metadata"
+          />
+        ) : (
+          <BoardVideoIframe
+            title={t("link.previewTitle")}
+            src={embedSrc}
+            className="link-preview-iframe"
+          />
+        )
+      ) : (
+        <p className="link-preview-fallback">{t("link.videoNotFound")}</p>
+      );
+    } else {
+      body = (
+        <img src={resolveBoardItemSrc(doc, item)} alt="" className="link-preview-image" />
+      );
+    }
   } else if (link.type === "text") {
     const boardText = findBoardText(doc, link.sectionId, link.textId);
     const section = findSection(doc, link.sectionId);

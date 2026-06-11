@@ -241,13 +241,32 @@
   border-radius: calc(var(--radius) - 2px);
 }
 
-.board-item img {
+.board-item img,
+.board-item-video {
   width: 100%;
   height: 100%;
   object-fit: contain;
   display: block;
   pointer-events: none;
-  background: transparent;
+  background: var(--bg-base);
+}
+
+.board-item-iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+  pointer-events: none;
+  background: #000;
+}
+
+.board-item--video-active .board-item-iframe,
+.board-item--video-active .board-item-video {
+  pointer-events: auto;
+}
+
+.board-item--video .board-item-visual {
+  background: #000;
 }
 
 .board-item-drag {

@@ -115,8 +115,10 @@ export function suggestLinkText(doc: GddDocument, href: string): string {
   }
 
   if (link.type === "media") {
+    const item = section.board.find((b) => b.id === link.itemId);
     const idx = section.board.findIndex((b) => b.id === link.itemId);
-    return idx >= 0 ? `Image ${idx + 1} · ${section.title}` : `Image · ${section.title}`;
+    const label = item?.kind === "video" ? "Video" : "Image";
+    return idx >= 0 ? `${label} ${idx + 1} · ${section.title}` : `${label} · ${section.title}`;
   }
 
   if (link.type === "text") {

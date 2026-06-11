@@ -95,12 +95,20 @@ export interface BoardImageAsset {
   name?: string;
 }
 
+export type BoardItemKind = "image" | "video";
+
 export interface BoardItem {
   id: string;
+  /** `image` when omitted (legacy documents). */
+  kind?: BoardItemKind;
   /** Reference to a shared entry in `boardImages`. */
   assetId?: string;
-  /** Inline source for new pastes; migrated into `boardImages` on add/load. */
+  /** Image data URL / asset path, or video embed URL when `kind` is `video`. */
   src?: string;
+  /** Original watch URL for embedded videos. */
+  videoUrl?: string;
+  /** How to render `kind: "video"` — iframe embed or HTML5 video. */
+  videoRender?: "iframe" | "video";
   x: number;
   y: number;
   width: number;

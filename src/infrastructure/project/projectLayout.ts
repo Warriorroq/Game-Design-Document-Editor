@@ -1,3 +1,4 @@
+import { isBoardVideoItem } from "@/domain/board/boardItem";
 import {
   assetIdFromAssetPath,
   collectBoardImageAsset,
@@ -70,7 +71,11 @@ interface ManifestFile {
 
 interface SectionFileBoardItem {
   id: string;
-  asset: string;
+  asset?: string;
+  kind?: "video";
+  videoUrl?: string;
+  embedUrl?: string;
+  videoRender?: "iframe" | "video";
   x: number;
   y: number;
   width: number;
@@ -155,6 +160,25 @@ function boardItemToFile(
   item: BoardItem,
   assets: Map<string, FolderAsset>
 ): SectionFileBoardItem {
+  if (isBoardVideoItem(item)) {
+    const embedUrl = item.src;
+    if (!embedUrl) {
+      throw new Error(`Board video ${item.id} has no embed URL`);
+    }
+    return {
+      id: item.id,
+      kind: "video",
+      videoUrl: item.videoUrl ?? embedUrl,
+      embedUrl,
+      videoRender: item.videoRender,
+      x: item.x,
+      y: item.y,
+      width: item.width,
+      height: item.height,
+      locked: item.locked,
+    };
+  }
+
   const src = resolveBoardItemSrc(doc, item);
   const assetId =
     item.assetId ??
@@ -210,6 +234,23 @@ function boardItemFromFile(
   assetMap: Map<string, FolderAsset>,
   registry: Record<string, BoardImageAsset>
 ): BoardItem | null {
+  if (item.kind === "video" && item.embedUrl) {
+    return {
+      id: item.id,
+      kind: "video",
+      videoUrl: item.videoUrl ?? item.embedUrl,
+      src: item.embedUrl,
+      videoRender: item.videoRender,
+      x: item.x,
+      y: item.y,
+      width: item.width,
+      height: item.height,
+      locked: item.locked,
+    };
+  }
+
+  if (!item.asset) return null;
+
   const asset = assetMap.get(item.asset);
   if (!asset) {
     return null;

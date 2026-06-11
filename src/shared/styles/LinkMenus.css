@@ -52,6 +52,26 @@
   color: var(--text-muted);
 }
 
+.link-paste-hint {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.link-paste-error {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--danger);
+}
+
+.link-preview-video {
+  width: 100%;
+  max-height: 200px;
+  border-radius: var(--radius);
+  background: #000;
+}
+
 .link-paste-title {
   margin: 0 0 16px;
   font-size: 16px;

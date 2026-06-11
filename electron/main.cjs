@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, ipcMain, dialog } = require("electron");
+const { app, BrowserWindow, Menu, ipcMain, dialog, session } = require("electron");
 const path = require("path");
 const git = require("./git.cjs");
 const project = require("./project.cjs");
@@ -207,7 +207,27 @@ function createWindow() {
   }
 }
 
+function configureEmbedReferrer() {
+  const embedReferer = "https://localhost/";
+  const filter = {
+    urls: [
+      "*://*.youtube.com/*",
+      "*://*.youtube-nocookie.com/*",
+      "*://*.googlevideo.com/*",
+      "*://*.ytimg.com/*",
+    ],
+  };
+
+  session.defaultSession.webRequest.onBeforeSendHeaders(filter, (details, callback) => {
+    const headers = { ...details.requestHeaders };
+    // file:// app pages send no Referer; YouTube embeds require one (error 153).
+    headers.Referer = embedReferer;
+    callback({ requestHeaders: headers });
+  });
+}
+
 app.whenReady().then(() => {
+  configureEmbedReferrer();
   Menu.setApplicationMenu(null);
   createWindow();
 

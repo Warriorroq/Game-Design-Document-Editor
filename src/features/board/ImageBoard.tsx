@@ -1,9 +1,17 @@
+import { useState } from "react";
 import { BoardShapesLayer } from "./components/BoardShapesLayer";
 import { BoardStrokesLayer } from "./components/BoardStrokesLayer";
 import { BoardToolbar } from "./components/BoardToolbar";
 import { BoardTextsLayer } from "./components/BoardTextsLayer";
 import { DeskContextMenu } from "./components/DeskContextMenu";
+import { BoardVideoIframe } from "./components/BoardVideoIframe";
+import { VideoInsertDialog } from "./components/VideoInsertDialog";
 import { buildMediaHref, buildTextHref } from "@/features/links/lib/links";
+import {
+  boardVideoEmbedSrc,
+  boardVideoRenderMode,
+  isBoardVideoItem,
+} from "@/domain/board/boardItem";
 import { selectionCount } from "@/domain/board/deskGroups";
 import { boardItemTransform } from "@/domain/board/boardItemTransform";
 import { useImageBoard, type ImageBoardProps } from "@/application/board/useImageBoard";
@@ -93,7 +101,10 @@ export function ImageBoard(props: ImageBoardProps) {
     applyTextStyle,
     drawPreview,
     pickDeskTool,
+    placeVideo,
   } = useImageBoard(props);
+
+  const [videoDialogOpen, setVideoDialogOpen] = useState(false);
 
   return (
     <div className="board-panel board-panel--embedded">
@@ -103,7 +114,8 @@ export function ImageBoard(props: ImageBoardProps) {
         </div>
         <div className="board-meta">
           <span className="board-zoom">{zoomPercent}%</span>
-          <span>{t("desk.images", { count: items.length })}</span>
+          <span>{t("desk.images", { count: items.filter((i) => !isBoardVideoItem(i)).length })}</span>
+          <span>{t("desk.videos", { count: items.filter(isBoardVideoItem).length })}</span>
           <span>{t("desk.shapes", { count: shapes.length })}</span>
           <span>{t("desk.labels", { count: texts.length })}</span>
           {canGroup && (
@@ -186,10 +198,16 @@ export function ImageBoard(props: ImageBoardProps) {
               onShapePointerDown={handleShapePointerDown}
               onEndpointPointerDown={startEndpointDrag}
             />
-            {items.map((item) => (
+            {items.map((item) => {
+              const isVideo = isBoardVideoItem(item);
+              const videoSelected = selectedItemSet.has(item.id);
+              const videoEmbedSrc = isVideo ? boardVideoEmbedSrc(item) : null;
+              const videoRender = isVideo ? boardVideoRenderMode(item) : null;
+
+              return (
               <div
                 key={item.id}
-                className={`board-item ${item.locked ? "locked" : ""} ${selectedItemSet.has(item.id) ? "selected" : ""} ${singleImageSelection === item.id ? "board-item--image-tools" : ""} ${highlightMediaId === item.id ? "board-item--link-target" : ""}`}
+                className={`board-item ${isVideo ? "board-item--video" : ""} ${item.locked ? "locked" : ""} ${videoSelected ? "selected" : ""} ${!isVideo && singleImageSelection === item.id ? "board-item--image-tools" : ""} ${videoSelected && isVideo ? "board-item--video-active" : ""} ${highlightMediaId === item.id ? "board-item--link-target" : ""}`}
                 style={{
                   left: item.x,
                   top: item.y,
@@ -216,7 +234,26 @@ export function ImageBoard(props: ImageBoardProps) {
                 >
                   <div className="board-item-frame" aria-hidden />
                   <div className="board-item-visual">
-                    <img src={resolveItemSrc(item)} alt="" draggable={false} />
+                    {isVideo && videoEmbedSrc ? (
+                      videoRender === "video" ? (
+                        <video
+                          className="board-item-video"
+                          src={videoEmbedSrc}
+                          controls
+                          playsInline
+                          preload="metadata"
+                          draggable={false}
+                        />
+                      ) : (
+                        <BoardVideoIframe
+                          className="board-item-iframe"
+                          src={videoEmbedSrc}
+                          title={item.videoUrl ?? t("desk.videoEmbedTitle")}
+                        />
+                      )
+                    ) : (
+                      <img src={resolveItemSrc(item)} alt="" draggable={false} />
+                    )}
                   </div>
                   <div className="board-item-handles">
                     <button
@@ -234,7 +271,7 @@ export function ImageBoard(props: ImageBoardProps) {
                           strokeIds: prev.strokeIds,
                         }));
                       }}
-                      aria-label="Remove image"
+                      aria-label={isVideo ? t("desk.removeVideo") : t("desk.removeImage")}
                     >
                       ×
                     </button>
@@ -242,7 +279,7 @@ export function ImageBoard(props: ImageBoardProps) {
                       className="board-item-resize"
                       onPointerDown={(e) => handleItemPointerDown(e, item, "resize")}
                     />
-                    {singleImageSelection === item.id && !item.locked && (
+                    {!isVideo && singleImageSelection === item.id && !item.locked && (
                       <div
                         className="board-item-rotate"
                         title={t("desk.rotate")}
@@ -253,7 +290,8 @@ export function ImageBoard(props: ImageBoardProps) {
                   </div>
                 </div>
               </div>
-            ))}
+            );
+            })}
             <BoardShapesLayer
               canvasWidth={canvasWidth}
               canvasHeight={canvasHeight}
@@ -329,6 +367,10 @@ export function ImageBoard(props: ImageBoardProps) {
             addTextAtCursor();
             setDeskMenu(null);
           }}
+          onInsertVideo={() => {
+            setVideoDialogOpen(true);
+            setDeskMenu(null);
+          }}
           onGroup={() => {
             groupSelection();
             setDeskMenu(null);
@@ -383,6 +425,14 @@ export function ImageBoard(props: ImageBoardProps) {
         texts={texts}
         onTextColorChange={applyTextColor}
         onTextStyleChange={applyTextStyle}
+      />
+
+      <VideoInsertDialog
+        open={videoDialogOpen}
+        onClose={() => setVideoDialogOpen(false)}
+        onInsert={(url) => {
+          placeVideo(url);
+        }}
       />
     </div>
   );
