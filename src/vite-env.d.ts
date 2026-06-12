@@ -49,6 +49,13 @@ interface Window {
           assets: { path: string; mime: string; dataBase64: string }[];
         }
       ) => Promise<{ ok: boolean; error?: string }>;
+      readArchive: (filePath: string) => Promise<{
+        ok: boolean;
+        filePath?: string;
+        dataBase64?: string;
+        error?: string;
+      }>;
+      onOpenArchive: (listener: (filePath: string) => void) => () => void;
     };
     git?: {
       isAvailable: () => Promise<boolean>;

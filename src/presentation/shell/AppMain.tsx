@@ -7,6 +7,7 @@ import { Toolbar } from "@/shared/components/Toolbar";
 import { useLinkContext } from "@/features/links/LinkContext";
 import { useLocale } from "@/shared/context/LocaleContext";
 import { useShortcuts } from "@/shared/context/ShortcutsContext";
+import { useDesktopArchiveOpen } from "@/application/project/useDesktopArchiveOpen";
 import { useProjectFolder } from "@/application/project/useProjectFolder";
 import { useResizablePanels } from "@/shared/hooks/useResizablePanels";
 import {
@@ -166,6 +167,15 @@ export function AppMain(props: DocumentStore) {
     },
     [projectFolder, replaceDocument]
   );
+
+  const handleDesktopArchiveError = useCallback(
+    (message: string) => {
+      window.alert(message === "read_failed" ? t("project.readError") : message);
+    },
+    [t]
+  );
+
+  useDesktopArchiveOpen(handleImportProject, handleDesktopArchiveError);
 
   const handleOpenProjectFolder = useCallback(async () => {
     if (projectFolder.folderPath) {

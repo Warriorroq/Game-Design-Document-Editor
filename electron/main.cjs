@@ -1,4 +1,5 @@
 const { app, BrowserWindow, Menu, ipcMain, dialog, session } = require("electron");
+const fs = require("fs");
 const path = require("path");
 const git = require("./git.cjs");
 const project = require("./project.cjs");
@@ -6,24 +7,73 @@ const project = require("./project.cjs");
 const BG = "#0f1117";
 const APP_ICON = path.join(__dirname, "icon.png");
 
-function createWindow() {
-  const win = new BrowserWindow({
-    width: 1400,
-    height: 900,
-    minWidth: 900,
-    minHeight: 600,
-    frame: false,
-    roundedCorners: false,
-    backgroundColor: BG,
-    icon: APP_ICON,
-    show: false,
-    webPreferences: {
-      contextIsolation: true,
-      nodeIntegration: false,
-      preload: path.join(__dirname, "preload.cjs"),
-    },
-  });
+let mainWindow = null;
+let pendingGdePath = null;
 
+function isGdeFileArg(arg) {
+  if (typeof arg !== "string" || !arg || arg.startsWith("-")) return false;
+  const normalized = arg.replace(/^"|"$/g, "");
+  return normalized.toLowerCase().endsWith(".gde");
+}
+
+function extractGdePath(argv) {
+  for (const arg of argv) {
+    if (isGdeFileArg(arg)) {
+      return path.resolve(arg.replace(/^"|"$/g, ""));
+    }
+  }
+  return null;
+}
+
+function sendOpenGdeToRenderer(filePath) {
+  if (!mainWindow) {
+    pendingGdePath = filePath;
+    return;
+  }
+
+  const deliver = () => {
+    mainWindow.webContents.send("project:open-archive", filePath);
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.show();
+    mainWindow.focus();
+  };
+
+  if (mainWindow.webContents.isLoading()) {
+    mainWindow.webContents.once("did-finish-load", deliver);
+  } else {
+    deliver();
+  }
+}
+
+function tryOpenGdePath(filePath) {
+  if (!filePath || !isGdeFileArg(filePath)) return;
+  const resolved = path.resolve(filePath.replace(/^"|"$/g, ""));
+  if (!fs.existsSync(resolved)) return;
+  sendOpenGdeToRenderer(resolved);
+}
+
+function flushPendingGdeOpen() {
+  if (!pendingGdePath) return;
+  const next = pendingGdePath;
+  pendingGdePath = null;
+  tryOpenGdePath(next);
+}
+
+const gotSingleInstanceLock = app.requestSingleInstanceLock();
+if (!gotSingleInstanceLock) {
+  app.quit();
+} else {
+  app.on("second-instance", (_event, argv) => {
+    tryOpenGdePath(extractGdePath(argv));
+  });
+}
+
+app.on("open-file", (event, filePath) => {
+  event.preventDefault();
+  tryOpenGdePath(filePath);
+});
+
+function registerIpcHandlers(win) {
   ipcMain.handle("window:minimize", () => win.minimize());
   ipcMain.handle("window:toggle-maximize", () => {
     if (win.isMaximized()) win.unmaximize();
@@ -67,6 +117,13 @@ function createWindow() {
       return { ok: false, error: "invalid_payload" };
     }
     return project.writeProjectFolder(folderPath, payload);
+  });
+
+  ipcMain.handle("project:read-archive", (_event, filePath) => {
+    if (typeof filePath !== "string" || !filePath) {
+      return { ok: false, error: "invalid_path" };
+    }
+    return project.readGdeArchiveFile(filePath);
   });
 
   ipcMain.handle("git:is-available", () => git.isGitAvailable());
@@ -191,6 +248,37 @@ function createWindow() {
     }
     return git.storeAccessToken(folderPath, token.trim());
   });
+}
+
+let ipcRegistered = false;
+
+function createWindow() {
+  const win = new BrowserWindow({
+    width: 1400,
+    height: 900,
+    minWidth: 900,
+    minHeight: 600,
+    frame: false,
+    roundedCorners: false,
+    backgroundColor: BG,
+    icon: APP_ICON,
+    show: false,
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false,
+      preload: path.join(__dirname, "preload.cjs"),
+    },
+  });
+
+  mainWindow = win;
+  win.on("closed", () => {
+    if (mainWindow === win) mainWindow = null;
+  });
+
+  if (!ipcRegistered) {
+    registerIpcHandlers(win);
+    ipcRegistered = true;
+  }
 
   const emitMaxChanged = () =>
     win.webContents.send("window:maximized-changed", win.isMaximized());
@@ -198,6 +286,10 @@ function createWindow() {
   win.on("unmaximize", emitMaxChanged);
 
   win.once("ready-to-show", () => win.show());
+
+  win.webContents.once("did-finish-load", () => {
+    flushPendingGdeOpen();
+  });
 
   if (process.env.VITE_DEV_SERVER_URL) {
     win.loadURL(process.env.VITE_DEV_SERVER_URL);
@@ -226,16 +318,19 @@ function configureEmbedReferrer() {
   });
 }
 
-app.whenReady().then(() => {
-  configureEmbedReferrer();
-  Menu.setApplicationMenu(null);
-  createWindow();
+if (gotSingleInstanceLock) {
+  app.whenReady().then(() => {
+    configureEmbedReferrer();
+    Menu.setApplicationMenu(null);
+    createWindow();
+    tryOpenGdePath(extractGdePath(process.argv));
 
-  app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    app.on("activate", () => {
+      if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    });
   });
-});
 
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") app.quit();
-});
+  app.on("window-all-closed", () => {
+    if (process.platform !== "darwin") app.quit();
+  });
+}

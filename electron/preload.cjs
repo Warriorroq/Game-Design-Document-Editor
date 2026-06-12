@@ -21,6 +21,13 @@ contextBridge.exposeInMainWorld("gddDesktop", {
       ipcRenderer.invoke("project:read-folder", folderPath),
     writeFolder: (folderPath, payload) =>
       ipcRenderer.invoke("project:write-folder", folderPath, payload),
+    readArchive: (filePath) =>
+      ipcRenderer.invoke("project:read-archive", filePath),
+    onOpenArchive: (listener) => {
+      const handler = (_event, filePath) => listener(String(filePath));
+      ipcRenderer.on("project:open-archive", handler);
+      return () => ipcRenderer.removeListener("project:open-archive", handler);
+    },
   },
   git: {
     isAvailable: () => ipcRenderer.invoke("git:is-available"),

@@ -177,9 +177,35 @@ function writeProjectFolder(dir, payload) {
   }
 }
 
+function readGdeArchiveFile(filePath) {
+  if (typeof filePath !== "string" || !filePath) {
+    return { ok: false, error: "invalid_path" };
+  }
+  if (path.extname(filePath).toLowerCase() !== ".gde") {
+    return { ok: false, error: "invalid_extension" };
+  }
+  if (!fs.existsSync(filePath)) {
+    return { ok: false, error: "not_found" };
+  }
+  try {
+    const data = fs.readFileSync(filePath);
+    return {
+      ok: true,
+      filePath,
+      dataBase64: data.toString("base64"),
+    };
+  } catch (err) {
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : "read_failed",
+    };
+  }
+}
+
 module.exports = {
   MANIFEST_FILE,
   hasProjectFile,
   readProjectFolder,
   writeProjectFolder,
+  readGdeArchiveFile,
 };

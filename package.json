@@ -23,6 +23,15 @@
       "electron/**/*",
       "package.json"
     ],
+    "fileAssociations": [
+      {
+        "ext": "gde",
+        "name": "GDD Editor Project",
+        "description": "GDD Editor project archive",
+        "role": "Editor",
+        "mimeType": "application/gdd-editor-archive"
+      }
+    ],
     "win": {
       "icon": "build/icon.png",
       "target": [
