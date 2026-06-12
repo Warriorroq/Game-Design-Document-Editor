@@ -3,6 +3,9 @@ export const STORAGE_EDITOR_HIDDEN = "gdd-editor-panel-hidden";
 export const STORAGE_BOARD_WIDTH = "gdd-editor-board-width";
 export const STORAGE_BOARD_HIDDEN = "gdd-editor-board-hidden";
 
+export const COMPACT_LAYOUT_MAX_WIDTH = 900;
+export const COMPACT_LAYOUT_MEDIA = `(max-width: ${COMPACT_LAYOUT_MAX_WIDTH}px)`;
+
 export const PANEL_MIN_BOARD = 160;
 export const PANEL_MAX_BOARD = 720;
 export const PANEL_DEFAULT_BOARD = 320;

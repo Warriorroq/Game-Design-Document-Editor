@@ -73,6 +73,10 @@ const en = {
   "toolbar.hideSections": "Hide sections",
   "toolbar.settings": "Settings",
 
+  "layout.compactEditor": "Document",
+  "layout.compactBoard": "Desk",
+  "layout.compactSwitchAria": "Switch between document and desk",
+
   "project.menu": "Project",
   "project.new": "New project",
   "project.export": "Export archive .gde",
@@ -441,6 +445,10 @@ const ru: Record<keyof typeof en, string> = {
   "toolbar.showSections": "Показать секции",
   "toolbar.hideSections": "Скрыть секции",
   "toolbar.settings": "Настройки",
+
+  "layout.compactEditor": "Документ",
+  "layout.compactBoard": "Доска",
+  "layout.compactSwitchAria": "Переключение между документом и доской",
 
   "project.menu": "Проект",
   "project.new": "Новый проект",

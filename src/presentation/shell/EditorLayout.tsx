@@ -1,7 +1,11 @@
 import type { RefObject } from "react";
 import { DocumentMeta } from "@/features/editor/DocumentMeta";
 import { ImageBoard } from "@/features/board/ImageBoard";
+import { CompactPaneToggle } from "@/shared/components/CompactPaneToggle";
 import { PanelSplitter } from "@/shared/components/PanelSplitter";
+import { useCompactPane } from "@/shared/hooks/useCompactPane";
+import { useMediaQuery } from "@/shared/hooks/useMediaQuery";
+import { COMPACT_LAYOUT_MEDIA } from "@/shared/lib/panelLayout";
 import { SectionEditor } from "@/features/editor/SectionEditor";
 import { Sidebar } from "@/features/sidebar/Sidebar";
 import { Space3DView } from "@/features/space3d/Space3DView";
@@ -142,6 +146,29 @@ export function EditorLayout({
 }: EditorLayoutProps) {
   const isSpace3D = activeSection ? isSpace3DSection(activeSection) : false;
   const resizingPanels = draggingEditor || draggingBoard;
+  const compactLayout = useMediaQuery(COMPACT_LAYOUT_MEDIA);
+  const { compactPane, setCompactPane } = useCompactPane();
+  const showCompactSwitch = compactLayout && !isSpace3D;
+  const compactEditorFull = showCompactSwitch && compactPane === "editor";
+  const compactBoardFull = showCompactSwitch && compactPane === "board";
+  const hideEditorPane = editorHidden || compactBoardFull;
+  const hideBoardPane = (boardHidden && !isSpace3D) || compactEditorFull;
+
+  const mainPanelClass = [
+    "main-panel",
+    isSpace3D ? "main-panel--space3d" : "",
+    showCompactSwitch ? `main-panel--compact main-panel--compact-${compactPane}` : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const compactFlex = {
+    flex: "1 1 auto",
+    alignSelf: "stretch",
+    width: "100%",
+    minWidth: "0",
+    flexShrink: 1,
+  } as const;
 
   return (
     <div className="app-body">
@@ -160,79 +187,89 @@ export function EditorLayout({
         onToggleFolder={onToggleFolder}
         onReorder={onReorderSidebar}
       />
-      <div
-        ref={mainRef}
-        className={`main-panel ${isSpace3D ? "main-panel--space3d" : ""}`}
-      >
-        {!isSpace3D && (
-          <>
-        <PanelSplitter
-          edge="start"
-          hidden={editorHidden}
-          dragging={draggingEditor}
-          onPointerDown={onEditorSplitterDown}
-          onDoubleClick={onEditorSplitterDoubleClick}
-        />
+      <div ref={mainRef} className={mainPanelClass}>
+        {showCompactSwitch && (
+          <CompactPaneToggle value={compactPane} onChange={setCompactPane} />
+        )}
+        {!isSpace3D && !compactLayout && (
+          <PanelSplitter
+            edge="start"
+            hidden={editorHidden}
+            dragging={draggingEditor}
+            onPointerDown={onEditorSplitterDown}
+            onDoubleClick={onEditorSplitterDoubleClick}
+          />
+        )}
 
-        <div
-          className={`content-column ${editorHidden ? "content-column--hidden" : ""}`}
-          style={panelFlexStyle(editorHidden, editorWidth, 280, resizingPanels)}
-        >
-          {!editorHidden && (
-            <div className="content-column-scroll">
-              <DocumentMeta doc={doc} onChange={onUpdateDoc} />
-              <div className="editor-pane" key={activeSection?.id ?? "no-section"}>
-                {activeSection ? (
-                  <SectionEditor
-                    key={activeSection.id}
-                    section={activeSection}
-                    scrollToAnchorId={scrollAnchorId}
-                    onScrollAnchorDone={onScrollAnchorDone}
-                    searchFocus={
-                      searchFocus?.sectionId === activeSection.id
-                        ? searchFocus
-                        : null
-                    }
-                    onSearchFocusDone={onSearchFocusDone}
-                    onChange={(patch) => onUpdateSection(activeSection.id, patch)}
-                  />
-                ) : (
-                  <div className="editor-empty">
-                    <p>{emptyLabel}</p>
-                    <button
-                      type="button"
-                      className="btn"
-                      onClick={() => {
-                        onAddSection();
-                        restoreAppFocus();
-                      }}
-                    >
-                      {addSectionLabel}
-                    </button>
-                  </div>
-                )}
+        {!isSpace3D && (
+          <div
+            className={`content-column ${hideEditorPane ? "content-column--hidden" : ""}`}
+            style={
+              compactEditorFull
+                ? compactFlex
+                : panelFlexStyle(editorHidden, editorWidth, 280, resizingPanels)
+            }
+          >
+            {!hideEditorPane && (
+              <div className="content-column-scroll">
+                <DocumentMeta doc={doc} onChange={onUpdateDoc} />
+                <div className="editor-pane" key={activeSection?.id ?? "no-section"}>
+                  {activeSection ? (
+                    <SectionEditor
+                      key={activeSection.id}
+                      section={activeSection}
+                      scrollToAnchorId={scrollAnchorId}
+                      onScrollAnchorDone={onScrollAnchorDone}
+                      searchFocus={
+                        searchFocus?.sectionId === activeSection.id
+                          ? searchFocus
+                          : null
+                      }
+                      onSearchFocusDone={onSearchFocusDone}
+                      onChange={(patch) => onUpdateSection(activeSection.id, patch)}
+                    />
+                  ) : (
+                    <div className="editor-empty">
+                      <p>{emptyLabel}</p>
+                      <button
+                        type="button"
+                        className="btn"
+                        onClick={() => {
+                          onAddSection();
+                          restoreAppFocus();
+                        }}
+                      >
+                        {addSectionLabel}
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
-          </>
+            )}
+          </div>
         )}
 
-        {!isSpace3D && (
-        <PanelSplitter
-          edge="end"
-          hidden={boardHidden}
-          dragging={draggingBoard}
-          onPointerDown={onBoardSplitterDown}
-          onDoubleClick={onBoardSplitterDoubleClick}
-        />
+        {!isSpace3D && !compactLayout && (
+          <PanelSplitter
+            edge="end"
+            hidden={boardHidden}
+            dragging={draggingBoard}
+            onPointerDown={onBoardSplitterDown}
+            onDoubleClick={onBoardSplitterDoubleClick}
+          />
         )}
 
         <div
-          className={`board-pane ${boardHidden && !isSpace3D ? "board-pane--hidden" : ""}`}
-          style={isSpace3D ? { flex: "1 1 auto", width: "100%" } : panelFlexStyle(boardHidden, boardWidth, 160, resizingPanels)}
+          className={`board-pane ${hideBoardPane ? "board-pane--hidden" : ""}`}
+          style={
+            isSpace3D
+              ? { flex: "1 1 auto", width: "100%" }
+              : compactBoardFull
+                ? compactFlex
+                : panelFlexStyle(boardHidden, boardWidth, 160, resizingPanels)
+          }
         >
-          {(isSpace3D || !boardHidden) &&
+          {(isSpace3D || !hideBoardPane) &&
             (activeSection ? (
               isSpace3D ? (
                 <Space3DView
