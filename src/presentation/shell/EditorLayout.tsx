@@ -151,8 +151,14 @@ export function EditorLayout({
   const showCompactSwitch = compactLayout && !isSpace3D;
   const compactEditorFull = showCompactSwitch && compactPane === "editor";
   const compactBoardFull = showCompactSwitch && compactPane === "board";
-  const hideEditorPane = editorHidden || compactBoardFull;
-  const hideBoardPane = (boardHidden && !isSpace3D) || compactEditorFull;
+  const hideEditorPane = showCompactSwitch
+    ? compactPane !== "editor"
+    : editorHidden;
+  const hideBoardPane = isSpace3D
+    ? false
+    : showCompactSwitch
+      ? compactPane !== "board"
+      : boardHidden;
 
   const mainPanelClass = [
     "main-panel",
