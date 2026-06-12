@@ -76,6 +76,8 @@ import {
 interface ImageBoardProps {
   projectId: string;
   sectionId: string;
+  savedBoardViewport?: BoardViewport;
+  onBoardViewportChange?: (viewport: BoardViewport) => void;
   items: BoardItem[];
   shapes: BoardShape[];
   strokes: BoardStroke[];
@@ -137,6 +139,8 @@ const EMPTY_SELECTION: DeskSelection = {
 export function useImageBoard({
   projectId,
   sectionId,
+  savedBoardViewport,
+  onBoardViewportChange,
   items,
   shapes,
   strokes,
@@ -224,6 +228,12 @@ export function useImageBoard({
     panX: 0,
     panY: 0,
   });
+  const viewportRef = useRef(viewport);
+  viewportRef.current = viewport;
+  const savedBoardViewportRef = useRef(savedBoardViewport);
+  savedBoardViewportRef.current = savedBoardViewport;
+  const onBoardViewportChangeRef = useRef(onBoardViewportChange);
+  onBoardViewportChangeRef.current = onBoardViewportChange;
 
   const selectedShapeIds = useMemo(
     () => new Set(selection.shapeIds),
@@ -858,16 +868,39 @@ export function useImageBoard({
   useEffect(() => {
     const el = surfaceRef.current;
     if (!el || el.clientWidth <= 0) return;
+    const saved = savedBoardViewportRef.current;
     setViewport(
-      fitBoardViewport(
-        el.clientWidth,
-        el.clientHeight,
-        canvasWidth,
-        canvasHeight
-      )
+      saved
+        ? constrainBoardViewport(
+            saved,
+            el.clientWidth,
+            el.clientHeight,
+            canvasWidth,
+            canvasHeight
+          )
+        : fitBoardViewport(
+            el.clientWidth,
+            el.clientHeight,
+            canvasWidth,
+            canvasHeight
+          )
     );
     clearSelection();
   }, [projectId, sectionId, canvasWidth, canvasHeight, clearSelection]);
+
+  useEffect(() => {
+    if (!onBoardViewportChangeRef.current) return;
+    const timer = window.setTimeout(() => {
+      onBoardViewportChangeRef.current?.(viewportRef.current);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [viewport]);
+
+  useEffect(() => {
+    return () => {
+      onBoardViewportChangeRef.current?.(viewportRef.current);
+    };
+  }, [sectionId]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {

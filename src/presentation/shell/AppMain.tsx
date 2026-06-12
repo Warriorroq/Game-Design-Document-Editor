@@ -32,6 +32,7 @@ export function AppMain(props: DocumentStore) {
     setActiveSectionId,
     updateDoc,
     updateSection,
+    updateSectionViewState,
     addSection,
     addSpace3DSection,
     addSpace3DModel,
@@ -338,6 +339,7 @@ export function AppMain(props: DocumentStore) {
           onBoardSplitterDoubleClick={onBoardSplitterDoubleClick}
           onUpdateDoc={updateDoc}
           onUpdateSection={updateSection}
+          onUpdateSectionViewState={updateSectionViewState}
           onScrollAnchorDone={clearLinkTarget}
           onSearchFocusDone={() => setSearchFocus(null)}
           onHighlightDone={clearLinkTarget}

@@ -147,6 +147,18 @@ export function useDocumentStore() {
     [armContentUndo, mutateDoc, scheduleSave]
   );
 
+  const updateSectionViewState = useCallback(
+    (
+      id: string,
+      patch: Partial<Pick<GddSection, "editorScrollTop" | "boardViewport">>
+    ) => {
+      mutateDoc((prev) => mutations.patchSection(prev, id, patch), {
+        recordHistory: false,
+      });
+    },
+    [mutateDoc]
+  );
+
   const addSection = useCallback(
     (folderId?: string) => {
       const { doc: next, sectionId } = mutations.addSection(docRef.current, folderId);
@@ -475,6 +487,7 @@ export function useDocumentStore() {
     setActiveSectionId,
     updateDoc,
     updateSection,
+    updateSectionViewState,
     addSection,
     addSpace3DSection,
     addFolder,

@@ -127,6 +127,12 @@ export interface Space3DData {
   grid?: Space3DGrid;
 }
 
+export interface SectionBoardViewport {
+  scale: number;
+  panX: number;
+  panY: number;
+}
+
 export interface GddSection {
   id: string;
   title: string;
@@ -137,6 +143,10 @@ export interface GddSection {
   /** Defaults to `"document"` when omitted. */
   kind?: SectionKind;
   space3d?: Space3DData;
+  /** Saved editor scroll position (content column). */
+  editorScrollTop?: number;
+  /** Saved desk pan/zoom when leaving the section. */
+  boardViewport?: SectionBoardViewport;
   board: BoardItem[];
   shapes: BoardShape[];
   strokes: BoardStroke[];

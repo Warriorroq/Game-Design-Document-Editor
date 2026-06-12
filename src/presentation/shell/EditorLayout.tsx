@@ -1,10 +1,12 @@
 import type { RefObject } from "react";
+import { useCallback, useRef } from "react";
 import { DocumentMeta } from "@/features/editor/DocumentMeta";
 import { ImageBoard } from "@/features/board/ImageBoard";
 import { CompactPaneToggle } from "@/shared/components/CompactPaneToggle";
 import { PanelSplitter } from "@/shared/components/PanelSplitter";
 import { useCompactPane } from "@/shared/hooks/useCompactPane";
 import { useMediaQuery } from "@/shared/hooks/useMediaQuery";
+import { useSectionEditorScroll } from "@/shared/hooks/useSectionEditorScroll";
 import { COMPACT_LAYOUT_MEDIA } from "@/shared/lib/panelLayout";
 import { SectionEditor } from "@/features/editor/SectionEditor";
 import { Sidebar } from "@/features/sidebar/Sidebar";
@@ -54,6 +56,7 @@ export interface EditorLayoutProps {
   onBoardSplitterDoubleClick: () => void;
   onUpdateDoc: DocumentStore["updateDoc"];
   onUpdateSection: DocumentStore["updateSection"];
+  onUpdateSectionViewState: DocumentStore["updateSectionViewState"];
   onScrollAnchorDone: () => void;
   onSearchFocusDone: () => void;
   onHighlightDone: () => void;
@@ -117,6 +120,7 @@ export function EditorLayout({
   onBoardSplitterDoubleClick,
   onUpdateDoc,
   onUpdateSection,
+  onUpdateSectionViewState,
   onScrollAnchorDone,
   onSearchFocusDone,
   onHighlightDone,
@@ -176,6 +180,20 @@ export function EditorLayout({
     flexShrink: 1,
   } as const;
 
+  const editorScrollRef = useRef<HTMLDivElement>(null);
+  const saveEditorScrollTop = useCallback(
+    (sectionId: string, scrollTop: number) => {
+      onUpdateSectionViewState(sectionId, { editorScrollTop: scrollTop });
+    },
+    [onUpdateSectionViewState]
+  );
+  useSectionEditorScroll(
+    editorScrollRef,
+    activeSectionId,
+    activeSection?.editorScrollTop,
+    saveEditorScrollTop
+  );
+
   return (
     <div className="app-body">
       <Sidebar
@@ -217,7 +235,7 @@ export function EditorLayout({
             }
           >
             {!hideEditorPane && (
-              <div className="content-column-scroll">
+              <div className="content-column-scroll" ref={editorScrollRef}>
                 <DocumentMeta doc={doc} onChange={onUpdateDoc} />
                 <div className="editor-pane" key={activeSection?.id ?? "no-section"}>
                   {activeSection ? (
@@ -294,6 +312,10 @@ export function EditorLayout({
                 key={activeSection.id}
                 projectId={doc.id}
                 sectionId={activeSection.id}
+                savedBoardViewport={activeSection.boardViewport}
+                onBoardViewportChange={(boardViewport) =>
+                  onUpdateSectionViewState(activeSection.id, { boardViewport })
+                }
                 items={activeSection.board}
                 shapes={activeSection.shapes}
                 strokes={activeSection.strokes}
