@@ -14,7 +14,8 @@ const SPLITTER_SIZE = 6;
 const COLLAPSED_SPLITTER = 10;
 const MIN_EDITOR = 280;
 const MIN_BOARD = PANEL_MIN_BOARD;
-const COLLAPSE_AT = 72;
+/** Width below which a panel snaps shut while dragging the splitter. */
+const COLLAPSE_AT = 32;
 const DEFAULT_EDITOR_RATIO = 0.55;
 
 type DragTarget = "editor" | "board";
@@ -131,13 +132,68 @@ function reflowToPanelWidth(state: PanelState, panelW: number): PanelState {
   return { ...state, editorWidth: e, boardWidth: b };
 }
 
+function readPanelWidths(panel: HTMLElement): { editor: number; board: number } {
+  const editorEl = panel.querySelector<HTMLElement>(".content-column");
+  const boardEl = panel.querySelector<HTMLElement>(".board-pane");
+  return {
+    editor: editorEl?.getBoundingClientRect().width ?? 0,
+    board: boardEl?.getBoundingClientRect().width ?? 0,
+  };
+}
+
+function finalizeAfterDrag(state: PanelState, panelW: number): PanelState {
+  if (state.editorHidden || state.boardHidden || panelW <= 0) return state;
+
+  let editorWidth = state.editorWidth;
+  let boardWidth = state.boardWidth;
+
+  if (editorWidth < COLLAPSE_AT) {
+    return {
+      ...state,
+      editorWidth: 0,
+      boardWidth: panelW - COLLAPSED_SPLITTER - SPLITTER_SIZE,
+      editorHidden: true,
+      boardHidden: false,
+    };
+  }
+  if (boardWidth < COLLAPSE_AT) {
+    return {
+      ...state,
+      editorWidth: panelW - COLLAPSED_SPLITTER - SPLITTER_SIZE,
+      boardWidth: 0,
+      editorHidden: false,
+      boardHidden: true,
+    };
+  }
+
+  if (editorWidth < MIN_EDITOR) editorWidth = MIN_EDITOR;
+  if (boardWidth < MIN_BOARD) boardWidth = MIN_BOARD;
+
+  const available = panelW - SPLITTER_SIZE * 2;
+  const excess = editorWidth + boardWidth - available;
+  if (excess > 0) {
+    boardWidth = Math.max(MIN_BOARD, boardWidth - excess);
+    if (editorWidth + boardWidth > available) {
+      editorWidth = Math.max(MIN_EDITOR, available - boardWidth);
+    }
+    if (editorWidth + boardWidth > available) {
+      boardWidth = Math.max(MIN_BOARD, available - editorWidth);
+    }
+  }
+
+  return { ...state, editorWidth, boardWidth };
+}
+
 export function panelFlexStyle(
   hidden: boolean,
   weight: number,
-  minPx: number
-): { flex: string } {
-  if (hidden) return { flex: "0 0 0px" };
-  return { flex: `${Math.max(weight, minPx)} 1 ${minPx}px` };
+  minPx: number,
+  dragging = false
+): { flex: string; minWidth: string; flexShrink: number } {
+  if (hidden) return { flex: "0 0 0px", minWidth: "0", flexShrink: 0 };
+  const w = Math.max(0, weight);
+  if (dragging) return { flex: `0 0 ${w}px`, minWidth: "0", flexShrink: 0 };
+  return { flex: `0 0 ${w}px`, minWidth: `${minPx}px`, flexShrink: 1 };
 }
 
 export function useResizablePanels(sidebarVisible: boolean) {
@@ -271,11 +327,12 @@ export function useResizablePanels(sidebarVisible: boolean) {
       if (!session || !panel) return;
 
       const panelW = panel.clientWidth;
-      const rect = panel.getBoundingClientRect();
       if (panelW <= 0) return;
 
+      const delta = e.clientX - session.startX;
+
       if (dragTarget === "board") {
-        const boardW = rect.right - e.clientX - SPLITTER_SIZE;
+        const boardW = session.startBoard - delta;
         if (boardW < COLLAPSE_AT) {
           applyState({
             editorWidth: panelW - COLLAPSED_SPLITTER - SPLITTER_SIZE,
@@ -285,8 +342,7 @@ export function useResizablePanels(sidebarVisible: boolean) {
           });
           return;
         }
-        const b = Math.max(MIN_BOARD, boardW);
-        const eW = panelW - b - SPLITTER_SIZE * 2;
+        const eW = panelW - boardW - SPLITTER_SIZE * 2;
         if (eW < COLLAPSE_AT) {
           applyState({
             editorWidth: 0,
@@ -297,15 +353,15 @@ export function useResizablePanels(sidebarVisible: boolean) {
           return;
         }
         applyState({
-          editorWidth: Math.max(MIN_EDITOR, eW),
-          boardWidth: b,
+          editorWidth: eW,
+          boardWidth: boardW,
           editorHidden: false,
           boardHidden: false,
         });
         return;
       }
 
-      const editorW = e.clientX - rect.left - SPLITTER_SIZE;
+      const editorW = session.startEditor + delta;
       if (editorW < COLLAPSE_AT) {
         applyState({
           editorWidth: 0,
@@ -315,8 +371,7 @@ export function useResizablePanels(sidebarVisible: boolean) {
         });
         return;
       }
-      const eW = Math.max(MIN_EDITOR, editorW);
-      const bW = panelW - eW - SPLITTER_SIZE * 2;
+      const bW = panelW - editorW - SPLITTER_SIZE * 2;
       if (bW < COLLAPSE_AT) {
         applyState({
           editorWidth: panelW - COLLAPSED_SPLITTER - SPLITTER_SIZE,
@@ -327,8 +382,8 @@ export function useResizablePanels(sidebarVisible: boolean) {
         return;
       }
       applyState({
-        editorWidth: eW,
-        boardWidth: Math.max(MIN_BOARD, bW),
+        editorWidth: editorW,
+        boardWidth: bW,
         editorHidden: false,
         boardHidden: false,
       });
@@ -338,7 +393,13 @@ export function useResizablePanels(sidebarVisible: boolean) {
       dragRef.current = null;
       setDragTarget(null);
       document.body.classList.remove("panel-resizing");
-      persist(stateRef.current);
+      const panelW = mainRef.current?.clientWidth ?? 0;
+      const next =
+        panelW > 0
+          ? finalizeAfterDrag(stateRef.current, panelW)
+          : stateRef.current;
+      applyState(next);
+      persist(next);
     };
 
     window.addEventListener("pointermove", onMove);
@@ -352,36 +413,54 @@ export function useResizablePanels(sidebarVisible: boolean) {
   const startDrag = useCallback(
     (target: DragTarget, e: React.PointerEvent) => {
       e.preventDefault();
-      const panelW = mainRef.current?.clientWidth ?? 0;
+      const panel = mainRef.current;
+      const panelW = panel?.clientWidth ?? 0;
       const s = stateRef.current;
+      let startEditor = s.editorHidden ? 0 : s.editorWidth;
+      let startBoard = s.boardHidden ? 0 : s.boardWidth;
 
-      if (target === "editor" && s.editorHidden && panelW > 0) {
-        const eW = loadNum(STORAGE_EDITOR_WIDTH) ?? Math.round(panelW * DEFAULT_EDITOR_RATIO);
-        const bW = panelW - eW - SPLITTER_SIZE * 2;
-        applyState({
-          editorWidth: Math.max(MIN_EDITOR, eW),
-          boardWidth: Math.max(MIN_BOARD, bW),
-          editorHidden: false,
-          boardHidden: false,
-        });
+      if (panel && panelW > 0) {
+        const rect = panel.getBoundingClientRect();
+
+        if (target === "editor" && s.editorHidden) {
+          startEditor = Math.max(COLLAPSE_AT, e.clientX - rect.left - SPLITTER_SIZE);
+          startBoard = Math.max(COLLAPSE_AT, panelW - startEditor - SPLITTER_SIZE * 2);
+          applyState({
+            editorWidth: startEditor,
+            boardWidth: startBoard,
+            editorHidden: false,
+            boardHidden: false,
+          });
+        } else if (target === "board" && s.boardHidden) {
+          startBoard = Math.max(COLLAPSE_AT, rect.right - e.clientX - SPLITTER_SIZE);
+          startEditor = Math.max(COLLAPSE_AT, panelW - startBoard - SPLITTER_SIZE * 2);
+          applyState({
+            editorWidth: startEditor,
+            boardWidth: startBoard,
+            editorHidden: false,
+            boardHidden: false,
+          });
+        } else {
+          const actual = readPanelWidths(panel);
+          startEditor = actual.editor;
+          startBoard = actual.board;
+          if (
+            Math.abs(actual.editor - s.editorWidth) > 1 ||
+            Math.abs(actual.board - s.boardWidth) > 1
+          ) {
+            applyState({
+              ...s,
+              editorWidth: actual.editor,
+              boardWidth: actual.board,
+            });
+          }
+        }
       }
 
-      if (target === "board" && s.boardHidden && panelW > 0) {
-        const bW = loadNum(STORAGE_BOARD_WIDTH) ?? Math.round(panelW * (1 - DEFAULT_EDITOR_RATIO));
-        const eW = panelW - bW - SPLITTER_SIZE * 2;
-        applyState({
-          editorWidth: Math.max(MIN_EDITOR, eW),
-          boardWidth: Math.max(MIN_BOARD, bW),
-          editorHidden: false,
-          boardHidden: false,
-        });
-      }
-
-      const current = stateRef.current;
       dragRef.current = {
         startX: e.clientX,
-        startEditor: current.editorHidden ? 0 : current.editorWidth,
-        startBoard: current.boardHidden ? 0 : current.boardWidth,
+        startEditor,
+        startBoard,
       };
       setDragTarget(target);
       document.body.classList.add("panel-resizing");

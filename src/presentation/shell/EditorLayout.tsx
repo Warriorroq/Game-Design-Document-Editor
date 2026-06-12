@@ -141,6 +141,7 @@ export function EditorLayout({
   onRenameSpace3DModelAsset,
 }: EditorLayoutProps) {
   const isSpace3D = activeSection ? isSpace3DSection(activeSection) : false;
+  const resizingPanels = draggingEditor || draggingBoard;
 
   return (
     <div className="app-body">
@@ -175,7 +176,7 @@ export function EditorLayout({
 
         <div
           className={`content-column ${editorHidden ? "content-column--hidden" : ""}`}
-          style={panelFlexStyle(editorHidden, editorWidth, 280)}
+          style={panelFlexStyle(editorHidden, editorWidth, 280, resizingPanels)}
         >
           {!editorHidden && (
             <div className="content-column-scroll">
@@ -229,7 +230,7 @@ export function EditorLayout({
 
         <div
           className={`board-pane ${boardHidden && !isSpace3D ? "board-pane--hidden" : ""}`}
-          style={isSpace3D ? { flex: "1 1 auto", width: "100%" } : panelFlexStyle(boardHidden, boardWidth, 160)}
+          style={isSpace3D ? { flex: "1 1 auto", width: "100%" } : panelFlexStyle(boardHidden, boardWidth, 160, resizingPanels)}
         >
           {(isSpace3D || !boardHidden) &&
             (activeSection ? (
