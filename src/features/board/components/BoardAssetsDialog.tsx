@@ -1,5 +1,9 @@
+import "@/shared/styles/LinkMenus.css";
+import "./BoardAssetsDialog.css";
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+
 import {
   countBoardImageAssetUsage,
   displayBoardImageAssetName,
@@ -9,14 +13,12 @@ import {
   buildAssetDeskClipboard,
   type DeskClipboard,
 } from "@/features/board/lib/deskClipboard";
-import { useLinkContext } from "@/features/links/LinkContext";
 import { buildMediaHref } from "@/features/links/lib/links";
+import { useLinkContext } from "@/features/links/LinkContext";
 import { useLocale } from "@/shared/context/LocaleContext";
 import { restoreAppFocus } from "@/shared/lib/desktop";
 import { loadImageDimensions } from "@/shared/lib/imageUtils";
 import type { GddDocument } from "@/shared/types";
-import "@/shared/styles/LinkMenus.css";
-import "./BoardAssetsDialog.css";
 
 interface BoardAssetsDialogProps {
   open: boolean;
@@ -49,7 +51,9 @@ export function BoardAssetsDialog({
   const assets = useMemo(() => {
     const entries = Object.values(doc.boardImages ?? {});
     return entries.sort((a, b) =>
-      displayBoardImageAssetName(a).localeCompare(displayBoardImageAssetName(b))
+      displayBoardImageAssetName(a).localeCompare(
+        displayBoardImageAssetName(b),
+      ),
     );
   }, [doc.boardImages]);
 
@@ -219,7 +223,10 @@ export function BoardAssetsDialog({
                             }}
                           />
                           {renameError && (
-                            <span className="board-assets-rename-error" role="alert">
+                            <span
+                              className="board-assets-rename-error"
+                              role="alert"
+                            >
                               {renameError}
                             </span>
                           )}
@@ -229,7 +236,9 @@ export function BoardAssetsDialog({
                           <span
                             className="board-assets-name board-assets-name--editable"
                             title={t("desk.imageAssetRenameHint")}
-                            onDoubleClick={() => startRename(asset.id, asset.name)}
+                            onDoubleClick={() =>
+                              startRename(asset.id, asset.name)
+                            }
                           >
                             {displayBoardImageAssetName(asset)}
                           </span>

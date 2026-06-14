@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
-import { useLocale } from "@/shared/context/LocaleContext";
+
 import type { GlobalSearchResult } from "@/features/search/lib/globalSearch";
+import { useLocale } from "@/shared/context/LocaleContext";
 
 interface GlobalSearchProps {
   query: string;
@@ -26,7 +27,9 @@ function SnippetHighlight({
   return (
     <>
       {snippet.slice(0, idx)}
-      <mark className="global-search-mark">{snippet.slice(idx, idx + q.length)}</mark>
+      <mark className="global-search-mark">
+        {snippet.slice(idx, idx + q.length)}
+      </mark>
       {snippet.slice(idx + q.length)}
     </>
   );

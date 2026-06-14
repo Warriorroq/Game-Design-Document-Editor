@@ -174,11 +174,7 @@
 .board-canvas {
   position: relative;
   background-color: var(--bg-panel);
-  background-image: radial-gradient(
-    circle,
-    var(--border) 1px,
-    transparent 1px
-  );
+  background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
@@ -429,7 +425,9 @@
   font-weight: 600;
   color: var(--text-muted);
   background: transparent;
-  transition: background 0.12s, color 0.12s;
+  transition:
+    background 0.12s,
+    color 0.12s;
 }
 
 .board-desk-mode-btn:hover {
@@ -460,7 +458,9 @@
   font-weight: 600;
   color: var(--text-muted);
   background: transparent;
-  transition: background 0.12s, color 0.12s;
+  transition:
+    background 0.12s,
+    color 0.12s;
 }
 
 .board-text-style-btn:hover {
@@ -501,7 +501,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.12s, color 0.12s;
+  transition:
+    background 0.12s,
+    color 0.12s;
 }
 
 .board-text-align-btn:hover {

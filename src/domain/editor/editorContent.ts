@@ -1,9 +1,12 @@
 import {
+  previewMissingTableControls,
+  renderMarkdown,
+} from "@/domain/editor/markdown";
+import { isExternalHref } from "@/features/links/lib/links";
+import {
   stripEphemeralEditorMarkup,
   stripEphemeralFromHtml,
 } from "@/shared/lib/searchHighlight";
-import { isExternalHref } from "@/features/links/lib/links";
-import { previewMissingTableControls, renderMarkdown } from "@/domain/editor/markdown";
 
 export { previewMissingTableControls };
 
@@ -31,9 +34,7 @@ export function looksLikeMarkdown(text: string): boolean {
 
 export function ensureHtmlContent(content: string): string {
   if (!content.trim()) return "";
-  const html = looksLikeMarkdown(content)
-    ? renderMarkdown(content)
-    : content;
+  const html = looksLikeMarkdown(content) ? renderMarkdown(content) : content;
   return stripEphemeralFromHtml(html);
 }
 

@@ -1,7 +1,12 @@
 import { migrateBoardImages } from "@/domain/board/boardImageRegistry";
 import { ensureHtmlContent } from "@/domain/editor/editorContent";
 import { normalizeSpace3DData } from "@/domain/space3d/space3d";
-import type { BoardItem, GddDocument, GddSection, GddSectionFolder } from "@/domain/types";
+import type {
+  BoardItem,
+  GddDocument,
+  GddSection,
+  GddSectionFolder,
+} from "@/domain/types";
 
 function parentKey(folderId: string | null | undefined): string {
   return folderId ?? "";
@@ -9,12 +14,14 @@ function parentKey(folderId: string | null | undefined): string {
 
 function renumberSectionsInParent(
   sections: GddDocument["sections"],
-  folderId: string | null
+  folderId: string | null,
 ): GddDocument["sections"] {
   const siblings = sections
     .filter((section) => parentKey(section.folderId) === parentKey(folderId))
     .sort((a, b) => a.order - b.order);
-  const orderMap = new Map(siblings.map((section, index) => [section.id, index]));
+  const orderMap = new Map(
+    siblings.map((section, index) => [section.id, index]),
+  );
   return sections.map((section) => {
     const order = orderMap.get(section.id);
     return order !== undefined ? { ...section, order } : section;
@@ -22,7 +29,7 @@ function renumberSectionsInParent(
 }
 
 function normalizeFolders(
-  folders: GddSectionFolder[] | undefined
+  folders: GddSectionFolder[] | undefined,
 ): GddSectionFolder[] {
   const normalized = (folders ?? []).map((folder) => ({
     ...folder,
@@ -41,7 +48,9 @@ function normalizeFolders(
   });
 }
 
-export function normalizeDocument(doc: GddDocument & { board?: BoardItem[] }): GddDocument {
+export function normalizeDocument(
+  doc: GddDocument & { board?: BoardItem[] },
+): GddDocument {
   const legacyBoard = Array.isArray(doc.board) ? doc.board : [];
   let migrated = false;
 
@@ -54,10 +63,14 @@ export function normalizeDocument(doc: GddDocument & { board?: BoardItem[] }): G
     const groups = (Array.isArray(s.groups) ? s.groups : []).map((g) => ({
       ...g,
       memberTextIds: Array.isArray(g.memberTextIds) ? g.memberTextIds : [],
-      memberStrokeIds: Array.isArray(g.memberStrokeIds) ? g.memberStrokeIds : [],
+      memberStrokeIds: Array.isArray(g.memberStrokeIds)
+        ? g.memberStrokeIds
+        : [],
     }));
     const folderId =
-      s.folderId && Array.isArray(doc.folders) && doc.folders.some((f) => f.id === s.folderId)
+      s.folderId &&
+      Array.isArray(doc.folders) &&
+      doc.folders.some((f) => f.id === s.folderId)
         ? s.folderId
         : undefined;
     return {
@@ -70,7 +83,8 @@ export function normalizeDocument(doc: GddDocument & { board?: BoardItem[] }): G
       folderId,
       content: s.kind === "space3d" ? s.content : ensureHtmlContent(s.content),
       kind: s.kind === "space3d" ? ("space3d" as const) : undefined,
-      space3d: s.kind === "space3d" ? normalizeSpace3DData(s.space3d) : undefined,
+      space3d:
+        s.kind === "space3d" ? normalizeSpace3DData(s.space3d) : undefined,
     };
   });
 
@@ -84,7 +98,7 @@ export function normalizeDocument(doc: GddDocument & { board?: BoardItem[] }): G
   let normalizedSections: GddSection[] = sections.map((section) =>
     section.folderId && !folderIds.has(section.folderId)
       ? { ...section, folderId: undefined }
-      : section
+      : section,
   );
 
   for (const folderId of folderIds) {

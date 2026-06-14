@@ -1,22 +1,33 @@
 import { useMemo, useState } from "react";
-import { ShortcutBindingInput } from "./ShortcutBindingInput";
+
 import { BoardSettingsPanel } from "@/features/board/components/BoardSettingsPanel";
 import { GitSettingsPanel } from "@/features/git/components/GitSettingsPanel";
+import type { GitStatus } from "@/features/git/lib/git";
 import { useLocale } from "@/shared/context/LocaleContext";
 import { useShortcuts } from "@/shared/context/ShortcutsContext";
+import { useAppTheme } from "@/shared/hooks/useAppTheme";
 import { APP_LANGUAGES } from "@/shared/i18n";
-import { shortcutDescKey, shortcutLabelKey } from "@/shared/i18n/shortcutMessages";
-import { APP_THEME_IDS, themePreview } from "@/shared/lib/appTheme";
 import { themeDescKey, themeNameKey } from "@/shared/i18n";
+import {
+  shortcutDescKey,
+  shortcutLabelKey,
+} from "@/shared/i18n/shortcutMessages";
+import { APP_THEME_IDS, themePreview } from "@/shared/lib/appTheme";
+import { isDesktopApp } from "@/shared/lib/desktop";
 import {
   SHORTCUT_DEFINITIONS,
   type ShortcutGroup,
 } from "@/shared/lib/shortcuts";
-import { useAppTheme } from "@/shared/hooks/useAppTheme";
-import { isDesktopApp } from "@/shared/lib/desktop";
-import type { GitStatus } from "@/features/git/lib/git";
 
-type SettingsTab = "general" | "styles" | "board" | "languages" | "shortcuts" | "git";
+import { ShortcutBindingInput } from "./ShortcutBindingInput";
+
+type SettingsTab =
+  | "general"
+  | "styles"
+  | "board"
+  | "languages"
+  | "shortcuts"
+  | "git";
 
 interface SettingsPageProps {
   projectFolderPath?: string | null;
@@ -212,7 +223,7 @@ export function SettingsPage({
                           </div>
                           <ShortcutBindingInput actionId={def.id} />
                         </li>
-                      )
+                      ),
                     )}
                   </ul>
                 </div>

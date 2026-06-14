@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
+
 import { useLocale } from "@/shared/context/LocaleContext";
-import { shortcutLabelKey } from "@/shared/i18n/shortcutMessages";
 import { useShortcuts } from "@/shared/context/ShortcutsContext";
+import { shortcutLabelKey } from "@/shared/i18n/shortcutMessages";
 import {
   bindingsEqual,
   formatShortcut,
@@ -22,8 +23,9 @@ export function ShortcutBindingInput({ actionId }: ShortcutBindingInputProps) {
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const binding = bindings[actionId];
-  const defaultBinding = SHORTCUT_DEFINITIONS.find((d) => d.id === actionId)!
-    .defaultBinding;
+  const defaultBinding = SHORTCUT_DEFINITIONS.find(
+    (d) => d.id === actionId,
+  )!.defaultBinding;
   const isDefault = bindingsEqual(binding, defaultBinding);
 
   useEffect(() => {

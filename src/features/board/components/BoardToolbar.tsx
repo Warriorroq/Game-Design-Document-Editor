@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { useLocale } from "@/shared/context/LocaleContext";
+
 import {
   BOARD_PEN_COLORS,
   BOARD_PEN_WIDTHS,
@@ -10,9 +10,10 @@ import {
   uniformFlag,
   uniformTextAlign,
 } from "@/features/board/lib/boardTextStyle";
+import { TextColorSwatches } from "@/shared/components/TextColorSwatches";
+import { useLocale } from "@/shared/context/LocaleContext";
 import { resolveBoardTextColor } from "@/shared/lib/textColorUtils";
 import type { BoardText, BoardTextAlign } from "@/shared/types";
-import { TextColorSwatches } from "@/shared/components/TextColorSwatches";
 
 interface BoardToolbarProps {
   penMode: boolean;
@@ -26,7 +27,7 @@ interface BoardToolbarProps {
   onTextColorChange: (textIds: string[], color: string) => void;
   onTextStyleChange: (
     textIds: string[],
-    patch: Pick<BoardText, "bold" | "italic" | "strikethrough">
+    patch: Pick<BoardText, "bold" | "italic" | "strikethrough">,
   ) => void;
   onTextAlignChange: (textIds: string[], align: BoardTextAlign) => void;
 }

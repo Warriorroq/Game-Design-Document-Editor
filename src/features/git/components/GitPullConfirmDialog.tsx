@@ -1,8 +1,10 @@
+import "@/shared/styles/LinkMenus.css";
+
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
-import { useLocale } from "@/shared/context/LocaleContext";
+
 import type { GitFileStatus } from "@/features/git/lib/git";
-import "@/shared/styles/LinkMenus.css";
+import { useLocale } from "@/shared/context/LocaleContext";
 
 export type GitPullConfirmAction = "stash" | "discard";
 
@@ -48,7 +50,9 @@ export function GitPullConfirmDialog({
         <h3 id="git-pull-confirm-title" className="link-paste-title">
           {t("git.pullConfirmTitle")}
         </h3>
-        <p className="git-pull-confirm-message">{t("git.pullConfirmMessage")}</p>
+        <p className="git-pull-confirm-message">
+          {t("git.pullConfirmMessage")}
+        </p>
         <div className="git-pull-confirm-changes">
           <span className="git-menu-changes-label">{t("git.changes")}</span>
           <ul>

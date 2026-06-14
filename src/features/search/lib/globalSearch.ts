@@ -2,14 +2,14 @@ import {
   displayBoardImageAssetName,
   listBoardImageAssetDesks,
 } from "@/features/board/lib/boardImageRegistry";
-import type { MessageKey } from "@/shared/i18n";
-import { translate, type AppLanguage } from "@/shared/i18n";
 import {
   buildAnchorHref,
   buildMediaHref,
   buildSectionHref,
   buildTextHref,
 } from "@/features/links/lib/links";
+import type { MessageKey } from "@/shared/i18n";
+import { type AppLanguage, translate } from "@/shared/i18n";
 import type { GddDocument, GddSection } from "@/shared/types";
 
 export type GlobalSearchMatchKind =
@@ -69,7 +69,7 @@ export function countMatches(haystack: string, needle: string): number {
 export function snippetAround(
   text: string,
   query: string,
-  radius = 36
+  radius = 36,
 ): string {
   const normalized = normalizeWhitespace(text);
   if (!normalized) return "";
@@ -82,7 +82,7 @@ export function snippetAround(
 
 function pushResult(
   results: GlobalSearchResult[],
-  item: Omit<GlobalSearchResult, "key"> & { key?: string }
+  item: Omit<GlobalSearchResult, "key"> & { key?: string },
 ) {
   results.push({
     ...item,
@@ -104,7 +104,7 @@ function searchSection(
   section: GddSection,
   query: string,
   results: GlobalSearchResult[],
-  lang: AppLanguage
+  lang: AppLanguage,
 ) {
   const sectionTitle = section.title || "Untitled";
 
@@ -148,7 +148,7 @@ function searchSection(
   if (section.content.trim()) {
     const parsed = new DOMParser().parseFromString(
       section.content,
-      "text/html"
+      "text/html",
     );
     parsed.querySelectorAll("[id]").forEach((el) => {
       const anchorId = el.id;
@@ -190,7 +190,7 @@ function searchBoardImages(
   doc: GddDocument,
   query: string,
   results: GlobalSearchResult[],
-  lang: AppLanguage
+  lang: AppLanguage,
 ) {
   for (const asset of Object.values(doc.boardImages ?? {})) {
     const displayName = displayBoardImageAssetName(asset);
@@ -231,7 +231,7 @@ function searchFolders(
   doc: GddDocument,
   query: string,
   results: GlobalSearchResult[],
-  lang: AppLanguage
+  lang: AppLanguage,
 ) {
   for (const folder of doc.folders ?? []) {
     if (!folder.title || !matches(folder.title, query)) continue;
@@ -264,7 +264,7 @@ export interface SearchFocusTarget {
 export function searchDocument(
   doc: GddDocument,
   query: string,
-  lang: AppLanguage = "en"
+  lang: AppLanguage = "en",
 ): GlobalSearchResult[] {
   const q = query.trim();
   if (!q) return [];

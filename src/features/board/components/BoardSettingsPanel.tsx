@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
-import { useLocale } from "@/shared/context/LocaleContext";
-import { useBoardSize } from "@/shared/context/BoardSizeContext";
+
 import {
   BOARD_SIZE_PRESET_IDS,
   BOARD_SIZE_PRESETS,
   boardSizeMatchesPreset,
-  normalizeBoardSize,
   type BoardSizePresetId,
+  normalizeBoardSize,
 } from "@/features/board/lib/boardSettings";
+import { useBoardSize } from "@/shared/context/BoardSizeContext";
+import { useLocale } from "@/shared/context/LocaleContext";
 import { boardPresetDescKey, boardPresetNameKey } from "@/shared/i18n";
 
 export function BoardSettingsPanel() {
@@ -78,7 +79,9 @@ export function BoardSettingsPanel() {
       </div>
 
       <div className="settings-board-custom">
-        <h3 className="settings-git-block-title">{t("settings.boardCustom")}</h3>
+        <h3 className="settings-git-block-title">
+          {t("settings.boardCustom")}
+        </h3>
         <div className="settings-board-custom-fields">
           <label className="settings-field">
             <span>{t("settings.boardWidth")}</span>

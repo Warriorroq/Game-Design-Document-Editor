@@ -1,7 +1,9 @@
+import "@/shared/styles/LinkMenus.css";
+
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+
 import { useLocale } from "@/shared/context/LocaleContext";
-import "@/shared/styles/LinkMenus.css";
 
 interface ConfirmDialogProps {
   open: boolean;

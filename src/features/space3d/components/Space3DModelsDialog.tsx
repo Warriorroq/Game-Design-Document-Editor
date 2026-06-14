@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
-import { useLocale } from "@/shared/context/LocaleContext";
+
 import {
   countSpace3DModelUsage,
   displaySpace3DModelName,
 } from "@/domain/space3d/modelRegistry";
+import { useLocale } from "@/shared/context/LocaleContext";
 import type { GddDocument } from "@/shared/types";
 
 interface Space3DModelsDialogProps {
@@ -29,9 +30,9 @@ export function Space3DModelsDialog({
   const assets = useMemo(
     () =>
       Object.values(doc.space3DModels ?? {}).sort((a, b) =>
-        displaySpace3DModelName(a).localeCompare(displaySpace3DModelName(b))
+        displaySpace3DModelName(a).localeCompare(displaySpace3DModelName(b)),
       ),
-    [doc.space3DModels]
+    [doc.space3DModels],
   );
 
   useEffect(() => {
@@ -56,7 +57,11 @@ export function Space3DModelsDialog({
       >
         <header className="space3d-models-header">
           <h3>{t("space3d.modelsTitle")}</h3>
-          <button type="button" className="space3d-models-close" onClick={onClose}>
+          <button
+            type="button"
+            className="space3d-models-close"
+            onClick={onClose}
+          >
             ×
           </button>
         </header>
@@ -121,6 +126,6 @@ export function Space3DModelsDialog({
         </div>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 }

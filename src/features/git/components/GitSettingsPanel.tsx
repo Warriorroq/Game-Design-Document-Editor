@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { useLocale } from "@/shared/context/LocaleContext";
-import { isDesktopApp } from "@/shared/lib/desktop";
+
+import type { GitStatus } from "@/features/git/lib/git";
 import {
   applyGitIdentity,
   authenticateGitRemote,
@@ -10,8 +10,12 @@ import {
   setGitRemote,
   storeGitAccessToken,
 } from "@/features/git/lib/git";
-import { loadGitSettings, saveGitSettings } from "@/features/git/lib/gitSettings";
-import type { GitStatus } from "@/features/git/lib/git";
+import {
+  loadGitSettings,
+  saveGitSettings,
+} from "@/features/git/lib/gitSettings";
+import { useLocale } from "@/shared/context/LocaleContext";
+import { isDesktopApp } from "@/shared/lib/desktop";
 
 interface GitSettingsPanelProps {
   folderPath: string | null;
@@ -109,7 +113,7 @@ export function GitSettingsPanel({
         if (gitStatus?.isRepo && accessToken.trim()) {
           const tokenResult = await storeGitAccessToken(
             folderPath,
-            accessToken.trim()
+            accessToken.trim(),
           );
           if (!tokenResult.ok) {
             setError(formatGitError(tokenResult.error, t));
@@ -122,9 +126,7 @@ export function GitSettingsPanel({
 
         onRefreshGitStatus?.();
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : t("git.errorGeneric")
-        );
+        setError(err instanceof Error ? err.message : t("git.errorGeneric"));
         setSaving(false);
         return;
       }
@@ -214,9 +216,7 @@ export function GitSettingsPanel({
 
       <section className="settings-git-block">
         <h3 className="settings-git-block-title">{t("git.settingsRepo")}</h3>
-        {!folderPath && (
-          <p className="settings-hint">{t("git.needFolder")}</p>
-        )}
+        {!folderPath && <p className="settings-hint">{t("git.needFolder")}</p>}
         {folderPath && !gitStatus?.isRepo && (
           <p className="settings-hint">{t("git.notARepo")}</p>
         )}

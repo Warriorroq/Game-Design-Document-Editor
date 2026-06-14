@@ -1,8 +1,13 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import "@/shared/styles/LinkMenus.css";
+
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { useLocale } from "@/shared/context/LocaleContext";
-import { useLinkContext } from "@/features/links/LinkContext";
-import { boardVideoEmbedSrc, boardVideoRenderMode, isBoardVideoItem } from "@/domain/board/boardItem";
+
+import {
+  boardVideoEmbedSrc,
+  boardVideoRenderMode,
+  isBoardVideoItem,
+} from "@/domain/board/boardItem";
 import { BoardVideoIframe } from "@/features/board/components/BoardVideoIframe";
 import { resolveBoardItemSrc } from "@/features/board/lib/boardImageRegistry";
 import {
@@ -11,15 +16,12 @@ import {
   findSection,
   parseGddHref,
 } from "@/features/links/lib/links";
-import "@/shared/styles/LinkMenus.css";
+import { useLinkContext } from "@/features/links/LinkContext";
+import { useLocale } from "@/shared/context/LocaleContext";
 
 const HOVER_MS = 250;
 
-function plainSnippet(
-  html: string,
-  emptyLabel: string,
-  max = 200
-): string {
+function plainSnippet(html: string, emptyLabel: string, max = 200): string {
   const doc = new DOMParser().parseFromString(html, "text/html");
   const text = (doc.body.textContent ?? "").replace(/\s+/g, " ").trim();
   if (!text) return emptyLabel;
@@ -54,7 +56,9 @@ export function LinkPreviewLayer() {
 
     const onOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement | null;
-      const link = target?.closest("a.gdd-link, a[href^='gdd:'], a[href^='http']");
+      const link = target?.closest(
+        "a.gdd-link, a[href^='gdd:'], a[href^='http']",
+      );
       if (!link || !(link instanceof HTMLAnchorElement)) {
         if (!anchorRef.current?.contains(target ?? null)) hide();
         return;
@@ -94,7 +98,7 @@ export function LinkPreviewLayer() {
   if (!preview) return null;
 
   const link = parseGddHref(preview.href);
-  let body: ReactNode = null;
+  let body: ReactNode;
 
   if (!link) {
     body = <p className="link-preview-fallback">{t("link.invalid")}</p>;
@@ -138,7 +142,11 @@ export function LinkPreviewLayer() {
       );
     } else {
       body = (
-        <img src={resolveBoardItemSrc(doc, item)} alt="" className="link-preview-image" />
+        <img
+          src={resolveBoardItemSrc(doc, item)}
+          alt=""
+          className="link-preview-image"
+        />
       );
     }
   } else if (link.type === "text") {
@@ -157,9 +165,14 @@ export function LinkPreviewLayer() {
   } else {
     const section = findSection(doc, link.sectionId);
     if (!section) {
-      body = <p className="link-preview-fallback">{t("link.sectionNotFound")}</p>;
+      body = (
+        <p className="link-preview-fallback">{t("link.sectionNotFound")}</p>
+      );
     } else if (link.type === "anchor") {
-      const frag = new DOMParser().parseFromString(section.content, "text/html");
+      const frag = new DOMParser().parseFromString(
+        section.content,
+        "text/html",
+      );
       const el = frag.getElementById(link.anchorId);
       body = (
         <div className="link-preview-section">

@@ -1,8 +1,14 @@
-import type { GddDocument, Space3DModelAsset, Space3DObject } from "@/domain/types";
+import type {
+  GddDocument,
+  Space3DModelAsset,
+  Space3DObject,
+} from "@/domain/types";
 
 const ASSETS_DIR = "assets";
 
-function parseDataUrl(src: string): { mime: string; dataBase64: string } | null {
+function parseDataUrl(
+  src: string,
+): { mime: string; dataBase64: string } | null {
   const match = /^data:([^;]+);base64,(.+)$/s.exec(src);
   if (!match) return null;
   return { mime: match[1], dataBase64: match[2] };
@@ -17,7 +23,7 @@ export function space3DModelContentKey(src: string): string {
 
 export function resolveSpace3DModelSrc(
   doc: GddDocument,
-  assetId: string | undefined
+  assetId: string | undefined,
 ): string | null {
   if (!assetId) return null;
   return doc.space3DModels?.[assetId]?.src ?? null;
@@ -31,7 +37,7 @@ export function displaySpace3DModelName(asset: Space3DModelAsset): string {
 export function registerSpace3DModel(
   doc: GddDocument,
   src: string,
-  name?: string
+  name?: string,
 ): { doc: GddDocument; assetId: string } {
   const key = space3DModelContentKey(src);
   const models = { ...(doc.space3DModels ?? {}) };
@@ -59,7 +65,7 @@ export function registerSpace3DModel(
 export function updateSpace3DModelAssetName(
   doc: GddDocument,
   assetId: string,
-  name: string
+  name: string,
 ): GddDocument {
   const trimmed = name.trim();
   if (trimmed.length > 200) {
@@ -83,7 +89,7 @@ export function updateSpace3DModelAssetName(
 
 export function deleteSpace3DModelAsset(
   doc: GddDocument,
-  assetId: string
+  assetId: string,
 ): GddDocument {
   const models = doc.space3DModels;
   if (!models?.[assetId]) return doc;
@@ -98,9 +104,10 @@ export function deleteSpace3DModelAsset(
 
 export function listSpace3DModelReferences(
   doc: GddDocument,
-  assetId: string
+  assetId: string,
 ): { sectionId: string; sectionTitle: string; objectId: string }[] {
-  const refs: { sectionId: string; sectionTitle: string; objectId: string }[] = [];
+  const refs: { sectionId: string; sectionTitle: string; objectId: string }[] =
+    [];
   for (const section of doc.sections) {
     if (section.kind !== "space3d") continue;
     for (const obj of section.space3d?.objects ?? []) {
@@ -116,13 +123,16 @@ export function listSpace3DModelReferences(
   return refs;
 }
 
-export function countSpace3DModelUsage(doc: GddDocument, assetId: string): number {
+export function countSpace3DModelUsage(
+  doc: GddDocument,
+  assetId: string,
+): number {
   return listSpace3DModelReferences(doc, assetId).length;
 }
 
 export function prepareSpace3DObjectForDoc(
   doc: GddDocument,
-  obj: Space3DObject
+  obj: Space3DObject,
 ): { doc: GddDocument; object: Space3DObject } {
   if (obj.type !== "model") {
     return { doc, object: obj };
@@ -136,7 +146,7 @@ export function prepareSpace3DObjectForDoc(
 }
 
 export function collectSpace3DModelRegistryAssets(
-  doc: GddDocument
+  doc: GddDocument,
 ): Space3DModelAsset[] {
   return Object.values(doc.space3DModels ?? {});
 }

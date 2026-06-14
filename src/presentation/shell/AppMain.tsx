@@ -1,26 +1,27 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
+import type { DocumentStore } from "@/application/document/useDocumentStore";
+import { useDesktopArchiveOpen } from "@/application/project/useDesktopArchiveOpen";
+import { useProjectFolder } from "@/application/project/useProjectFolder";
+import { importAsNewProject } from "@/domain/document/document";
+import type { GddDocument } from "@/domain/types";
+import { BoardAssetsDialog } from "@/features/board/components/BoardAssetsDialog";
+import { useLinkContext } from "@/features/links/LinkContext";
 import { LinkContextMenu } from "@/features/links/LinkContextMenu";
 import { LinkPasteDialog } from "@/features/links/LinkPasteDialog";
 import { LinkPreviewLayer } from "@/features/links/LinkPreviewLayer";
-import { SettingsPage } from "@/features/settings/SettingsPage";
-import { Toolbar } from "@/shared/components/Toolbar";
-import { useLinkContext } from "@/features/links/LinkContext";
-import { useLocale } from "@/shared/context/LocaleContext";
-import { useShortcuts } from "@/shared/context/ShortcutsContext";
-import { useDesktopArchiveOpen } from "@/application/project/useDesktopArchiveOpen";
-import { useProjectFolder } from "@/application/project/useProjectFolder";
-import { useResizablePanels } from "@/shared/hooks/useResizablePanels";
 import {
-  searchDocument,
   type GlobalSearchResult,
+  searchDocument,
   type SearchFocusTarget,
 } from "@/features/search/lib/globalSearch";
-import { useSidebarVisible } from "@/shared/hooks/useSidebarVisible";
-import { BoardAssetsDialog } from "@/features/board/components/BoardAssetsDialog";
-import { importAsNewProject } from "@/domain/document/document";
-import type { DocumentStore } from "@/application/document/useDocumentStore";
-import type { GddDocument } from "@/domain/types";
+import { SettingsPage } from "@/features/settings/SettingsPage";
 import { EditorLayout } from "@/presentation/shell/EditorLayout";
+import { Toolbar } from "@/shared/components/Toolbar";
+import { useLocale } from "@/shared/context/LocaleContext";
+import { useShortcuts } from "@/shared/context/ShortcutsContext";
+import { useResizablePanels } from "@/shared/hooks/useResizablePanels";
+import { useSidebarVisible } from "@/shared/hooks/useSidebarVisible";
 
 type AppView = "editor" | "settings";
 
@@ -75,17 +76,20 @@ export function AppMain(props: DocumentStore) {
   const [view, setView] = useState<AppView>("editor");
   const [imageAssetsOpen, setImageAssetsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchFocus, setSearchFocus] = useState<SearchFocusTarget | null>(null);
-  const lastSearchResultRef = useRef<{ key: string; matchIndex: number } | null>(
-    null
+  const [searchFocus, setSearchFocus] = useState<SearchFocusTarget | null>(
+    null,
   );
+  const lastSearchResultRef = useRef<{
+    key: string;
+    matchIndex: number;
+  } | null>(null);
   const { language, t } = useLocale();
   const projectFolder = useProjectFolder();
   const { matches: shortcutMatches } = useShortcuts();
   const { sidebarVisible, toggleSidebar } = useSidebarVisible();
   const searchResults = useMemo(
     () => searchDocument(doc, searchQuery, language),
-    [doc, searchQuery, language]
+    [doc, searchQuery, language],
   );
   const {
     mainRef,
@@ -147,7 +151,7 @@ export function AppMain(props: DocumentStore) {
         lastSearchResultRef.current = null;
       }
     },
-    [navigateToHref, searchQuery]
+    [navigateToHref, searchQuery],
   );
 
   useEffect(() => {
@@ -166,14 +170,16 @@ export function AppMain(props: DocumentStore) {
       projectFolder.closeFolder();
       replaceDocument(importAsNewProject(incoming));
     },
-    [projectFolder, replaceDocument]
+    [projectFolder, replaceDocument],
   );
 
   const handleDesktopArchiveError = useCallback(
     (message: string) => {
-      window.alert(message === "read_failed" ? t("project.readError") : message);
+      window.alert(
+        message === "read_failed" ? t("project.readError") : message,
+      );
     },
-    [t]
+    [t],
   );
 
   useDesktopArchiveOpen(handleImportProject, handleDesktopArchiveError);
@@ -224,7 +230,9 @@ export function AppMain(props: DocumentStore) {
   const handleAfterGitPull = useCallback(async () => {
     if (!projectFolder.folderPath) return;
     try {
-      const imported = await projectFolder.loadFromFolder(projectFolder.folderPath);
+      const imported = await projectFolder.loadFromFolder(
+        projectFolder.folderPath,
+      );
       replaceDocument(imported);
     } catch (err) {
       const message =

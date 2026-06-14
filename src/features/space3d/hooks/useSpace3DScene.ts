@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
+
 import { resolveSpace3DModelSrc } from "@/domain/space3d/modelRegistry";
 import {
   defaultSpace3DData,
@@ -9,15 +10,22 @@ import {
   normalizeSpace3DObject,
   transformModeToControls,
 } from "@/domain/space3d/space3d";
-import type { GddDocument, Space3DData, Space3DEditMode, Space3DObject } from "@/domain/types";
+import type {
+  GddDocument,
+  Space3DData,
+  Space3DEditMode,
+  Space3DObject,
+} from "@/domain/types";
 import {
   createInfiniteGrid,
   disposeInfiniteGrid,
   snapTransformPatch,
   updateInfiniteGrid,
 } from "@/features/space3d/lib/space3dGrid";
-import { cloneModelInstance, loadSpace3DModelTemplate } from "@/features/space3d/lib/space3dLoader";
-import { configureTransformControlsGizmo } from "@/features/space3d/lib/space3dTransformControls";
+import {
+  cloneModelInstance,
+  loadSpace3DModelTemplate,
+} from "@/features/space3d/lib/space3dLoader";
 import {
   applyObjectTransform,
   disposeObject3D,
@@ -25,6 +33,7 @@ import {
   patchFromObject3D,
   primitiveMesh,
 } from "@/features/space3d/lib/space3dObject";
+import { configureTransformControlsGizmo } from "@/features/space3d/lib/space3dTransformControls";
 
 interface UseSpace3DSceneOptions {
   containerRef: React.RefObject<HTMLDivElement | null>;
@@ -111,7 +120,10 @@ export function useSpace3DScene({
       RIGHT: THREE.MOUSE.PAN,
     };
 
-    const transformControls = new TransformControls(camera, renderer.domElement);
+    const transformControls = new TransformControls(
+      camera,
+      renderer.domElement,
+    );
     transformControls.setMode(transformModeToControls(editMode));
     configureTransformControlsGizmo(transformControls);
     scene.add(transformControls.getHelper());
@@ -208,7 +220,7 @@ export function useSpace3DScene({
           gridHelper,
           camera,
           controls.target,
-          normalizeSpace3DGrid(space3dRef.current.grid)
+          normalizeSpace3DGrid(space3dRef.current.grid),
         );
       }
       renderer.render(scene, camera);
@@ -318,7 +330,9 @@ export function useSpace3DScene({
 
     async function syncObjects() {
       syncingRef.current = true;
-      const objects = space3dRef.current.objects.map((obj) => normalizeSpace3DObject(obj));
+      const objects = space3dRef.current.objects.map((obj) =>
+        normalizeSpace3DObject(obj),
+      );
       const nextIds = new Set(objects.map((obj) => obj.id));
 
       for (const [id, root] of ctx!.instances) {

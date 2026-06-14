@@ -1,7 +1,9 @@
+import "@/shared/styles/LinkMenus.css";
+
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+
 import { useLocale } from "@/shared/context/LocaleContext";
-import "@/shared/styles/LinkMenus.css";
 
 export type GitSyncOperation = "push" | "pull";
 
@@ -80,7 +82,12 @@ export function GitProgressDialog({ state, onClose }: GitProgressDialogProps) {
         {state.percent !== null && state.status === "running" && (
           <p className="git-progress-percent">{state.percent}%</p>
         )}
-        <div className="git-progress-log" ref={logRef} role="log" aria-live="polite">
+        <div
+          className="git-progress-log"
+          ref={logRef}
+          role="log"
+          aria-live="polite"
+        >
           {state.lines.length === 0 ? (
             <p className="git-progress-log-empty">{t("git.progressWaiting")}</p>
           ) : (
@@ -108,18 +115,4 @@ export function GitProgressDialog({ state, onClose }: GitProgressDialogProps) {
   );
 
   return createPortal(dialog, document.body);
-}
-
-export function parseGitProgressPercent(line: string): number | null {
-  const match = line.match(/(\d+)%/);
-  if (match) return Number(match[1]);
-
-  const ratio = line.match(/\((\d+)\/(\d+)\)/);
-  if (ratio) {
-    const current = Number(ratio[1]);
-    const total = Number(ratio[2]);
-    if (total > 0) return Math.round((current / total) * 100);
-  }
-
-  return null;
 }

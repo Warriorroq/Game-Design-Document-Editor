@@ -1,17 +1,18 @@
 import {
   createContext,
+  type ReactNode,
   useCallback,
   useContext,
   useMemo,
   useState,
-  type ReactNode,
 } from "react";
+
 import {
+  type AppLanguage,
   loadStoredLanguage,
+  type MessageKey,
   saveLanguage,
   translate,
-  type AppLanguage,
-  type MessageKey,
   type TranslateParams,
 } from "@/shared/i18n";
 
@@ -25,7 +26,7 @@ const LocaleContext = createContext<LocaleContextValue | null>(null);
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<AppLanguage>(() =>
-    loadStoredLanguage()
+    loadStoredLanguage(),
   );
 
   const setLanguage = useCallback((lang: AppLanguage) => {
@@ -34,13 +35,14 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const t = useCallback(
-    (key: MessageKey, params?: TranslateParams) => translate(language, key, params),
-    [language]
+    (key: MessageKey, params?: TranslateParams) =>
+      translate(language, key, params),
+    [language],
   );
 
   const value = useMemo(
     () => ({ language, setLanguage, t }),
-    [language, setLanguage, t]
+    [language, setLanguage, t],
   );
 
   return (

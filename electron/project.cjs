@@ -12,7 +12,8 @@ function manifestPath(dir) {
 
 function hasProjectFile(dir) {
   return (
-    fs.existsSync(manifestPath(dir)) || fs.existsSync(path.join(dir, LEGACY_FILE))
+    fs.existsSync(manifestPath(dir)) ||
+    fs.existsSync(path.join(dir, LEGACY_FILE))
   );
 }
 
@@ -109,13 +110,6 @@ function writeBinaryFile(filePath, dataBase64) {
   fs.writeFileSync(filePath, buffer);
 }
 
-function listFiles(dirPath) {
-  if (!fs.existsSync(dirPath)) return [];
-  return fs
-    .readdirSync(dirPath)
-    .filter((name) => fs.statSync(path.join(dirPath, name)).isFile());
-}
-
 function cleanupDir(dirPath, keepNames) {
   if (!fs.existsSync(dirPath)) return;
   const keep = new Set(keepNames);
@@ -148,7 +142,7 @@ function writeProjectFolder(dir, payload) {
       fs.writeFileSync(
         path.join(dir, SECTIONS_DIR, name),
         section.content,
-        "utf8"
+        "utf8",
       );
     }
 

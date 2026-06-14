@@ -21,7 +21,7 @@ export function insertLinkInEditor(
   root: HTMLElement,
   href: string,
   text: string,
-  savedRange?: Range | null
+  savedRange?: Range | null,
 ): void {
   root.focus();
   const sel = window.getSelection();

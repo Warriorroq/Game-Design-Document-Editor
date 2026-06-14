@@ -34,7 +34,7 @@ export function useSidebarVisible() {
       setVisible(next);
       persistVisible(next);
     },
-    [persistVisible]
+    [persistVisible],
   );
 
   return { sidebarVisible: visible, toggleSidebar, setSidebarVisible };

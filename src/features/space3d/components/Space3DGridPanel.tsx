@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+
 import { useLocale } from "@/shared/context/LocaleContext";
 import type { Space3DGrid } from "@/shared/types";
 

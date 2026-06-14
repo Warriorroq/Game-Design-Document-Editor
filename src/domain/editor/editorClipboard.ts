@@ -40,7 +40,14 @@ const ALLOWED_TAGS = new Set([
   "BUTTON",
 ]);
 
-const GLOBAL_ATTRS = new Set(["class", "id", "contenteditable", "tabindex", "aria-label", "role"]);
+const GLOBAL_ATTRS = new Set([
+  "class",
+  "id",
+  "contenteditable",
+  "tabindex",
+  "aria-label",
+  "role",
+]);
 
 const TAG_ATTRS: Record<string, Set<string>> = {
   A: new Set(["href", "class", "target", "rel"]),
@@ -49,7 +56,13 @@ const TAG_ATTRS: Record<string, Set<string>> = {
   TH: new Set(["colspan", "rowspan"]),
   TABLE: new Set(["class"]),
   DIV: new Set(["class"]),
-  BUTTON: new Set(["type", "class", "contenteditable", "tabindex", "aria-label"]),
+  BUTTON: new Set([
+    "type",
+    "class",
+    "contenteditable",
+    "tabindex",
+    "aria-label",
+  ]),
 };
 
 function escapeHtml(text: string): string {
@@ -154,12 +167,12 @@ export function selectionIsInRoot(root: HTMLElement): boolean {
   const anchor = sel.anchorNode;
   const focus = sel.focusNode;
   return Boolean(
-    anchor && focus && root.contains(anchor) && root.contains(focus)
+    anchor && focus && root.contains(anchor) && root.contains(focus),
   );
 }
 
 export function getSelectionRichContent(
-  root: HTMLElement
+  root: HTMLElement,
 ): { html: string; plain: string } | null {
   if (!selectionIsInRoot(root)) return null;
   const sel = window.getSelection()!;
@@ -172,7 +185,7 @@ export function getSelectionRichContent(
 export function setClipboardRichContent(
   e: ClipboardEvent,
   html: string,
-  plain: string
+  plain: string,
 ): void {
   const data = e.clipboardData;
   if (!data) return;
@@ -187,19 +200,17 @@ export function deleteSelectionInRoot(root: HTMLElement): boolean {
   if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return false;
   const anchor = sel.anchorNode;
   const focus = sel.focusNode;
-  if (
-    !anchor ||
-    !focus ||
-    !root.contains(anchor) ||
-    !root.contains(focus)
-  ) {
+  if (!anchor || !focus || !root.contains(anchor) || !root.contains(focus)) {
     return false;
   }
   sel.deleteFromDocument();
   return true;
 }
 
-export function pasteRichContent(root: HTMLElement, clipboard: DataTransfer): void {
+export function pasteRichContent(
+  root: HTMLElement,
+  clipboard: DataTransfer,
+): void {
   const html = clipboard.getData("text/html").trim();
   const plain = clipboard.getData("text/plain");
 

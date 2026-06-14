@@ -1,11 +1,12 @@
-import { useCallback, useLayoutEffect, useState, type RefObject } from "react";
+import { type RefObject, useCallback, useLayoutEffect, useState } from "react";
 import { createPortal } from "react-dom";
+
 import {
   applyEditorFormat,
   applyEditorTextColor,
   editorHasTextSelection,
-  getEditorSelectionColor,
   type FormatAction,
+  getEditorSelectionColor,
 } from "@/features/editor/lib/editorFormat";
 import { TextColorSwatches } from "@/shared/components/TextColorSwatches";
 
@@ -51,7 +52,7 @@ const TOOLS: { group: ToolButton[] }[] = [
 
 function measureContentColumn() {
   const col = document.querySelector(
-    ".content-column:not(.content-column--hidden)"
+    ".content-column:not(.content-column--hidden)",
   );
   if (!col) return { left: 0, width: 0 };
   const rect = col.getBoundingClientRect();
@@ -83,7 +84,7 @@ export function FormatToolbar({
     update();
 
     const col = document.querySelector(
-      ".content-column:not(.content-column--hidden)"
+      ".content-column:not(.content-column--hidden)",
     );
     const observer = new ResizeObserver(update);
     if (col) observer.observe(col);

@@ -56,7 +56,11 @@ export function normalizeEmbedSrc(src: string): string {
     ? url.hostname.slice(4)
     : url.hostname;
 
-  if (YOUTUBE_HOSTS.has(url.hostname) || YOUTUBE_HOSTS.has(bareHost) || host === "youtu.be") {
+  if (
+    YOUTUBE_HOSTS.has(url.hostname) ||
+    YOUTUBE_HOSTS.has(bareHost) ||
+    host === "youtu.be"
+  ) {
     const id =
       url.pathname.match(/^\/embed\/([^/?]+)/)?.[1] ??
       (host === "youtu.be" ? url.pathname.slice(1).split("/")[0] : null);

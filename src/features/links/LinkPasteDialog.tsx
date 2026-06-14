@@ -1,8 +1,10 @@
+import "@/shared/styles/LinkMenus.css";
+
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { useLocale } from "@/shared/context/LocaleContext";
+
 import { useLinkContext } from "@/features/links/LinkContext";
-import "@/shared/styles/LinkMenus.css";
+import { useLocale } from "@/shared/context/LocaleContext";
 
 export function LinkPasteDialog() {
   const { t } = useLocale();
@@ -65,7 +67,11 @@ export function LinkPasteDialog() {
           />
         </label>
         <div className="link-paste-actions">
-          <button type="button" className="btn btn-ghost" onClick={closePasteDialog}>
+          <button
+            type="button"
+            className="btn btn-ghost"
+            onClick={closePasteDialog}
+          >
             {t("link.cancel")}
           </button>
           <button type="button" className="btn" onClick={submit}>

@@ -119,7 +119,8 @@ const en = {
   "git.ffOnlyFailed":
     "Fast-forward pull is not possible. Resolve conflicts in Git, then try again.",
   "git.notARepo": "Initialize a Git repository in the project folder first.",
-  "git.remoteBranchNotFound": "Remote branch not found. Push to the remote first.",
+  "git.remoteBranchNotFound":
+    "Remote branch not found. Push to the remote first.",
   "git.noInitialCommit":
     "No commits in this repository yet. Commit your project first, then push or pull.",
   "git.progressPush": "Pushing to remote",
@@ -227,7 +228,8 @@ const en = {
   "desk.lock": "Lock",
   "desk.unlock": "Unlock",
   "desk.removeSelected": "Remove selected",
-  "desk.empty": "Paste or drop images, or paste a video URL (YouTube, Vimeo, .mp4)",
+  "desk.empty":
+    "Paste or drop images, or paste a video URL (YouTube, Vimeo, .mp4)",
   "desk.videos": "{count} videos",
   "desk.insertVideo": "Insert video",
   "desk.videoDialogTitle": "Insert video",
@@ -261,14 +263,16 @@ const en = {
   "space3d.addBox": "Box",
   "space3d.addSphere": "Sphere",
   "space3d.remove": "Remove",
-  "space3d.hint": "Right click: add objects · Delete: remove selection · Ctrl+Z: undo",
+  "space3d.hint":
+    "Right click: add objects · Delete: remove selection · Ctrl+Z: undo",
   "space3d.editModeAria": "Object edit mode",
   "space3d.mode.move": "Move",
   "space3d.mode.scale": "Scale",
   "space3d.mode.rotate": "Rotate",
   "space3d.models": "Models",
   "space3d.modelsTitle": "3D models library",
-  "space3d.modelsEmpty": "No models imported yet. Add .glb, .gltf, .fbx or .obj files.",
+  "space3d.modelsEmpty":
+    "No models imported yet. Add .glb, .gltf, .fbx or .obj files.",
   "space3d.modelsCount": "{count} models",
   "space3d.importModel": "Import model",
   "space3d.placeModel": "Place",
@@ -482,7 +486,8 @@ const ru: Record<keyof typeof en, string> = {
   "git.apply": "Применить",
   "git.nothingToCommit": "Нечего коммитить.",
   "git.errorGeneric": "Ошибка Git.",
-  "git.noRemote": "Сначала укажите URL удалённого репозитория (Проект → Git → URL remote).",
+  "git.noRemote":
+    "Сначала укажите URL удалённого репозитория (Проект → Git → URL remote).",
   "git.needFolder": "Сначала откройте папку проекта (Проект → Папка проекта).",
   "git.authFailed":
     "Ошибка авторизации. В Настройки → Git нажмите «Подключить» (браузер) или вставьте Personal Access Token и Сохранить.",
@@ -492,7 +497,8 @@ const ru: Record<keyof typeof en, string> = {
   "git.ffOnlyFailed":
     "Fast-forward pull невозможен. Разрешите конфликты в Git и повторите.",
   "git.notARepo": "Сначала инициализируйте Git-репозиторий в папке проекта.",
-  "git.remoteBranchNotFound": "Ветка на remote не найдена. Сначала сделайте push.",
+  "git.remoteBranchNotFound":
+    "Ветка на remote не найдена. Сначала сделайте push.",
   "git.noInitialCommit":
     "В репозитории ещё нет коммитов. Сначала закоммитьте проект, затем push или pull.",
   "git.progressPush": "Отправка на remote",
@@ -572,9 +578,9 @@ const ru: Record<keyof typeof en, string> = {
   "sidebar.toggleFolder": "Развернуть или свернуть папку",
   "sidebar.renameFolder": "Переименовать папку",
   "sidebar.renameFolderHint": "Двойной щелчок — переименовать",
-  "sidebar.confirmRemove": 'Удалить секцию «{title}»?',
+  "sidebar.confirmRemove": "Удалить секцию «{title}»?",
   "sidebar.confirmRemoveFolder":
-    'Удалить папку «{title}»? Вложенные папки и секции поднимутся на уровень выше.',
+    "Удалить папку «{title}»? Вложенные папки и секции поднимутся на уровень выше.",
 
   "doc.titlePlaceholder": "Название игры",
   "doc.subtitlePlaceholder": "Подзаголовок",
@@ -600,7 +606,8 @@ const ru: Record<keyof typeof en, string> = {
   "desk.lock": "Заблокировать",
   "desk.unlock": "Разблокировать",
   "desk.removeSelected": "Удалить выбранное",
-  "desk.empty": "Вставьте или перетащите изображения, или вставьте ссылку на видео (YouTube, Vimeo, .mp4)",
+  "desk.empty":
+    "Вставьте или перетащите изображения, или вставьте ссылку на видео (YouTube, Vimeo, .mp4)",
   "desk.videos": "{count} видео",
   "desk.insertVideo": "Вставить видео",
   "desk.videoDialogTitle": "Вставить видео",
@@ -641,7 +648,8 @@ const ru: Record<keyof typeof en, string> = {
   "space3d.mode.rotate": "Поворот",
   "space3d.models": "Модели",
   "space3d.modelsTitle": "Библиотека 3D моделей",
-  "space3d.modelsEmpty": "Модели не импортированы. Добавьте файлы .glb, .gltf, .fbx или .obj.",
+  "space3d.modelsEmpty":
+    "Модели не импортированы. Добавьте файлы .glb, .gltf, .fbx или .obj.",
   "space3d.modelsCount": "{count} моделей",
   "space3d.importModel": "Импорт модели",
   "space3d.placeModel": "Разместить",
@@ -673,7 +681,8 @@ const ru: Record<keyof typeof en, string> = {
   "desk.imageAssetsUnused": "Не на доске",
   "desk.imageAssetCopy": "Копировать",
   "desk.imageAssetCopied": "Скопировано",
-  "desk.imageAssetCopyFailed": "Не удалось подготовить изображение для вставки.",
+  "desk.imageAssetCopyFailed":
+    "Не удалось подготовить изображение для вставки.",
   "desk.imageAssetDelete": "Удалить",
   "desk.imageAssetInUse": "Используется на доске — сначала удалите объекты.",
   "desk.imageAssetRenameHint": "Двойной клик — переименовать",
@@ -695,8 +704,7 @@ const ru: Record<keyof typeof en, string> = {
   "link.insert": "Вставить",
   "link.cancel": "Отмена",
   "dialog.confirm": "Подтвердить",
-  "link.previewBlocked":
-    "Некоторые сайты блокируют встроенный предпросмотр.",
+  "link.previewBlocked": "Некоторые сайты блокируют встроенный предпросмотр.",
   "link.blockNotFound": "Блок не найден",
   "link.imageNotFound": "Изображение не найдено",
   "link.videoNotFound": "Видео не найдено",

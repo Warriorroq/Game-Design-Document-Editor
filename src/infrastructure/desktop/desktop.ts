@@ -2,7 +2,7 @@ export const isDesktopApp =
   typeof window !== "undefined" &&
   Boolean(
     (window as Window & { gddDesktop?: { isDesktop?: boolean } }).gddDesktop
-      ?.isDesktop
+      ?.isDesktop,
   );
 
 export const isWindowsDesktopApp =
@@ -20,7 +20,7 @@ export function restoreAppFocus() {
     window.focus();
     document
       .querySelector<HTMLElement>(
-        ".markdown-preview--editable, .editor-empty .btn"
+        ".markdown-preview--editable, .editor-empty .btn",
       )
       ?.focus();
   });

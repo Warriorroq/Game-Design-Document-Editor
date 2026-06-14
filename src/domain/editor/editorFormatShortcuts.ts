@@ -14,7 +14,7 @@ export const EDITOR_FORMAT_SHORTCUT_ACTIONS: {
 ];
 
 export function formatActionForShortcut(
-  id: ShortcutActionId
+  id: ShortcutActionId,
 ): FormatAction | null {
   return (
     EDITOR_FORMAT_SHORTCUT_ACTIONS.find((entry) => entry.id === id)?.action ??

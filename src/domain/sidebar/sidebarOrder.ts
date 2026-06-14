@@ -24,7 +24,7 @@ function parentKey(folderId: string | null | undefined): string {
 
 export function childItems(
   doc: SidebarDoc,
-  parentFolderId: string | null
+  parentFolderId: string | null,
 ): ChildItem[] {
   const parent = parentKey(parentFolderId);
   const folders = foldersOf(doc)
@@ -53,7 +53,7 @@ export function rootItems(doc: SidebarDoc): ChildItem[] {
 
 export function sectionsInFolder(
   doc: SidebarDoc,
-  folderId: string
+  folderId: string,
 ): GddSection[] {
   return doc.sections
     .filter((section) => section.folderId === folderId)
@@ -62,7 +62,7 @@ export function sectionsInFolder(
 
 export function nextChildOrder(
   doc: SidebarDoc,
-  parentFolderId: string | null
+  parentFolderId: string | null,
 ): number {
   const items = childItems(doc, parentFolderId);
   if (items.length === 0) return 0;
@@ -75,36 +75,46 @@ export function nextRootOrder(doc: SidebarDoc): number {
 }
 
 /** @deprecated Use nextChildOrder */
-export function nextFolderSectionOrder(doc: SidebarDoc, folderId: string): number {
+export function nextFolderSectionOrder(
+  doc: SidebarDoc,
+  folderId: string,
+): number {
   return nextChildOrder(doc, folderId);
 }
 
 function folderParent(doc: SidebarDoc, folderId: string): string | null {
-  return foldersOf(doc).find((folder) => folder.id === folderId)?.parentFolderId ?? null;
+  return (
+    foldersOf(doc).find((folder) => folder.id === folderId)?.parentFolderId ??
+    null
+  );
 }
 
 function wouldCreateFolderCycle(
   doc: SidebarDoc,
   dragFolderId: string,
-  newParentId: string | null
+  newParentId: string | null,
 ): boolean {
   if (!newParentId) return false;
   let current: string | undefined = newParentId;
   while (current) {
     if (current === dragFolderId) return true;
-    current = foldersOf(doc).find((folder) => folder.id === current)?.parentFolderId;
+    current = foldersOf(doc).find(
+      (folder) => folder.id === current,
+    )?.parentFolderId;
   }
   return false;
 }
 
 function renumberSectionsInParent(
   sections: GddSection[],
-  folderId: string | null
+  folderId: string | null,
 ): GddSection[] {
   const siblings = sections
     .filter((section) => parentKey(section.folderId) === parentKey(folderId))
     .sort((a, b) => a.order - b.order);
-  const orderMap = new Map(siblings.map((section, index) => [section.id, index]));
+  const orderMap = new Map(
+    siblings.map((section, index) => [section.id, index]),
+  );
   return sections.map((section) => {
     const order = orderMap.get(section.id);
     return order !== undefined ? { ...section, order } : section;
@@ -114,7 +124,7 @@ function renumberSectionsInParent(
 function applyChildOrders(
   doc: GddDocument,
   parentFolderId: string | null,
-  ordered: ChildItem[]
+  ordered: ChildItem[],
 ): GddDocument {
   const folderOrders = new Map<string, number>();
   const sectionOrders = new Map<string, number>();
@@ -143,7 +153,7 @@ function moveSectionToParent(
   doc: GddDocument,
   sectionId: string,
   parentFolderId: string | null,
-  insertIndex: number
+  insertIndex: number,
 ): GddDocument {
   const section = doc.sections.find((entry) => entry.id === sectionId);
   if (!section) return doc;
@@ -154,7 +164,7 @@ function moveSectionToParent(
     sections: doc.sections.map((entry) =>
       entry.id === sectionId
         ? { ...entry, folderId: parentFolderId ?? undefined }
-        : entry
+        : entry,
     ),
   };
 
@@ -163,13 +173,13 @@ function moveSectionToParent(
       nextDoc,
       oldParent,
       childItems(nextDoc, oldParent).filter(
-        (entry) => !(entry.kind === "section" && entry.item.id === sectionId)
-      )
+        (entry) => !(entry.kind === "section" && entry.item.id === sectionId),
+      ),
     );
   }
 
   const items = childItems(nextDoc, parentFolderId).filter(
-    (entry) => !(entry.kind === "section" && entry.item.id === sectionId)
+    (entry) => !(entry.kind === "section" && entry.item.id === sectionId),
   );
   const moved = nextDoc.sections.find((entry) => entry.id === sectionId)!;
   const clampedIndex = Math.max(0, Math.min(insertIndex, items.length));
@@ -181,7 +191,7 @@ function moveFolderToParent(
   doc: GddDocument,
   folderId: string,
   parentFolderId: string | null,
-  insertIndex: number
+  insertIndex: number,
 ): GddDocument | null {
   if (wouldCreateFolderCycle(doc, folderId, parentFolderId)) return null;
 
@@ -194,7 +204,7 @@ function moveFolderToParent(
     folders: foldersOf(doc).map((entry) =>
       entry.id === folderId
         ? { ...entry, parentFolderId: parentFolderId ?? undefined }
-        : entry
+        : entry,
     ),
   };
 
@@ -203,13 +213,13 @@ function moveFolderToParent(
       nextDoc,
       oldParent,
       childItems(nextDoc, oldParent).filter(
-        (entry) => !(entry.kind === "folder" && entry.item.id === folderId)
-      )
+        (entry) => !(entry.kind === "folder" && entry.item.id === folderId),
+      ),
     );
   }
 
   const items = childItems(nextDoc, parentFolderId).filter(
-    (entry) => !(entry.kind === "folder" && entry.item.id === folderId)
+    (entry) => !(entry.kind === "folder" && entry.item.id === folderId),
   );
   const moved = nextDoc.folders!.find((entry) => entry.id === folderId)!;
   const clampedIndex = Math.max(0, Math.min(insertIndex, items.length));
@@ -221,7 +231,7 @@ function insertSectionAtChildIndex(
   doc: GddDocument,
   sectionId: string,
   parentFolderId: string | null,
-  insertIndex: number
+  insertIndex: number,
 ): GddDocument {
   return moveSectionToParent(doc, sectionId, parentFolderId, insertIndex);
 }
@@ -229,12 +239,12 @@ function insertSectionAtChildIndex(
 export function applySidebarDrop(
   doc: GddDocument,
   drag: { kind: SidebarDragKind; id: string },
-  target: SidebarDropTarget
+  target: SidebarDropTarget,
 ): GddDocument | null {
   if (drag.kind === "folder") {
     if (target.kind === "folder" && target.position === "inside") {
       const insertIndex = childItems(doc, target.id).filter(
-        (entry) => !(entry.kind === "folder" && entry.item.id === drag.id)
+        (entry) => !(entry.kind === "folder" && entry.item.id === drag.id),
       ).length;
       return moveFolderToParent(doc, drag.id, target.id, insertIndex);
     }
@@ -243,7 +253,7 @@ export function applySidebarDrop(
       const parentId = folderParent(doc, target.id);
       const items = childItems(doc, parentId);
       const targetIndex = items.findIndex(
-        (entry) => entry.kind === "folder" && entry.item.id === target.id
+        (entry) => entry.kind === "folder" && entry.item.id === target.id,
       );
       if (targetIndex < 0) return null;
       const insertIndex =
@@ -251,12 +261,14 @@ export function applySidebarDrop(
       return moveFolderToParent(doc, drag.id, parentId, insertIndex);
     }
 
-    const targetSection = doc.sections.find((section) => section.id === target.id);
+    const targetSection = doc.sections.find(
+      (section) => section.id === target.id,
+    );
     if (!targetSection) return null;
     const parentId = targetSection.folderId ?? null;
     const items = childItems(doc, parentId);
     const targetIndex = items.findIndex(
-      (entry) => entry.kind === "section" && entry.item.id === target.id
+      (entry) => entry.kind === "section" && entry.item.id === target.id,
     );
     if (targetIndex < 0) return null;
     const insertIndex =
@@ -270,7 +282,7 @@ export function applySidebarDrop(
   if (target.kind === "folder") {
     if (target.position === "inside") {
       const insertIndex = sectionsInFolder(doc, target.id).filter(
-        (section) => section.id !== drag.id
+        (section) => section.id !== drag.id,
       ).length;
       return moveSectionToParent(doc, drag.id, target.id, insertIndex);
     }
@@ -278,7 +290,7 @@ export function applySidebarDrop(
     const parentId = folderParent(doc, target.id);
     const items = childItems(doc, parentId);
     const targetIndex = items.findIndex(
-      (entry) => entry.kind === "folder" && entry.item.id === target.id
+      (entry) => entry.kind === "folder" && entry.item.id === target.id,
     );
     if (targetIndex < 0) return null;
     const insertIndex =
@@ -286,7 +298,9 @@ export function applySidebarDrop(
     return insertSectionAtChildIndex(doc, drag.id, parentId, insertIndex);
   }
 
-  const targetSection = doc.sections.find((section) => section.id === target.id);
+  const targetSection = doc.sections.find(
+    (section) => section.id === target.id,
+  );
   if (!targetSection || drag.id === target.id) return null;
 
   const parentFolderId = targetSection.folderId ?? null;
@@ -294,7 +308,7 @@ export function applySidebarDrop(
     .filter(
       (section) =>
         parentKey(section.folderId) === parentKey(parentFolderId) &&
-        section.id !== drag.id
+        section.id !== drag.id,
     )
     .sort((a, b) => a.order - b.order);
   let insertIndex = siblings.findIndex((section) => section.id === target.id);
@@ -306,7 +320,7 @@ export function applySidebarDrop(
 
 export function removeSectionFromDoc(
   doc: GddDocument,
-  sectionId: string
+  sectionId: string,
 ): GddDocument {
   const removed = doc.sections.find((section) => section.id === sectionId);
   if (!removed) return doc;
@@ -331,7 +345,7 @@ function refreshChildItem(doc: GddDocument, entry: ChildItem): ChildItem {
 
 export function removeFolderFromDoc(
   doc: GddDocument,
-  folderId: string
+  folderId: string,
 ): GddDocument {
   const folder = foldersOf(doc).find((entry) => entry.id === folderId);
   if (!folder) return doc;
@@ -339,28 +353,30 @@ export function removeFolderFromDoc(
   const parentId = folder.parentFolderId ?? null;
   const parentItems = childItems(doc, parentId);
   const folderIndex = parentItems.findIndex(
-    (entry) => entry.kind === "folder" && entry.item.id === folderId
+    (entry) => entry.kind === "folder" && entry.item.id === folderId,
   );
   if (folderIndex < 0) return doc;
 
   const hoistedChildren = childItems(doc, folderId);
 
   let folders = foldersOf(doc).filter((entry) => entry.id !== folderId);
-  let sections = doc.sections.map((section) =>
+  const sections = doc.sections.map((section) =>
     section.folderId === folderId
       ? { ...section, folderId: parentId ?? undefined }
-      : section
+      : section,
   );
   folders = folders.map((entry) =>
     entry.parentFolderId === folderId
       ? { ...entry, parentFolderId: parentId ?? undefined }
-      : entry
+      : entry,
   );
 
   const nextDoc: GddDocument = { ...doc, folders, sections };
   const before = parentItems.slice(0, folderIndex);
   const after = parentItems.slice(folderIndex + 1);
-  const hoistedItems = hoistedChildren.map((entry) => refreshChildItem(nextDoc, entry));
+  const hoistedItems = hoistedChildren.map((entry) =>
+    refreshChildItem(nextDoc, entry),
+  );
   const newParentOrder = [
     ...before.map((entry) => refreshChildItem(nextDoc, entry)),
     ...hoistedItems,

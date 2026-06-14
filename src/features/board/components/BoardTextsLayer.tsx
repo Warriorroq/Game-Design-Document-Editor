@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+
 import { boardTextStyleProps } from "@/features/board/lib/boardTextStyle";
 import { resolveBoardTextColor } from "@/shared/lib/textColorUtils";
 import type { BoardText } from "@/shared/types";
@@ -93,7 +94,10 @@ export function BoardTextsLayer({
                   e.stopPropagation();
                   if (e.key === "Escape") {
                     e.preventDefault();
-                    onTextCommit(text.id, plainTextFromEditable(e.currentTarget));
+                    onTextCommit(
+                      text.id,
+                      plainTextFromEditable(e.currentTarget),
+                    );
                     onEditEnd();
                   }
                 }}
@@ -103,7 +107,9 @@ export function BoardTextsLayer({
               </div>
             ) : (
               <>
-                <div className="board-text-content">{text.content || "\u00a0"}</div>
+                <div className="board-text-content">
+                  {text.content || "\u00a0"}
+                </div>
                 <div className="board-text-drag" aria-hidden />
               </>
             )}

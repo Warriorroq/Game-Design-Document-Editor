@@ -20,7 +20,7 @@ export function pointerAngleRad(
   centerX: number,
   centerY: number,
   pointerX: number,
-  pointerY: number
+  pointerY: number,
 ): number {
   return Math.atan2(pointerY - centerY, pointerX - centerX);
 }

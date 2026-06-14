@@ -1,13 +1,53 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useBoardSize } from "@/shared/context/BoardSizeContext";
-import { useLocale } from "@/shared/context/LocaleContext";
-import { useShortcuts } from "@/shared/context/ShortcutsContext";
-import { useLinkContext } from "@/features/links/LinkContext";
+
+import {
+  DEFAULT_VIDEO_HEIGHT,
+  DEFAULT_VIDEO_WIDTH,
+  isBoardVideoItem,
+} from "@/domain/board/boardItem";
+import {
+  clamp,
+  DEFAULT_PLACE,
+  DEFAULT_TEXT_WIDTH,
+  isShapeTool,
+  PASTE_OFFSET,
+  shapeLongEnough,
+  ZOOM_INTENSITY,
+} from "@/domain/board/deskDrawing";
+import { parseVideoEmbed } from "@/domain/board/videoEmbed";
+import type {
+  BoardDrawTool,
+  BoardGroup,
+  BoardItem,
+  BoardPoint,
+  BoardShape,
+  BoardShapeType,
+  BoardStroke,
+  BoardText,
+} from "@/domain/types";
+import { snapBoardPoint } from "@/features/board/lib/boardGeometry";
+import {
+  pointerAngleRad,
+  rotationDeltaDeg,
+  snapRotationAngle,
+} from "@/features/board/lib/boardItemTransform";
+import {
+  appendPenPoint,
+  DEFAULT_PEN_COLOR,
+  DEFAULT_PEN_WIDTH,
+  penStrokeLongEnough,
+} from "@/features/board/lib/boardPen";
+import {
+  BOARD_MAX_SCALE,
+  type BoardViewport,
+  constrainBoardViewport,
+  fitBoardViewport,
+} from "@/features/board/lib/boardViewport";
 import {
   buildDeskClipboard,
-  pasteDeskClipboard,
   type DeskClipboard,
   type DeskSelection,
+  pasteDeskClipboard,
 } from "@/features/board/lib/deskClipboard";
 import {
   applyDeskSelectClick,
@@ -16,62 +56,23 @@ import {
   isSingleImageSelection,
   selectionCount,
 } from "@/features/board/lib/deskGroups";
+import { canReorderDeskLayer } from "@/features/board/lib/deskLayerOrder";
 import {
   boardRectFromPoints,
   selectionFromMarqueeRect,
 } from "@/features/board/lib/deskMarquee";
 import { translateStroke } from "@/features/board/lib/deskStrokeTransform";
 import { translateShapeForDrag } from "@/features/board/lib/deskTransform";
-import {
-  appendPenPoint,
-  DEFAULT_PEN_COLOR,
-  DEFAULT_PEN_WIDTH,
-  penStrokeLongEnough,
-} from "@/features/board/lib/boardPen";
-import {
-  DEFAULT_VIDEO_HEIGHT,
-  DEFAULT_VIDEO_WIDTH,
-  isBoardVideoItem,
-} from "@/domain/board/boardItem";
-import { parseVideoEmbed } from "@/domain/board/videoEmbed";
+import { useLinkContext } from "@/features/links/LinkContext";
+import { useBoardSize } from "@/shared/context/BoardSizeContext";
+import { useLocale } from "@/shared/context/LocaleContext";
+import { useShortcuts } from "@/shared/context/ShortcutsContext";
 import {
   blobToDataUrl,
   getImageFromClipboard,
   loadImageDimensions,
 } from "@/shared/lib/imageUtils";
-import {
-  pointerAngleRad,
-  rotationDeltaDeg,
-  snapRotationAngle,
-} from "@/features/board/lib/boardItemTransform";
-import { snapBoardPoint } from "@/features/board/lib/boardGeometry";
-import { canReorderDeskLayer } from "@/features/board/lib/deskLayerOrder";
-import {
-  BOARD_MAX_SCALE,
-  constrainBoardViewport,
-  fitBoardViewport,
-  type BoardViewport,
-} from "@/features/board/lib/boardViewport";
 import { HIGHLIGHT_FLASH_MS } from "@/shared/lib/searchHighlight";
-import type {
-  BoardGroup,
-  BoardItem,
-  BoardPoint,
-  BoardDrawTool,
-  BoardShape,
-  BoardShapeType,
-  BoardStroke,
-  BoardText,
-} from "@/domain/types";
-import {
-  DEFAULT_PLACE,
-  DEFAULT_TEXT_WIDTH,
-  PASTE_OFFSET,
-  ZOOM_INTENSITY,
-  clamp,
-  isShapeTool,
-  shapeLongEnough,
-} from "@/domain/board/deskDrawing";
 
 interface ImageBoardProps {
   projectId: string;
@@ -99,7 +100,7 @@ interface ImageBoardProps {
   onUpdateText: (
     id: string,
     patch: Partial<BoardText>,
-    options?: { recordHistory?: boolean }
+    options?: { recordHistory?: boolean },
   ) => void;
   onRemoveText: (id: string) => void;
   onAddGroup: (group: BoardGroup) => void;
@@ -115,11 +116,11 @@ interface ImageBoardProps {
     itemIds: string[],
     shapeIds: string[],
     textIds: string[],
-    strokeIds: string[]
+    strokeIds: string[],
   ) => void;
   onReorderLayer: (
     selection: DeskSelection,
-    direction: "forward" | "backward"
+    direction: "forward" | "backward",
   ) => void;
   onBeginTransientEdit?: () => void;
   onEndTransientEdit?: () => void;
@@ -127,7 +128,6 @@ interface ImageBoardProps {
   deskClipboard: DeskClipboard | null;
   onStoreDeskClipboard: (clip: DeskClipboard | null) => void;
 }
-
 
 const EMPTY_SELECTION: DeskSelection = {
   itemIds: [],
@@ -219,7 +219,7 @@ export function useImageBoard({
     end: BoardPoint;
   } | null>(null);
   const [deskMenu, setDeskMenu] = useState<{ x: number; y: number } | null>(
-    null
+    null,
   );
   const [pasteHint, setPasteHint] = useState(false);
   const [editingTextId, setEditingTextId] = useState<string | null>(null);
@@ -237,27 +237,27 @@ export function useImageBoard({
 
   const selectedShapeIds = useMemo(
     () => new Set(selection.shapeIds),
-    [selection.shapeIds]
+    [selection.shapeIds],
   );
   const selectedItemSet = useMemo(
     () => new Set(selection.itemIds),
-    [selection.itemIds]
+    [selection.itemIds],
   );
   const selectedTextIds = useMemo(
     () => new Set(selection.textIds),
-    [selection.textIds]
+    [selection.textIds],
   );
   const selectedStrokeIds = useMemo(
     () => new Set(selection.strokeIds),
-    [selection.strokeIds]
+    [selection.strokeIds],
   );
   const boxShapes = useMemo(
     () => shapes.filter((shape) => shape.type === "box"),
-    [shapes]
+    [shapes],
   );
   const lineShapes = useMemo(
     () => shapes.filter((shape) => shape.type !== "box"),
-    [shapes]
+    [shapes],
   );
   const boxDrawPreview = drawPreview?.type === "box" ? drawPreview : null;
   const lineDrawPreview =
@@ -306,7 +306,9 @@ export function useImageBoard({
       ...selection.strokeIds.map((id) => ({ kind: "stroke" as const, id })),
     ];
     const total = selectedIds.length;
-    const locked = selectedIds.filter(({ kind, id }) => isSelectionLocked[kind](id)).length;
+    const locked = selectedIds.filter(({ kind, id }) =>
+      isSelectionLocked[kind](id),
+    ).length;
     return { total, locked, unlocked: total - locked };
   }, [selection, isSelectionLocked]);
 
@@ -323,7 +325,7 @@ export function useImageBoard({
       texts,
       strokes,
       groups,
-      selection
+      selection,
     );
     if (!clip) return;
     onStoreDeskClipboard({
@@ -383,19 +385,19 @@ export function useImageBoard({
         onUpdateText(id, { color }, { recordHistory: true });
       }
     },
-    [onUpdateText]
+    [onUpdateText],
   );
 
   const applyTextStyle = useCallback(
     (
       textIds: string[],
-      patch: Pick<BoardText, "bold" | "italic" | "strikethrough">
+      patch: Pick<BoardText, "bold" | "italic" | "strikethrough">,
     ) => {
       for (const id of textIds) {
         onUpdateText(id, patch, { recordHistory: true });
       }
     },
-    [onUpdateText]
+    [onUpdateText],
   );
 
   const applyTextAlign = useCallback(
@@ -404,15 +406,23 @@ export function useImageBoard({
         onUpdateText(id, { textAlign }, { recordHistory: true });
       }
     },
-    [onUpdateText]
+    [onUpdateText],
   );
 
   const deleteSelection = useCallback(() => {
     if (selectionSize === 0) return;
-    const itemIds = selection.itemIds.filter((id) => !isSelectionLocked.item(id));
-    const shapeIds = selection.shapeIds.filter((id) => !isSelectionLocked.shape(id));
-    const textIds = selection.textIds.filter((id) => !isSelectionLocked.text(id));
-    const strokeIds = selection.strokeIds.filter((id) => !isSelectionLocked.stroke(id));
+    const itemIds = selection.itemIds.filter(
+      (id) => !isSelectionLocked.item(id),
+    );
+    const shapeIds = selection.shapeIds.filter(
+      (id) => !isSelectionLocked.shape(id),
+    );
+    const textIds = selection.textIds.filter(
+      (id) => !isSelectionLocked.text(id),
+    );
+    const strokeIds = selection.strokeIds.filter(
+      (id) => !isSelectionLocked.stroke(id),
+    );
     if (
       itemIds.length === 0 &&
       shapeIds.length === 0 &&
@@ -426,37 +436,36 @@ export function useImageBoard({
       itemIds: selection.itemIds.filter((id) => isSelectionLocked.item(id)),
       shapeIds: selection.shapeIds.filter((id) => isSelectionLocked.shape(id)),
       textIds: selection.textIds.filter((id) => isSelectionLocked.text(id)),
-      strokeIds: selection.strokeIds.filter((id) => isSelectionLocked.stroke(id)),
+      strokeIds: selection.strokeIds.filter((id) =>
+        isSelectionLocked.stroke(id),
+      ),
     });
-  }, [
-    onRemoveSelection,
-    selection,
-    selectionSize,
-    isSelectionLocked,
-  ]);
+  }, [onRemoveSelection, selection, selectionSize, isSelectionLocked]);
 
   const lockSelection = useCallback(() => {
     for (const id of selection.itemIds) onUpdate(id, { locked: true });
     for (const id of selection.shapeIds) onUpdateShape(id, { locked: true });
-    for (const id of selection.textIds) onUpdateText(id, { locked: true }, { recordHistory: true });
+    for (const id of selection.textIds)
+      onUpdateText(id, { locked: true }, { recordHistory: true });
     for (const id of selection.strokeIds) onUpdateStroke(id, { locked: true });
   }, [selection, onUpdate, onUpdateShape, onUpdateText, onUpdateStroke]);
 
   const unlockSelection = useCallback(() => {
     for (const id of selection.itemIds) onUpdate(id, { locked: false });
     for (const id of selection.shapeIds) onUpdateShape(id, { locked: false });
-    for (const id of selection.textIds) onUpdateText(id, { locked: false }, { recordHistory: true });
+    for (const id of selection.textIds)
+      onUpdateText(id, { locked: false }, { recordHistory: true });
     for (const id of selection.strokeIds) onUpdateStroke(id, { locked: false });
   }, [selection, onUpdate, onUpdateShape, onUpdateText, onUpdateStroke]);
 
   const deskLayerState = useMemo(
     () => ({ items, shapes, texts, strokes }),
-    [items, shapes, texts, strokes]
+    [items, shapes, texts, strokes],
   );
 
   const singleImageSelection = useMemo(
     () => (isSingleImageSelection(selection) ? selection.itemIds[0]! : null),
-    [selection]
+    [selection],
   );
 
   const singleImageLayerSelection = useMemo(
@@ -469,21 +478,25 @@ export function useImageBoard({
             strokeIds: [],
           }
         : EMPTY_SELECTION,
-    [singleImageSelection]
+    [singleImageSelection],
   );
 
   const canBringForward = useMemo(
     () =>
       singleImageSelection !== null &&
       canReorderDeskLayer(deskLayerState, singleImageLayerSelection, "forward"),
-    [deskLayerState, singleImageLayerSelection, singleImageSelection]
+    [deskLayerState, singleImageLayerSelection, singleImageSelection],
   );
 
   const canSendBackward = useMemo(
     () =>
       singleImageSelection !== null &&
-      canReorderDeskLayer(deskLayerState, singleImageLayerSelection, "backward"),
-    [deskLayerState, singleImageLayerSelection, singleImageSelection]
+      canReorderDeskLayer(
+        deskLayerState,
+        singleImageLayerSelection,
+        "backward",
+      ),
+    [deskLayerState, singleImageLayerSelection, singleImageSelection],
   );
 
   const canFlipImages = useMemo(() => {
@@ -514,21 +527,28 @@ export function useImageBoard({
   ]);
 
   const flipSelectionHorizontal = useCallback(() => {
-    if (!singleImageSelection || isSelectionLocked.item(singleImageSelection)) return;
+    if (!singleImageSelection || isSelectionLocked.item(singleImageSelection))
+      return;
     const item = items.find((i) => i.id === singleImageSelection);
     if (!item) return;
     onUpdate(singleImageSelection, { flipH: !item.flipH });
   }, [items, isSelectionLocked, onUpdate, singleImageSelection]);
 
   const flipSelectionVertical = useCallback(() => {
-    if (!singleImageSelection || isSelectionLocked.item(singleImageSelection)) return;
+    if (!singleImageSelection || isSelectionLocked.item(singleImageSelection))
+      return;
     const item = items.find((i) => i.id === singleImageSelection);
     if (!item) return;
     onUpdate(singleImageSelection, { flipV: !item.flipV });
   }, [items, isSelectionLocked, onUpdate, singleImageSelection]);
 
   const openDeskObjectMenu = useCallback(
-    (clientX: number, clientY: number, nextSelection: DeskSelection, copyHref?: string) => {
+    (
+      clientX: number,
+      clientY: number,
+      nextSelection: DeskSelection,
+      copyHref?: string,
+    ) => {
       setSelection(nextSelection);
       openContextMenu({
         x: clientX,
@@ -546,14 +566,16 @@ export function useImageBoard({
             label: t("desk.lock"),
             onClick: lockSelection,
             disabled:
-              selectionCount(nextSelection) === 0 || selectionLockSummary.unlocked === 0,
+              selectionCount(nextSelection) === 0 ||
+              selectionLockSummary.unlocked === 0,
           },
           {
             id: "desk.unlock",
             label: t("desk.unlock"),
             onClick: unlockSelection,
             disabled:
-              selectionCount(nextSelection) === 0 || selectionLockSummary.locked === 0,
+              selectionCount(nextSelection) === 0 ||
+              selectionLockSummary.locked === 0,
           },
           ...(isSingleImageSelection(nextSelection)
             ? [
@@ -569,7 +591,7 @@ export function useImageBoard({
                       textIds: [],
                       strokeIds: [],
                     },
-                    "forward"
+                    "forward",
                   ),
                 },
                 {
@@ -584,7 +606,7 @@ export function useImageBoard({
                       textIds: [],
                       strokeIds: [],
                     },
-                    "backward"
+                    "backward",
                   ),
                 },
                 {
@@ -618,7 +640,7 @@ export function useImageBoard({
       sendSelectionBackward,
       t,
       unlockSelection,
-    ]
+    ],
   );
 
   const applyViewport = useCallback(
@@ -629,7 +651,7 @@ export function useImageBoard({
         return constrainBoardViewport(next, w, h, canvasWidth, canvasHeight);
       });
     },
-    [canvasWidth, canvasHeight]
+    [canvasWidth, canvasHeight],
   );
 
   const screenToWorld = useCallback(
@@ -641,7 +663,7 @@ export function useImageBoard({
         y: (clientY - rect.top - viewport.panY) / viewport.scale,
       };
     },
-    [viewport.panX, viewport.panY, viewport.scale]
+    [viewport.panX, viewport.panY, viewport.scale],
   );
 
   useEffect(() => {
@@ -652,7 +674,12 @@ export function useImageBoard({
       return;
     }
 
-    setSelection({ itemIds: [item.id], shapeIds: [], textIds: [], strokeIds: [] });
+    setSelection({
+      itemIds: [item.id],
+      shapeIds: [],
+      textIds: [],
+      strokeIds: [],
+    });
     const { w, h } = surfaceSizeRef.current;
     if (w > 0 && h > 0) {
       setViewport((v) => {
@@ -668,12 +695,15 @@ export function useImageBoard({
           w,
           h,
           canvasWidth,
-          canvasHeight
+          canvasHeight,
         );
       });
     }
 
-    const timer = window.setTimeout(() => onHighlightDone?.(), HIGHLIGHT_FLASH_MS);
+    const timer = window.setTimeout(
+      () => onHighlightDone?.(),
+      HIGHLIGHT_FLASH_MS,
+    );
     return () => clearTimeout(timer);
   }, [highlightMediaId, items, onHighlightDone, canvasWidth, canvasHeight]);
 
@@ -685,7 +715,12 @@ export function useImageBoard({
       return;
     }
 
-    setSelection({ itemIds: [], shapeIds: [], textIds: [text.id], strokeIds: [] });
+    setSelection({
+      itemIds: [],
+      shapeIds: [],
+      textIds: [text.id],
+      strokeIds: [],
+    });
     const { w, h } = surfaceSizeRef.current;
     if (w > 0 && h > 0) {
       setViewport((v) => {
@@ -701,12 +736,15 @@ export function useImageBoard({
           w,
           h,
           canvasWidth,
-          canvasHeight
+          canvasHeight,
         );
       });
     }
 
-    const timer = window.setTimeout(() => onHighlightDone?.(), HIGHLIGHT_FLASH_MS);
+    const timer = window.setTimeout(
+      () => onHighlightDone?.(),
+      HIGHLIGHT_FLASH_MS,
+    );
     return () => clearTimeout(timer);
   }, [highlightTextId, texts, onHighlightDone, canvasWidth, canvasHeight]);
 
@@ -741,7 +779,7 @@ export function useImageBoard({
       setSelection({ itemIds: [id], shapeIds: [], textIds: [], strokeIds: [] });
       setPasteHint(false);
     },
-    [canvasWidth, canvasHeight, nextPastePosition, onAdd]
+    [canvasWidth, canvasHeight, nextPastePosition, onAdd],
   );
 
   const placeVideo = useCallback(
@@ -769,7 +807,7 @@ export function useImageBoard({
       setPasteHint(false);
       return true;
     },
-    [canvasWidth, canvasHeight, nextPastePosition, onAdd]
+    [canvasWidth, canvasHeight, nextPastePosition, onAdd],
   );
 
   const handlePaste = useCallback(
@@ -793,20 +831,20 @@ export function useImageBoard({
         pasteDesk();
       }
     },
-    [deskClipboard, isDeskFocused, pasteDesk, placeImage, placeVideo]
+    [deskClipboard, isDeskFocused, pasteDesk, placeImage, placeVideo],
   );
 
   const handleDrop = useCallback(
     async (e: React.DragEvent) => {
       e.preventDefault();
       const file = [...e.dataTransfer.files].find((f) =>
-        f.type.startsWith("image/")
+        f.type.startsWith("image/"),
       );
       if (!file) return;
       const world = screenToWorld(e.clientX, e.clientY);
       await placeImage(file, { x: world.x - 40, y: world.y - 40 });
     },
-    [placeImage, screenToWorld]
+    [placeImage, screenToWorld],
   );
 
   const handleWheel = useCallback(
@@ -824,9 +862,7 @@ export function useImageBoard({
         const factor = Math.exp(-e.deltaY * ZOOM_INTENSITY);
         const { w, h } = surfaceSizeRef.current;
         const minScale =
-          w > 0 && h > 0
-            ? Math.max(w / canvasWidth, h / canvasHeight)
-            : 0.15;
+          w > 0 && h > 0 ? Math.max(w / canvasWidth, h / canvasHeight) : 0.15;
         const nextScale = clamp(v.scale * factor, minScale, BOARD_MAX_SCALE);
 
         return {
@@ -836,7 +872,7 @@ export function useImageBoard({
         };
       });
     },
-    [applyViewport, canvasWidth, canvasHeight]
+    [applyViewport, canvasWidth, canvasHeight],
   );
 
   useEffect(() => {
@@ -848,7 +884,7 @@ export function useImageBoard({
       const h = el.clientHeight;
       surfaceSizeRef.current = { w, h };
       setViewport((v) =>
-        constrainBoardViewport(v, w, h, canvasWidth, canvasHeight)
+        constrainBoardViewport(v, w, h, canvasWidth, canvasHeight),
       );
     };
 
@@ -876,14 +912,14 @@ export function useImageBoard({
             el.clientWidth,
             el.clientHeight,
             canvasWidth,
-            canvasHeight
+            canvasHeight,
           )
         : fitBoardViewport(
             el.clientWidth,
             el.clientHeight,
             canvasWidth,
-            canvasHeight
-          )
+            canvasHeight,
+          ),
     );
     clearSelection();
   }, [projectId, sectionId, canvasWidth, canvasHeight, clearSelection]);
@@ -906,11 +942,7 @@ export function useImageBoard({
     const onKey = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement).tagName;
       const target = e.target as HTMLElement;
-      if (
-        tag === "INPUT" ||
-        tag === "TEXTAREA" ||
-        target.isContentEditable
-      ) {
+      if (tag === "INPUT" || tag === "TEXTAREA" || target.isContentEditable) {
         return;
       }
 
@@ -998,13 +1030,18 @@ export function useImageBoard({
           start: session.start,
           end,
         });
-        setSelection({ itemIds: [], shapeIds: [id], textIds: [], strokeIds: [] });
+        setSelection({
+          itemIds: [],
+          shapeIds: [id],
+          textIds: [],
+          strokeIds: [],
+        });
       }
       drawSession.current = null;
       setDrawPreview(null);
       setActiveTool(null);
     },
-    [items, onAddShape]
+    [items, onAddShape],
   );
 
   const commitPen = useCallback(() => {
@@ -1031,7 +1068,7 @@ export function useImageBoard({
 
   const startMultiDrag = (
     e: React.PointerEvent,
-    activeSelection: DeskSelection
+    activeSelection: DeskSelection,
   ) => {
     const hasUnlocked =
       activeSelection.itemIds.some((id) => !isSelectionLocked.item(id)) ||
@@ -1046,7 +1083,7 @@ export function useImageBoard({
     const startX = e.clientX;
     const startY = e.clientY;
     const movedItems = new Set(
-      activeSelection.itemIds.filter((id) => !isSelectionLocked.item(id))
+      activeSelection.itemIds.filter((id) => !isSelectionLocked.item(id)),
     );
 
     const itemOrigins = activeSelection.itemIds
@@ -1118,7 +1155,7 @@ export function useImageBoard({
       }
       onUpdateText(textId, { content }, { recordHistory: true });
     },
-    [onRemoveText, onUpdateText]
+    [onRemoveText, onUpdateText],
   );
 
   const addTextAtCursor = useCallback(() => {
@@ -1139,7 +1176,7 @@ export function useImageBoard({
   const startTextDrag = (
     e: React.PointerEvent,
     text: BoardText,
-    activeSelection: DeskSelection
+    activeSelection: DeskSelection,
   ) => {
     if (selectionCount(activeSelection) > 1) {
       startMultiDrag(e, activeSelection);
@@ -1171,10 +1208,7 @@ export function useImageBoard({
     window.addEventListener("pointerup", onUp);
   };
 
-  const handleTextPointerDown = (
-    e: React.PointerEvent,
-    text: BoardText
-  ) => {
+  const handleTextPointerDown = (e: React.PointerEvent, text: BoardText) => {
     if (text.locked) return;
     if (isDrawing && e.button === 0) return;
     e.stopPropagation();
@@ -1186,7 +1220,7 @@ export function useImageBoard({
       text.id,
       e.shiftKey,
       selection,
-      groups
+      groups,
     );
     setSelection(next);
     armDragAfterThreshold(e, () => startTextDrag(e, text, next));
@@ -1196,13 +1230,10 @@ export function useImageBoard({
     e: React.PointerEvent,
     item: BoardItem,
     mode: "move" | "resize",
-    activeSelection: DeskSelection
+    activeSelection: DeskSelection,
   ) => {
     if (item.locked) return;
-    if (
-      mode === "move" &&
-      selectionCount(activeSelection) > 1
-    ) {
+    if (mode === "move" && selectionCount(activeSelection) > 1) {
       startMultiDrag(e, activeSelection);
       return;
     }
@@ -1244,7 +1275,7 @@ export function useImageBoard({
   const startShapeBodyDrag = (
     e: React.PointerEvent,
     shapeId: string,
-    activeSelection: DeskSelection
+    activeSelection: DeskSelection,
   ) => {
     const lockedShape = shapes.find((s) => s.id === shapeId)?.locked;
     if (lockedShape) return;
@@ -1295,7 +1326,7 @@ export function useImageBoard({
       centerX,
       centerY,
       startWorld.x,
-      startWorld.y
+      startWorld.y,
     );
 
     const rotationAt = (clientX: number, clientY: number) => {
@@ -1324,7 +1355,7 @@ export function useImageBoard({
   const handleItemPointerDown = (
     e: React.PointerEvent,
     item: BoardItem,
-    mode: "move" | "resize"
+    mode: "move" | "resize",
   ) => {
     if (item.locked) return;
     if (isDrawing && e.button === 0) return;
@@ -1336,7 +1367,7 @@ export function useImageBoard({
       item.id,
       e.shiftKey,
       selection,
-      groups
+      groups,
     );
     setSelection(next);
 
@@ -1356,10 +1387,7 @@ export function useImageBoard({
     startDrag();
   };
 
-  const handleShapePointerDown = (
-    e: React.PointerEvent,
-    shapeId: string
-  ) => {
+  const handleShapePointerDown = (e: React.PointerEvent, shapeId: string) => {
     const lockedShape = shapes.find((s) => s.id === shapeId)?.locked;
     if (lockedShape) return;
     if (isDrawing && e.button === 0) return;
@@ -1371,7 +1399,7 @@ export function useImageBoard({
       shapeId,
       e.shiftKey,
       selection,
-      groups
+      groups,
     );
     setSelection(next);
 
@@ -1394,7 +1422,7 @@ export function useImageBoard({
   const startStrokeDrag = (
     e: React.PointerEvent,
     strokeId: string,
-    activeSelection: DeskSelection
+    activeSelection: DeskSelection,
   ) => {
     const lockedStroke = strokes.find((s) => s.id === strokeId)?.locked;
     if (lockedStroke) return;
@@ -1428,10 +1456,7 @@ export function useImageBoard({
     window.addEventListener("pointerup", onUp);
   };
 
-  const handleStrokePointerDown = (
-    e: React.PointerEvent,
-    strokeId: string
-  ) => {
+  const handleStrokePointerDown = (e: React.PointerEvent, strokeId: string) => {
     const lockedStroke = strokes.find((s) => s.id === strokeId)?.locked;
     if (lockedStroke) return;
     if (isDrawing && e.button === 0) return;
@@ -1443,7 +1468,7 @@ export function useImageBoard({
       strokeId,
       e.shiftKey,
       selection,
-      groups
+      groups,
     );
     setSelection(next);
 
@@ -1460,14 +1485,19 @@ export function useImageBoard({
   const startEndpointDrag = (
     e: React.PointerEvent,
     shapeId: string,
-    endpoint: "start" | "end"
+    endpoint: "start" | "end",
   ) => {
     const lockedShape = shapes.find((s) => s.id === shapeId)?.locked;
     if (lockedShape) return;
     if (isDrawing && e.button === 0) return;
     e.preventDefault();
     e.stopPropagation();
-    setSelection({ itemIds: [], shapeIds: [shapeId], textIds: [], strokeIds: [] });
+    setSelection({
+      itemIds: [],
+      shapeIds: [shapeId],
+      textIds: [],
+      strokeIds: [],
+    });
 
     const shape = shapes.find((s) => s.id === shapeId);
     if (!shape) return;
@@ -1505,7 +1535,7 @@ export function useImageBoard({
       if (nextSelection) setSelection(nextSelection);
       showDeskMenuAt(clientX, clientY);
     },
-    [showDeskMenuAt]
+    [showDeskMenuAt],
   );
 
   const handleSurfaceContextMenu = (e: React.MouseEvent) => {
@@ -1550,11 +1580,11 @@ export function useImageBoard({
   const isPanBlocker = (target: HTMLElement) =>
     Boolean(
       target.closest(".board-item") ||
-        target.closest(".board-shape-handle") ||
-        target.closest(".board-text") ||
-        target.closest(".board-stroke") ||
-        target.closest(".board-item-rotate") ||
-        target.closest(".board-item-resize")
+      target.closest(".board-shape-handle") ||
+      target.closest(".board-text") ||
+      target.closest(".board-stroke") ||
+      target.closest(".board-item-rotate") ||
+      target.closest(".board-item-resize"),
     );
 
   const startPanSession = (e: React.PointerEvent) => {
@@ -1607,7 +1637,7 @@ export function useImageBoard({
       penWidth,
       clearSelection,
       items,
-    ]
+    ],
   );
 
   const onSurfacePointerDownCapture = (e: React.PointerEvent) => {
@@ -1621,10 +1651,7 @@ export function useImageBoard({
     const target = e.target as HTMLElement;
     const onCanvas = Boolean(target.closest(".board-canvas"));
 
-    if (
-      e.button === 1 ||
-      (e.button === 0 && spaceHeld.current && onCanvas)
-    ) {
+    if (e.button === 1 || (e.button === 0 && spaceHeld.current && onCanvas)) {
       e.preventDefault();
       startPanSession(e);
       return;
@@ -1669,7 +1696,10 @@ export function useImageBoard({
       const session = marqueeSession.current;
       const dx = world.x - session.startWorld.x;
       const dy = world.y - session.startWorld.y;
-      if (Math.abs(dx) > 3 / viewport.scale || Math.abs(dy) > 3 / viewport.scale) {
+      if (
+        Math.abs(dx) > 3 / viewport.scale ||
+        Math.abs(dy) > 3 / viewport.scale
+      ) {
         session.moved = true;
       }
       setMarqueePreview({ start: session.startWorld, end: world });
@@ -1732,7 +1762,10 @@ export function useImageBoard({
       if (!session.moved && !editingTextId && !session.shiftKey) {
         clearSelection();
       } else if (session.moved && marqueePreview) {
-        const rect = boardRectFromPoints(marqueePreview.start, marqueePreview.end);
+        const rect = boardRectFromPoints(
+          marqueePreview.start,
+          marqueePreview.end,
+        );
         if (rect.width >= 2 || rect.height >= 2) {
           setSelection(
             selectionFromMarqueeRect(
@@ -1743,8 +1776,8 @@ export function useImageBoard({
               strokes,
               groups,
               session.shiftKey,
-              selection
-            )
+              selection,
+            ),
           );
         } else if (!session.shiftKey) {
           clearSelection();

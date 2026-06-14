@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+
 import { BOARD_TEXT_COLORS } from "@/features/board/lib/boardTextColors";
 
 interface TextColorSwatchesProps {

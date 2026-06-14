@@ -36,9 +36,7 @@ function clamp(n: number, min: number, max: number) {
 export function normalizeBoardSize(width: number, height: number): BoardSize {
   return {
     width: Math.round(clamp(width, MIN_BOARD_DIMENSION, MAX_BOARD_DIMENSION)),
-    height: Math.round(
-      clamp(height, MIN_BOARD_DIMENSION, MAX_BOARD_DIMENSION)
-    ),
+    height: Math.round(clamp(height, MIN_BOARD_DIMENSION, MAX_BOARD_DIMENSION)),
   };
 }
 
@@ -52,10 +50,7 @@ export function loadBoardSize(): BoardSize {
       };
     }
     const parsed = JSON.parse(raw) as Partial<BoardSize>;
-    if (
-      typeof parsed.width !== "number" ||
-      typeof parsed.height !== "number"
-    ) {
+    if (typeof parsed.width !== "number" || typeof parsed.height !== "number") {
       return {
         width: DEFAULT_BOARD_WIDTH,
         height: DEFAULT_BOARD_HEIGHT,
@@ -78,7 +73,7 @@ export function saveBoardSize(size: BoardSize): BoardSize {
 
 export function boardSizeMatchesPreset(
   size: BoardSize,
-  presetId: BoardSizePresetId
+  presetId: BoardSizePresetId,
 ): boolean {
   const preset = BOARD_SIZE_PRESETS[presetId];
   return size.width === preset.width && size.height === preset.height;

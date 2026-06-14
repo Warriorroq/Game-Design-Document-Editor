@@ -584,7 +584,9 @@ mark.gdd-search-hit-active {
   font-weight: 500;
   border-radius: var(--radius);
   color: var(--text-muted);
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 }
 
 .settings-tab:hover {
@@ -626,7 +628,9 @@ mark.gdd-search-hit-active {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--bg-panel);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .theme-card:hover {
@@ -679,7 +683,9 @@ mark.gdd-search-hit-active {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--bg-panel);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .language-card:hover {
@@ -802,7 +808,9 @@ mark.gdd-search-hit-active {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--bg-panel);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .board-preset-card:hover {
@@ -919,7 +927,9 @@ mark.gdd-search-hit-active {
   background: var(--bg-raised);
   color: var(--text);
   cursor: pointer;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .shortcut-kbd:hover {
@@ -1661,7 +1671,9 @@ body.panel-resizing * {
   background: var(--swatch);
   padding: 0;
   flex-shrink: 0;
-  transition: transform 0.1s, box-shadow 0.1s;
+  transition:
+    transform 0.1s,
+    box-shadow 0.1s;
 }
 
 .text-color-swatch:hover {
@@ -1670,7 +1682,9 @@ body.panel-resizing * {
 
 .text-color-swatch.active {
   border-color: var(--text);
-  box-shadow: 0 0 0 2px var(--bg-raised), 0 0 0 4px var(--accent);
+  box-shadow:
+    0 0 0 2px var(--bg-raised),
+    0 0 0 4px var(--accent);
 }
 
 .format-btn {
@@ -1681,7 +1695,9 @@ body.panel-resizing * {
   font-size: 12px;
   font-weight: 600;
   color: var(--text-muted);
-  transition: background 0.12s, color 0.12s;
+  transition:
+    background 0.12s,
+    color 0.12s;
 }
 
 .format-btn:hover {

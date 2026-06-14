@@ -58,7 +58,8 @@ function normalizeTemplate(group: THREE.Group): THREE.Group {
 }
 
 function prepareLoadedRoot(root: THREE.Object3D): THREE.Group {
-  const group = root instanceof THREE.Group ? root : new THREE.Group().add(root);
+  const group =
+    root instanceof THREE.Group ? root : new THREE.Group().add(root);
   group.traverse((child) => {
     if (child instanceof THREE.Mesh) {
       child.castShadow = true;
@@ -74,7 +75,7 @@ function loadGltf(src: string): Promise<THREE.Group> {
       src,
       (gltf) => resolve(prepareLoadedRoot(gltf.scene)),
       undefined,
-      reject
+      reject,
     );
   });
 }
@@ -85,7 +86,7 @@ function loadFbx(src: string): Promise<THREE.Group> {
       src,
       (object) => resolve(prepareLoadedRoot(object)),
       undefined,
-      reject
+      reject,
     );
   });
 }
@@ -96,7 +97,7 @@ function loadObj(src: string): Promise<THREE.Group> {
       src,
       (object) => resolve(prepareLoadedRoot(object)),
       undefined,
-      reject
+      reject,
     );
   });
 }

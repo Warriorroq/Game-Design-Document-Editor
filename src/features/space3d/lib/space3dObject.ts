@@ -1,10 +1,11 @@
 import * as THREE from "three";
+
 import type { Space3DObject } from "@/domain/types";
 
 export const MIN_SCALE = 0.001;
 
 export function clampTransformPatch(
-  patch: Partial<Space3DObject>
+  patch: Partial<Space3DObject>,
 ): Partial<Space3DObject> {
   const next = { ...patch };
   for (const key of ["scaleX", "scaleY", "scaleZ"] as const) {
@@ -15,9 +16,19 @@ export function clampTransformPatch(
   return next;
 }
 
-export function patchFromObject3D(obj: THREE.Object3D): Pick<
+export function patchFromObject3D(
+  obj: THREE.Object3D,
+): Pick<
   Space3DObject,
-  "x" | "y" | "z" | "scaleX" | "scaleY" | "scaleZ" | "rotationX" | "rotationY" | "rotationZ"
+  | "x"
+  | "y"
+  | "z"
+  | "scaleX"
+  | "scaleY"
+  | "scaleZ"
+  | "rotationX"
+  | "rotationY"
+  | "rotationZ"
 > {
   return clampTransformPatch({
     x: obj.position.x,
@@ -31,11 +42,22 @@ export function patchFromObject3D(obj: THREE.Object3D): Pick<
     rotationZ: THREE.MathUtils.radToDeg(obj.rotation.z),
   }) as Pick<
     Space3DObject,
-    "x" | "y" | "z" | "scaleX" | "scaleY" | "scaleZ" | "rotationX" | "rotationY" | "rotationZ"
+    | "x"
+    | "y"
+    | "z"
+    | "scaleX"
+    | "scaleY"
+    | "scaleZ"
+    | "rotationX"
+    | "rotationY"
+    | "rotationZ"
   >;
 }
 
-export function applyObjectTransform(obj3d: THREE.Object3D, obj: Space3DObject): void {
+export function applyObjectTransform(
+  obj3d: THREE.Object3D,
+  obj: Space3DObject,
+): void {
   obj3d.position.set(obj.x, obj.y, obj.z);
   const sx = Math.max(MIN_SCALE, Math.abs(obj.scaleX ?? 1));
   const sy = Math.max(MIN_SCALE, Math.abs(obj.scaleY ?? 1));
@@ -44,7 +66,7 @@ export function applyObjectTransform(obj3d: THREE.Object3D, obj: Space3DObject):
   obj3d.rotation.set(
     THREE.MathUtils.degToRad(obj.rotationX ?? 0),
     THREE.MathUtils.degToRad(obj.rotationY ?? 0),
-    THREE.MathUtils.degToRad(obj.rotationZ ?? 0)
+    THREE.MathUtils.degToRad(obj.rotationZ ?? 0),
   );
 }
 

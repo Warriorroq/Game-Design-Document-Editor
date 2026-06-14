@@ -1,7 +1,9 @@
+import "@/shared/styles/LinkMenus.css";
+
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+
 import { useLocale } from "@/shared/context/LocaleContext";
-import "@/shared/styles/LinkMenus.css";
 
 interface Space3DContextMenuProps {
   x: number;
@@ -50,13 +52,28 @@ export function Space3DContextMenu({
       style={{ left: x, top: y }}
       role="menu"
     >
-      <button type="button" className="link-menu-item" role="menuitem" onClick={onAddBox}>
+      <button
+        type="button"
+        className="link-menu-item"
+        role="menuitem"
+        onClick={onAddBox}
+      >
         {t("space3d.addBox")}
       </button>
-      <button type="button" className="link-menu-item" role="menuitem" onClick={onAddSphere}>
+      <button
+        type="button"
+        className="link-menu-item"
+        role="menuitem"
+        onClick={onAddSphere}
+      >
         {t("space3d.addSphere")}
       </button>
-      <button type="button" className="link-menu-item" role="menuitem" onClick={onOpenModels}>
+      <button
+        type="button"
+        className="link-menu-item"
+        role="menuitem"
+        onClick={onOpenModels}
+      >
         {t("space3d.models")}
       </button>
       <div className="board-menu-sep" role="separator" />
@@ -70,6 +87,6 @@ export function Space3DContextMenu({
         {t("space3d.remove")}
       </button>
     </div>,
-    document.body
+    document.body,
   );
 }

@@ -1,11 +1,12 @@
 import {
   createContext,
+  type ReactNode,
   useCallback,
   useContext,
   useMemo,
   useState,
-  type ReactNode,
 } from "react";
+
 import {
   bindingFromKeyboardEvent,
   defaultShortcutBindings,
@@ -23,14 +24,14 @@ interface ShortcutsContextValue {
   matches: (actionId: ShortcutActionId, e: KeyboardEvent) => boolean;
   setBinding: (
     actionId: ShortcutActionId,
-    binding: ShortcutBinding
+    binding: ShortcutBinding,
   ) => ShortcutActionId | null;
   resetBinding: (actionId: ShortcutActionId) => void;
   resetAll: () => void;
   bindingFromEvent: (e: KeyboardEvent) => ShortcutBinding | null;
   findConflict: (
     actionId: ShortcutActionId,
-    candidate: ShortcutBinding
+    candidate: ShortcutBinding,
   ) => ShortcutActionId | null;
 }
 
@@ -44,13 +45,13 @@ export function ShortcutsProvider({ children }: { children: ReactNode }) {
       setBindings(next);
       saveShortcutBindings(next);
     },
-    []
+    [],
   );
 
   const matches = useCallback(
     (actionId: ShortcutActionId, e: KeyboardEvent) =>
       eventMatchesBinding(e, bindings[actionId]),
-    [bindings]
+    [bindings],
   );
 
   const setBinding = useCallback(
@@ -61,7 +62,7 @@ export function ShortcutsProvider({ children }: { children: ReactNode }) {
       persist(next);
       return null;
     },
-    [bindings, persist]
+    [bindings, persist],
   );
 
   const resetBinding = useCallback(
@@ -70,7 +71,7 @@ export function ShortcutsProvider({ children }: { children: ReactNode }) {
       if (!def) return;
       persist({ ...bindings, [actionId]: { ...def.defaultBinding } });
     },
-    [bindings, persist]
+    [bindings, persist],
   );
 
   const resetAll = useCallback(() => {
@@ -80,7 +81,7 @@ export function ShortcutsProvider({ children }: { children: ReactNode }) {
   const findConflict = useCallback(
     (actionId: ShortcutActionId, candidate: ShortcutBinding) =>
       findBindingConflict(bindings, actionId, candidate),
-    [bindings]
+    [bindings],
   );
 
   const value = useMemo(
@@ -93,7 +94,7 @@ export function ShortcutsProvider({ children }: { children: ReactNode }) {
       bindingFromEvent: bindingFromKeyboardEvent,
       findConflict,
     }),
-    [bindings, matches, setBinding, resetBinding, resetAll, findConflict]
+    [bindings, matches, setBinding, resetBinding, resetAll, findConflict],
   );
 
   return (

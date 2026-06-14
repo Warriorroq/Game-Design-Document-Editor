@@ -1,7 +1,9 @@
+import "@/shared/styles/LinkMenus.css";
+
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+
 import { useLocale } from "@/shared/context/LocaleContext";
-import "@/shared/styles/LinkMenus.css";
 
 export type GitPromptKind = "commit" | "remote";
 
@@ -85,10 +87,7 @@ export function GitPromptDialog({
   };
 
   const dialog = (
-    <div
-      className="link-dialog-backdrop"
-      onMouseDown={closeIfBackdrop}
-    >
+    <div className="link-dialog-backdrop" onMouseDown={closeIfBackdrop}>
       <div
         ref={dialogRef}
         className="link-paste-dialog"
@@ -116,7 +115,9 @@ export function GitPromptDialog({
                 submit();
               }
             }}
-            placeholder={kind === "remote" ? "https://github.com/user/repo.git" : ""}
+            placeholder={
+              kind === "remote" ? "https://github.com/user/repo.git" : ""
+            }
           />
         </label>
         <div className="link-paste-actions">

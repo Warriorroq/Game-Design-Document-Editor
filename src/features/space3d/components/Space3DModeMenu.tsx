@@ -12,7 +12,11 @@ export function Space3DModeMenu({ mode, onChange }: Space3DModeMenuProps) {
   const { t } = useLocale();
 
   return (
-    <div className="space3d-mode-menu" role="group" aria-label={t("space3d.editModeAria")}>
+    <div
+      className="space3d-mode-menu"
+      role="group"
+      aria-label={t("space3d.editModeAria")}
+    >
       {MODES.map((entry) => (
         <button
           key={entry}

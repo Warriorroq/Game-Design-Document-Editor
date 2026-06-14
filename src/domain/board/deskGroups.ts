@@ -1,30 +1,30 @@
-import type { BoardGroup } from "@/domain/types";
 import type { DeskSelection } from "@/domain/board/deskClipboard";
+import type { BoardGroup } from "@/domain/types";
 
 export function findGroupForItem(
   groups: BoardGroup[],
-  itemId: string
+  itemId: string,
 ): BoardGroup | undefined {
   return groups.find((g) => g.memberItemIds.includes(itemId));
 }
 
 export function findGroupForShape(
   groups: BoardGroup[],
-  shapeId: string
+  shapeId: string,
 ): BoardGroup | undefined {
   return groups.find((g) => g.memberShapeIds.includes(shapeId));
 }
 
 export function findGroupForText(
   groups: BoardGroup[],
-  textId: string
+  textId: string,
 ): BoardGroup | undefined {
   return groups.find((g) => g.memberTextIds.includes(textId));
 }
 
 export function findGroupForStroke(
   groups: BoardGroup[],
-  strokeId: string
+  strokeId: string,
 ): BoardGroup | undefined {
   return groups.find((g) => g.memberStrokeIds.includes(strokeId));
 }
@@ -47,7 +47,10 @@ export function selectionFromGroup(group: BoardGroup): DeskSelection {
   };
 }
 
-export function mergeSelections(a: DeskSelection, b: DeskSelection): DeskSelection {
+export function mergeSelections(
+  a: DeskSelection,
+  b: DeskSelection,
+): DeskSelection {
   return {
     itemIds: [...new Set([...a.itemIds, ...b.itemIds])],
     shapeIds: [...new Set([...a.shapeIds, ...b.shapeIds])],
@@ -61,7 +64,7 @@ export function removeMembersFromGroups(
   itemIds: string[],
   shapeIds: string[],
   textIds: string[] = [],
-  strokeIds: string[] = []
+  strokeIds: string[] = [],
 ): BoardGroup[] {
   const itemSet = new Set(itemIds);
   const shapeSet = new Set(shapeIds);
@@ -82,13 +85,13 @@ export function removeMembersFromGroups(
           g.memberShapeIds.length +
           g.memberTextIds.length +
           g.memberStrokeIds.length >=
-        2
+        2,
     );
 }
 
 export function groupsTouchingSelection(
   groups: BoardGroup[],
-  selection: DeskSelection
+  selection: DeskSelection,
 ): BoardGroup[] {
   const itemSet = new Set(selection.itemIds);
   const shapeSet = new Set(selection.shapeIds);
@@ -99,7 +102,7 @@ export function groupsTouchingSelection(
       g.memberItemIds.some((id) => itemSet.has(id)) ||
       g.memberShapeIds.some((id) => shapeSet.has(id)) ||
       g.memberTextIds.some((id) => textSet.has(id)) ||
-      g.memberStrokeIds.some((id) => strokeSet.has(id))
+      g.memberStrokeIds.some((id) => strokeSet.has(id)),
   );
 }
 
@@ -127,7 +130,7 @@ export function applyDeskSelectClick(
   id: string,
   shiftKey: boolean,
   prev: DeskSelection,
-  groups: BoardGroup[]
+  groups: BoardGroup[],
 ): DeskSelection {
   if (shiftKey) {
     if (kind === "item") {
@@ -212,13 +215,14 @@ const DRAG_THRESHOLD_PX = 4;
 export function armDragAfterThreshold(
   e: React.PointerEvent | PointerEvent,
   onDrag: () => void,
-  threshold = DRAG_THRESHOLD_PX
+  threshold = DRAG_THRESHOLD_PX,
 ) {
   const startX = e.clientX;
   const startY = e.clientY;
 
   const onMove = (ev: PointerEvent) => {
-    if (Math.hypot(ev.clientX - startX, ev.clientY - startY) < threshold) return;
+    if (Math.hypot(ev.clientX - startX, ev.clientY - startY) < threshold)
+      return;
     cleanup();
     onDrag();
   };

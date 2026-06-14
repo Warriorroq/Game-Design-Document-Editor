@@ -28,7 +28,7 @@ const PASTE_MAX_WIDTH = 420;
 export function buildAssetDeskClipboard(
   assetId: string,
   src: string,
-  dimensions: { width: number; height: number }
+  dimensions: { width: number; height: number },
 ): DeskClipboard {
   const scale = Math.min(1, PASTE_MAX_WIDTH / dimensions.width);
   const width = Math.round(dimensions.width * scale);
@@ -57,7 +57,7 @@ function clonePoint(
   point: BoardPoint,
   idMap: Map<string, string>,
   dx: number,
-  dy: number
+  dy: number,
 ): BoardPoint {
   const next: BoardPoint = {
     x: point.x + dx,
@@ -79,7 +79,7 @@ export function buildDeskClipboard(
   texts: BoardText[],
   strokes: BoardStroke[],
   groups: BoardGroup[],
-  selection: DeskSelection
+  selection: DeskSelection,
 ): DeskClipboard | null {
   const itemSet = new Set(selection.itemIds);
   const shapeSet = new Set(selection.shapeIds);
@@ -112,14 +112,17 @@ export function buildDeskClipboard(
           g.memberShapeIds.length +
           g.memberTextIds.length +
           g.memberStrokeIds.length >=
-        2
+        2,
     );
 
   return {
     items: clipItems.map((i) => ({ ...i })),
     shapes: clipShapes.map((s) => ({
       ...s,
-      start: { ...s.start, attach: s.start.attach ? { ...s.start.attach } : undefined },
+      start: {
+        ...s.start,
+        attach: s.start.attach ? { ...s.start.attach } : undefined,
+      },
       end: { ...s.end, attach: s.end.attach ? { ...s.end.attach } : undefined },
     })),
     texts: clipTexts.map((t) => ({ ...t })),
@@ -133,7 +136,7 @@ export function buildDeskClipboard(
 
 export function pasteDeskClipboard(
   clipboard: DeskClipboard,
-  origin?: { x: number; y: number }
+  origin?: { x: number; y: number },
 ): {
   items: BoardItem[];
   shapes: BoardShape[];

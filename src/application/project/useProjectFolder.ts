@@ -1,4 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+
+import type { GddDocument } from "@/domain/types";
+import { isDesktopApp } from "@/infrastructure/desktop/desktop";
+import { getGitStatus, type GitStatus } from "@/infrastructure/git";
 import {
   folderLabel,
   getStoredProjectFolder,
@@ -7,13 +11,10 @@ import {
   saveProjectToFolder,
   setStoredProjectFolder,
 } from "@/infrastructure/project/projectFolder";
-import { getGitStatus, type GitStatus } from "@/infrastructure/git";
-import { isDesktopApp } from "@/infrastructure/desktop/desktop";
-import type { GddDocument } from "@/domain/types";
 
 export function useProjectFolder() {
   const [folderPath, setFolderPath] = useState<string | null>(() =>
-    isDesktopApp ? getStoredProjectFolder() : null
+    isDesktopApp ? getStoredProjectFolder() : null,
   );
   const [gitStatus, setGitStatus] = useState<GitStatus | null>(null);
   const [gitAvailable, setGitAvailable] = useState(false);
@@ -47,7 +48,7 @@ export function useProjectFolder() {
       setStoredProjectFolder(path);
       void refreshGitStatus(path);
     },
-    [refreshGitStatus]
+    [refreshGitStatus],
   );
 
   const pickFolder = useCallback(async () => {
@@ -58,7 +59,7 @@ export function useProjectFolder() {
     (path: string | null) => {
       bindFolder(path);
     },
-    [bindFolder]
+    [bindFolder],
   );
 
   const loadFromFolder = useCallback(async (path: string) => {
@@ -70,7 +71,7 @@ export function useProjectFolder() {
       await saveProjectToFolder(path, doc);
       await refreshGitStatus(path);
     },
-    [refreshGitStatus]
+    [refreshGitStatus],
   );
 
   const saveDoc = useCallback(
@@ -78,7 +79,7 @@ export function useProjectFolder() {
       if (!folderPath) return;
       await saveDocTo(folderPath, doc);
     },
-    [folderPath, saveDocTo]
+    [folderPath, saveDocTo],
   );
 
   const scheduleSaveDoc = useCallback(
@@ -89,7 +90,7 @@ export function useProjectFolder() {
         void saveDoc(doc);
       }, 600);
     },
-    [folderPath, saveDoc]
+    [folderPath, saveDoc],
   );
 
   const closeFolder = useCallback(() => {

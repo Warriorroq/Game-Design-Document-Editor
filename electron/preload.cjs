@@ -12,7 +12,8 @@ contextBridge.exposeInMainWorld("gddDesktop", {
     onMaximizedChanged: (listener) => {
       const handler = (_event, maximized) => listener(Boolean(maximized));
       ipcRenderer.on("window:maximized-changed", handler);
-      return () => ipcRenderer.removeListener("window:maximized-changed", handler);
+      return () =>
+        ipcRenderer.removeListener("window:maximized-changed", handler);
     },
   },
   project: {

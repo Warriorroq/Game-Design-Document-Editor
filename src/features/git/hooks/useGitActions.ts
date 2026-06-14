@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocale } from "@/shared/context/LocaleContext";
+
 import {
   applyGitIdentity,
   commitGitChanges,
@@ -7,21 +7,23 @@ import {
   formatGitError,
   getGitRemote,
   getGitStatus,
+  type GitFileStatus,
+  type GitStatus,
   initGitRepo,
   pullGitChanges,
   pushGitChanges,
   setGitRemote,
   stashGitChanges,
-  type GitFileStatus,
-  type GitStatus,
 } from "@/features/git/lib/git";
-import type { GitPromptKind } from "../components/GitPromptDialog";
-import type { GitPullConfirmAction } from "../components/GitPullConfirmDialog";
+import { parseGitProgressPercent } from "@/features/git/lib/gitProgress";
+import { useLocale } from "@/shared/context/LocaleContext";
+
 import {
-  parseGitProgressPercent,
   type GitSyncOperation,
   type GitSyncProgressState,
 } from "../components/GitProgressDialog";
+import type { GitPromptKind } from "../components/GitPromptDialog";
+import type { GitPullConfirmAction } from "../components/GitPullConfirmDialog";
 
 interface UseGitActionsOptions {
   folderPath: string | null;
@@ -46,8 +48,9 @@ export function useGitActions({
   const [busy, setBusy] = useState(false);
   const [promptKind, setPromptKind] = useState<GitPromptKind | null>(null);
   const [promptInitial, setPromptInitial] = useState("");
-  const [syncProgress, setSyncProgress] =
-    useState<GitSyncProgressState | null>(null);
+  const [syncProgress, setSyncProgress] = useState<GitSyncProgressState | null>(
+    null,
+  );
   const [pullConfirmFiles, setPullConfirmFiles] = useState<
     GitFileStatus[] | null
   >(null);
@@ -100,7 +103,7 @@ export function useGitActions({
 
     if (result.ok) {
       setSyncProgress((prev) =>
-        prev ? { ...prev, status: "success", percent: 100 } : prev
+        prev ? { ...prev, status: "success", percent: 100 } : prev,
       );
       onRefreshStatus();
       if (operation === "pull") {
@@ -116,7 +119,7 @@ export function useGitActions({
             status: "error",
             error: formatGitError(result.error, t),
           }
-        : prev
+        : prev,
     );
   };
 

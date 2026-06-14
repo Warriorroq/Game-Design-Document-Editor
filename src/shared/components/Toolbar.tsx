@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { useLocale } from "@/shared/context/LocaleContext";
+
+import type { GitStatus } from "@/features/git/lib/git";
+import { ProjectMenu } from "@/features/project/ProjectMenu";
 import { GlobalSearch } from "@/features/search/GlobalSearch";
 import type { GlobalSearchResult } from "@/features/search/lib/globalSearch";
-import { ProjectMenu } from "@/features/project/ProjectMenu";
+import { useLocale } from "@/shared/context/LocaleContext";
 import { isWindowsDesktopApp } from "@/shared/lib/desktop";
-import type { GitStatus } from "@/features/git/lib/git";
 import type { GddDocument } from "@/shared/types";
 
 interface ToolbarProps {
@@ -90,10 +91,14 @@ export function Toolbar({
             onClick={onToggleSidebar}
             aria-pressed={sidebarVisible}
             aria-label={
-              sidebarVisible ? t("toolbar.hideSections") : t("toolbar.showSections")
+              sidebarVisible
+                ? t("toolbar.hideSections")
+                : t("toolbar.showSections")
             }
             title={
-              sidebarVisible ? t("toolbar.hideSections") : t("toolbar.showSections")
+              sidebarVisible
+                ? t("toolbar.hideSections")
+                : t("toolbar.showSections")
             }
           >
             {t("toolbar.sections")}

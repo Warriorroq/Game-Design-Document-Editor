@@ -1,8 +1,9 @@
 import { useCallback, useState } from "react";
+
 import {
   applyTheme,
-  loadStoredTheme,
   type AppThemeId,
+  loadStoredTheme,
 } from "@/shared/lib/appTheme";
 
 export function useAppTheme() {

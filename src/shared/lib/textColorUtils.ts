@@ -23,12 +23,14 @@ export function normalizeColorToHex(value: string): string | null {
   return null;
 }
 
-export function matchPaletteColor(value: string | null | undefined): string | null {
+export function matchPaletteColor(
+  value: string | null | undefined,
+): string | null {
   if (!value) return null;
   const hex = normalizeColorToHex(value);
   if (!hex) return null;
   const hit = BOARD_TEXT_COLORS.find(
-    (c) => c.toLowerCase() === hex.toLowerCase()
+    (c) => c.toLowerCase() === hex.toLowerCase(),
   );
   return hit ?? null;
 }

@@ -1,17 +1,20 @@
 import JSZip from "jszip";
+
 import { normalizeDocument } from "@/domain/document/document";
+import type { GddDocument } from "@/domain/types";
 import { parseGdeProject } from "@/infrastructure/project/projectFile";
 import {
   documentToFolderFiles,
   folderFilesToDocument,
   MANIFEST_FILE,
 } from "@/infrastructure/project/projectLayout";
-import type { GddDocument } from "@/domain/types";
 
 const ZIP_MAGIC = [0x50, 0x4b];
 
 function isZipArchive(data: Uint8Array): boolean {
-  return data.length >= 2 && data[0] === ZIP_MAGIC[0] && data[1] === ZIP_MAGIC[1];
+  return (
+    data.length >= 2 && data[0] === ZIP_MAGIC[0] && data[1] === ZIP_MAGIC[1]
+  );
 }
 
 function projectArchiveName(doc: GddDocument): string {
@@ -23,7 +26,9 @@ function projectArchiveName(doc: GddDocument): string {
   return `${base}.gde`;
 }
 
-async function readZipFiles(blob: Blob): Promise<Map<string, string | Uint8Array>> {
+async function readZipFiles(
+  blob: Blob,
+): Promise<Map<string, string | Uint8Array>> {
   const zip = await JSZip.loadAsync(blob);
   const files = new Map<string, string | Uint8Array>();
 
@@ -55,7 +60,9 @@ export async function buildGdeArchive(doc: GddDocument): Promise<Blob> {
   });
 }
 
-export async function parseGdeArchive(input: Blob | ArrayBuffer): Promise<GddDocument> {
+export async function parseGdeArchive(
+  input: Blob | ArrayBuffer,
+): Promise<GddDocument> {
   const blob = input instanceof Blob ? input : new Blob([input]);
   const bytes = new Uint8Array(await blob.arrayBuffer());
 

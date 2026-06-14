@@ -1,5 +1,10 @@
 import { resolveBoardPoint } from "@/domain/board/boardGeometry";
-import type { BoardDrawTool, BoardItem, BoardPoint, BoardShapeType } from "@/domain/types";
+import type {
+  BoardDrawTool,
+  BoardItem,
+  BoardPoint,
+  BoardShapeType,
+} from "@/domain/types";
 
 export const DEFAULT_PLACE = { x: 120, y: 120 };
 export const PASTE_OFFSET = 28;
@@ -19,7 +24,7 @@ export function shapeLongEnough(
   start: BoardPoint,
   end: BoardPoint,
   boardItems: BoardItem[],
-  type: BoardShapeType
+  type: BoardShapeType,
 ) {
   const a = resolveBoardPoint(start, boardItems);
   const b = resolveBoardPoint(end, boardItems);

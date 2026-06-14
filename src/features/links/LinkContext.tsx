@@ -1,15 +1,16 @@
 import {
   createContext,
+  type ReactNode,
   useCallback,
   useContext,
   useMemo,
   useState,
-  type ReactNode,
 } from "react";
+
 import {
+  type LinkTarget,
   linkTargetFromGddLink,
   parseGddHref,
-  type LinkTarget,
 } from "@/features/links/lib/links";
 import type { GddDocument } from "@/shared/types";
 
@@ -62,11 +63,9 @@ export function LinkProvider({
 }) {
   const [linkTarget, setLinkTarget] = useState<LinkTarget | null>(null);
   const [contextMenu, setContextMenu] = useState<ContextMenuRequest | null>(
-    null
+    null,
   );
-  const [pasteDialog, setPasteDialog] = useState<PasteLinkRequest | null>(
-    null
-  );
+  const [pasteDialog, setPasteDialog] = useState<PasteLinkRequest | null>(null);
 
   const clearLinkTarget = useCallback(() => setLinkTarget(null), []);
 
@@ -87,7 +86,7 @@ export function LinkProvider({
       setLinkTarget(target);
       return true;
     },
-    [setActiveSectionId]
+    [setActiveSectionId],
   );
 
   const copyHref = useCallback(async (href: string) => {
@@ -135,12 +134,10 @@ export function LinkProvider({
       openPasteDialog,
       closePasteDialog,
       setActiveSectionId,
-    ]
+    ],
   );
 
-  return (
-    <LinkContext.Provider value={value}>{children}</LinkContext.Provider>
-  );
+  return <LinkContext.Provider value={value}>{children}</LinkContext.Provider>;
 }
 
 export function useLinkContext(): LinkContextValue {

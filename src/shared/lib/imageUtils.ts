@@ -10,7 +10,11 @@ function readBlobAsDataUrl(blob: Blob): Promise<string> {
   });
 }
 
-function imageHasAlpha(ctx: CanvasRenderingContext2D, width: number, height: number): boolean {
+function imageHasAlpha(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+): boolean {
   const { data } = ctx.getImageData(0, 0, width, height);
   for (let i = 3; i < data.length; i += 4) {
     if (data[i] < 255) return true;
@@ -24,7 +28,10 @@ function mimeSupportsAlpha(mime: string): boolean {
 
 export async function blobToDataUrl(blob: Blob): Promise<string> {
   const bitmap = await createImageBitmap(blob);
-  const scale = Math.min(1, MAX_DIMENSION / Math.max(bitmap.width, bitmap.height));
+  const scale = Math.min(
+    1,
+    MAX_DIMENSION / Math.max(bitmap.width, bitmap.height),
+  );
   const width = Math.max(1, Math.round(bitmap.width * scale));
   const height = Math.max(1, Math.round(bitmap.height * scale));
 
@@ -141,7 +148,7 @@ export function copyImageSrcToClipboard(src: string): Promise<void> {
 }
 
 export function loadImageDimensions(
-  src: string
+  src: string,
 ): Promise<{ width: number; height: number }> {
   return new Promise((resolve, reject) => {
     const img = new Image();

@@ -1,8 +1,10 @@
-import { useEffect, useRef } from "react";
-import { useLocale } from "@/shared/context/LocaleContext";
-import { createPortal } from "react-dom";
-import type { BoardDrawTool } from "@/shared/types";
 import "@/shared/styles/LinkMenus.css";
+
+import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
+
+import { useLocale } from "@/shared/context/LocaleContext";
+import type { BoardDrawTool } from "@/shared/types";
 
 interface DeskContextMenuProps {
   x: number;
@@ -129,28 +131,49 @@ export function DeskContextMenu({
       </button>
       <div className="board-menu-sep" role="separator" />
       {canCopy && (
-        <button type="button" className="link-menu-item" role="menuitem" onClick={onCopy}>
+        <button
+          type="button"
+          className="link-menu-item"
+          role="menuitem"
+          onClick={onCopy}
+        >
           {t("menu.copy")}
         </button>
       )}
       {canPaste && (
-        <button type="button" className="link-menu-item" role="menuitem" onClick={onPaste}>
+        <button
+          type="button"
+          className="link-menu-item"
+          role="menuitem"
+          onClick={onPaste}
+        >
           {t("menu.paste")}
         </button>
       )}
       {canLock && (
-        <button type="button" className="link-menu-item" role="menuitem" onClick={onLock}>
+        <button
+          type="button"
+          className="link-menu-item"
+          role="menuitem"
+          onClick={onLock}
+        >
           {t("desk.lock")}
         </button>
       )}
       {canUnlock && (
-        <button type="button" className="link-menu-item" role="menuitem" onClick={onUnlock}>
+        <button
+          type="button"
+          className="link-menu-item"
+          role="menuitem"
+          onClick={onUnlock}
+        >
           {t("desk.unlock")}
         </button>
       )}
-      {(canBringForward || canSendBackward || canFlipHorizontal || canFlipVertical) && (
-        <div className="board-menu-sep" role="separator" />
-      )}
+      {(canBringForward ||
+        canSendBackward ||
+        canFlipHorizontal ||
+        canFlipVertical) && <div className="board-menu-sep" role="separator" />}
       {canBringForward && (
         <button
           type="button"
@@ -192,12 +215,22 @@ export function DeskContextMenu({
         </button>
       )}
       {canGroup && (
-        <button type="button" className="link-menu-item" role="menuitem" onClick={onGroup}>
+        <button
+          type="button"
+          className="link-menu-item"
+          role="menuitem"
+          onClick={onGroup}
+        >
           {t("desk.group")}
         </button>
       )}
       {canUngroup && (
-        <button type="button" className="link-menu-item" role="menuitem" onClick={onUngroup}>
+        <button
+          type="button"
+          className="link-menu-item"
+          role="menuitem"
+          onClick={onUngroup}
+        >
           {t("desk.ungroup")}
         </button>
       )}

@@ -5,7 +5,9 @@ export const DEFAULT_TABLE_MARKDOWN = `| Column 1 | Column 2 |
 
 export function previewMissingTableControls(root: HTMLElement): boolean {
   for (const table of root.querySelectorAll("table")) {
-    if (!table.closest(".gdd-table-wrap")?.querySelector(".gdd-table-control")) {
+    if (
+      !table.closest(".gdd-table-wrap")?.querySelector(".gdd-table-control")
+    ) {
       return true;
     }
   }
@@ -190,14 +192,10 @@ export function renderMarkdown(md: string): string {
       const body = b.lines.map(renderInline).join("<br>");
       out.push(`<p>${body}</p>`);
     } else if (b.type === "ul") {
-      const items = b.items
-        .map((t) => `<li>${renderInline(t)}</li>`)
-        .join("");
+      const items = b.items.map((t) => `<li>${renderInline(t)}</li>`).join("");
       out.push(`<ul>${items}</ul>`);
     } else if (b.type === "ol") {
-      const items = b.items
-        .map((t) => `<li>${renderInline(t)}</li>`)
-        .join("");
+      const items = b.items.map((t) => `<li>${renderInline(t)}</li>`).join("");
       out.push(`<ol>${items}</ol>`);
     } else if (b.type === "hr") {
       out.push("<hr>");
@@ -206,20 +204,20 @@ export function renderMarkdown(md: string): string {
       const trs = b.rows
         .map(
           (row) =>
-            `<tr>${row.map((c) => `<td>${renderInline(c)}</td>`).join("")}</tr>`
+            `<tr>${row.map((c) => `<td>${renderInline(c)}</td>`).join("")}</tr>`,
         )
         .join("");
       out.push(
         `<div class='gdd-table-wrap'>` +
           `<table class='gdd-table'>` +
-            `<thead><tr>${th}</tr></thead>` +
-            `<tbody>${trs}</tbody>` +
+          `<thead><tr>${th}</tr></thead>` +
+          `<tbody>${trs}</tbody>` +
           `</table>` +
           `<button type='button' class='gdd-table-control gdd-table-add-row' contenteditable='false' tabindex='-1' aria-label='Add row'>+</button>` +
           `<button type='button' class='gdd-table-control gdd-table-del-row' contenteditable='false' tabindex='-1' aria-label='Delete row'>-</button>` +
           `<button type='button' class='gdd-table-control gdd-table-add-col' contenteditable='false' tabindex='-1' aria-label='Add column'>+</button>` +
           `<button type='button' class='gdd-table-control gdd-table-del-col' contenteditable='false' tabindex='-1' aria-label='Delete column'>-</button>` +
-        `</div>`
+          `</div>`,
       );
     }
   }

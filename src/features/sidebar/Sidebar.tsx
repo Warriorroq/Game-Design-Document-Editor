@@ -1,16 +1,23 @@
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
-import { useLocale } from "@/shared/context/LocaleContext";
-import { useLinkContext } from "@/features/links/LinkContext";
-import { restoreAppFocus } from "@/shared/lib/desktop";
+import {
+  type KeyboardEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
+import { isSpace3DSection } from "@/domain/space3d/space3d";
 import { buildSectionHref } from "@/features/links/lib/links";
+import { useLinkContext } from "@/features/links/LinkContext";
 import {
   childItems,
   type SectionDropPosition,
   type SidebarDropTarget,
 } from "@/features/sidebar/lib/sidebarOrder";
-import type { GddSection, GddSectionFolder } from "@/shared/types";
-import { isSpace3DSection } from "@/domain/space3d/space3d";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
+import { useLocale } from "@/shared/context/LocaleContext";
+import { restoreAppFocus } from "@/shared/lib/desktop";
+import type { GddSection, GddSectionFolder } from "@/shared/types";
 
 interface SidebarProps {
   hidden: boolean;
@@ -27,7 +34,7 @@ interface SidebarProps {
   onToggleFolder: (id: string) => void;
   onReorder: (
     drag: { kind: "section" | "folder"; id: string },
-    target: SidebarDropTarget
+    target: SidebarDropTarget,
   ) => void;
 }
 
@@ -45,14 +52,14 @@ function sectionHasContent(section: GddSection): boolean {
 }
 
 function dropPositionFromEvent(
-  e: React.DragEvent<HTMLElement>
+  e: React.DragEvent<HTMLElement>,
 ): SectionDropPosition {
   const rect = e.currentTarget.getBoundingClientRect();
   return e.clientY < rect.top + rect.height / 2 ? "before" : "after";
 }
 
 function folderDropPositionFromEvent(
-  e: React.DragEvent<HTMLElement>
+  e: React.DragEvent<HTMLElement>,
 ): SectionDropPosition | "inside" {
   const rect = e.currentTarget.getBoundingClientRect();
   const relativeY = e.clientY - rect.top;
@@ -161,14 +168,16 @@ export function Sidebar({
   const { t } = useLocale();
   const { openContextMenu } = useLinkContext();
   const createMenuRef = useRef<HTMLDivElement>(null);
-  const [pendingRemove, setPendingRemove] = useState<PendingRemove | null>(null);
+  const [pendingRemove, setPendingRemove] = useState<PendingRemove | null>(
+    null,
+  );
   const [dragging, setDragging] = useState<DragPayload | null>(null);
   const [dropTarget, setDropTarget] = useState<SidebarDropTarget | null>(null);
   const [renamingFolderId, setRenamingFolderId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
-  const [createMenuParent, setCreateMenuParent] = useState<string | null | false>(
-    false
-  );
+  const [createMenuParent, setCreateMenuParent] = useState<
+    string | null | false
+  >(false);
 
   const docLike = { folders, sections };
 
@@ -200,26 +209,29 @@ export function Sidebar({
   const handleDragStart = useCallback(
     (e: React.DragEvent<HTMLSpanElement>, payload: DragPayload) => {
       e.dataTransfer.effectAllowed = "move";
-      e.dataTransfer.setData("application/x-gdde-sidebar", JSON.stringify(payload));
+      e.dataTransfer.setData(
+        "application/x-gdde-sidebar",
+        JSON.stringify(payload),
+      );
       const item = e.currentTarget.closest(".sidebar-row");
       if (item instanceof HTMLElement) {
         e.dataTransfer.setDragImage(item, 16, 16);
       }
       setDragging(payload);
     },
-    []
+    [],
   );
 
   const handleDrop = useCallback(
     (e: React.DragEvent<HTMLElement>, target: SidebarDropTarget) => {
       e.preventDefault();
       const payload = parseDragPayload(
-        e.dataTransfer.getData("application/x-gdde-sidebar")
+        e.dataTransfer.getData("application/x-gdde-sidebar"),
       );
       if (payload) onReorder(payload, target);
       clearDragState();
     },
-    [clearDragState, onReorder]
+    [clearDragState, onReorder],
   );
 
   const startRenameFolder = (folder: GddSectionFolder) => {
@@ -242,7 +254,7 @@ export function Sidebar({
 
   const onRenameKeyDown = (
     e: KeyboardEvent<HTMLInputElement>,
-    folderId: string
+    folderId: string,
   ) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -259,11 +271,14 @@ export function Sidebar({
         ? parentFolderId
         : current === parentFolderId
           ? false
-          : parentFolderId
+          : parentFolderId,
     );
   };
 
-  const renderCreateButton = (parentFolderId: string | null, compact = false) => {
+  const renderCreateButton = (
+    parentFolderId: string | null,
+    compact = false,
+  ) => {
     const open =
       createMenuParent !== false && createMenuParent === parentFolderId;
 
@@ -300,7 +315,8 @@ export function Sidebar({
     const filled = sectionHasContent(section);
     const active = section.id === activeId;
     const space3d = isSpace3DSection(section);
-    const isDragging = dragging?.kind === "section" && dragging.id === section.id;
+    const isDragging =
+      dragging?.kind === "section" && dragging.id === section.id;
     const dropBefore =
       dropTarget?.kind === "section" &&
       dropTarget.id === section.id &&
@@ -359,7 +375,7 @@ export function Sidebar({
           setDropTarget((current) =>
             current?.kind === "section" && current.id === section.id
               ? null
-              : current
+              : current,
           );
         }}
       >
@@ -391,7 +407,10 @@ export function Sidebar({
             )}
           </span>
           {space3d && (
-            <span className="section-kind-badge" title={t("sidebar.space3dBadge")}>
+            <span
+              className="section-kind-badge"
+              title={t("sidebar.space3dBadge")}
+            >
               {t("sidebar.space3dBadgeLabel")}
             </span>
           )}
@@ -467,11 +486,12 @@ export function Sidebar({
             })
           }
           onDragLeave={(e) => {
-            if (e.currentTarget.contains(e.relatedTarget as Node | null)) return;
+            if (e.currentTarget.contains(e.relatedTarget as Node | null))
+              return;
             setDropTarget((current) =>
               current?.kind === "folder" && current.id === folder.id
                 ? null
-                : current
+                : current,
             );
           }}
         >
@@ -545,7 +565,7 @@ export function Sidebar({
           childItems(docLike, folder.id).map((entry) =>
             entry.kind === "folder"
               ? renderFolderBlock(entry.item, depth + 1)
-              : renderSectionRow(entry.item, depth + 1)
+              : renderSectionRow(entry.item, depth + 1),
           )}
       </div>
     );
@@ -553,7 +573,10 @@ export function Sidebar({
 
   return (
     <>
-      <aside className={`sidebar ${hidden ? "sidebar--hidden" : ""}`} aria-hidden={hidden}>
+      <aside
+        className={`sidebar ${hidden ? "sidebar--hidden" : ""}`}
+        aria-hidden={hidden}
+      >
         <div className="sidebar-header">
           <h2>{t("sidebar.sections")}</h2>
           <div className="sidebar-header-actions">
@@ -564,7 +587,7 @@ export function Sidebar({
           {childItems(docLike, null).map((entry) =>
             entry.kind === "folder"
               ? renderFolderBlock(entry.item, 0)
-              : renderSectionRow(entry.item, 0)
+              : renderSectionRow(entry.item, 0),
           )}
         </nav>
       </aside>

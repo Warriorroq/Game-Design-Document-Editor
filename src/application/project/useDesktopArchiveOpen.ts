@@ -1,6 +1,7 @@
 import { useEffect } from "react";
-import { parseGdeArchive } from "@/infrastructure/project/gdeArchive";
+
 import type { GddDocument } from "@/domain/types";
+import { parseGdeArchive } from "@/infrastructure/project/gdeArchive";
 
 function base64ToArrayBuffer(base64: string): ArrayBuffer {
   const binary = atob(base64);
@@ -13,7 +14,7 @@ function base64ToArrayBuffer(base64: string): ArrayBuffer {
 
 export function useDesktopArchiveOpen(
   onImport: (doc: GddDocument) => void,
-  onError: (message: string) => void
+  onError: (message: string) => void,
 ) {
   useEffect(() => {
     const projectApi = window.gddDesktop?.project;
@@ -26,7 +27,9 @@ export function useDesktopArchiveOpen(
           onError(result.error ?? "read_failed");
           return;
         }
-        const doc = await parseGdeArchive(base64ToArrayBuffer(result.dataBase64));
+        const doc = await parseGdeArchive(
+          base64ToArrayBuffer(result.dataBase64),
+        );
         onImport(doc);
       } catch (err) {
         onError(err instanceof Error ? err.message : "read_failed");

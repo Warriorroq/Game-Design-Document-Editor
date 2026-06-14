@@ -1,21 +1,27 @@
+import "./Board.css";
+
 import { useState } from "react";
-import { BoardShapesLayer } from "./components/BoardShapesLayer";
-import { BoardStrokesLayer } from "./components/BoardStrokesLayer";
-import { BoardToolbar } from "./components/BoardToolbar";
-import { BoardTextsLayer } from "./components/BoardTextsLayer";
-import { DeskContextMenu } from "./components/DeskContextMenu";
-import { BoardVideoIframe } from "./components/BoardVideoIframe";
-import { VideoInsertDialog } from "./components/VideoInsertDialog";
-import { buildMediaHref, buildTextHref } from "@/features/links/lib/links";
+
+import {
+  type ImageBoardProps,
+  useImageBoard,
+} from "@/application/board/useImageBoard";
 import {
   boardVideoEmbedSrc,
   boardVideoRenderMode,
   isBoardVideoItem,
 } from "@/domain/board/boardItem";
-import { selectionCount } from "@/domain/board/deskGroups";
 import { boardItemTransform } from "@/domain/board/boardItemTransform";
-import { useImageBoard, type ImageBoardProps } from "@/application/board/useImageBoard";
-import "./Board.css";
+import { selectionCount } from "@/domain/board/deskGroups";
+import { buildMediaHref, buildTextHref } from "@/features/links/lib/links";
+
+import { BoardShapesLayer } from "./components/BoardShapesLayer";
+import { BoardStrokesLayer } from "./components/BoardStrokesLayer";
+import { BoardTextsLayer } from "./components/BoardTextsLayer";
+import { BoardToolbar } from "./components/BoardToolbar";
+import { BoardVideoIframe } from "./components/BoardVideoIframe";
+import { DeskContextMenu } from "./components/DeskContextMenu";
+import { VideoInsertDialog } from "./components/VideoInsertDialog";
 
 export type { ImageBoardProps };
 
@@ -115,8 +121,14 @@ export function ImageBoard(props: ImageBoardProps) {
         </div>
         <div className="board-meta">
           <span className="board-zoom">{zoomPercent}%</span>
-          <span>{t("desk.images", { count: items.filter((i) => !isBoardVideoItem(i)).length })}</span>
-          <span>{t("desk.videos", { count: items.filter(isBoardVideoItem).length })}</span>
+          <span>
+            {t("desk.images", {
+              count: items.filter((i) => !isBoardVideoItem(i)).length,
+            })}
+          </span>
+          <span>
+            {t("desk.videos", { count: items.filter(isBoardVideoItem).length })}
+          </span>
           <span>{t("desk.shapes", { count: shapes.length })}</span>
           <span>{t("desk.labels", { count: texts.length })}</span>
           {canGroup && (
@@ -184,10 +196,10 @@ export function ImageBoard(props: ImageBoardProps) {
               texts.length === 0 &&
               !drawPreview &&
               !penPreview && (
-              <div className="board-empty">
-                <p>{t("desk.empty")}</p>
-              </div>
-            )}
+                <div className="board-empty">
+                  <p>{t("desk.empty")}</p>
+                </div>
+              )}
             <BoardShapesLayer
               canvasWidth={canvasWidth}
               canvasHeight={canvasHeight}
@@ -206,92 +218,119 @@ export function ImageBoard(props: ImageBoardProps) {
               const videoRender = isVideo ? boardVideoRenderMode(item) : null;
 
               return (
-              <div
-                key={item.id}
-                className={`board-item ${isVideo ? "board-item--video" : ""} ${item.locked ? "locked" : ""} ${videoSelected ? "selected" : ""} ${!isVideo && singleImageSelection === item.id ? "board-item--image-tools" : ""} ${videoSelected && isVideo ? "board-item--video-active" : ""} ${highlightMediaId === item.id ? "board-item--link-target" : ""}`}
-                style={{
-                  left: item.x,
-                  top: item.y,
-                  width: item.width,
-                  height: item.height,
-                }}
-                onContextMenu={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  const next =
-                    selection.itemIds.includes(item.id) && selectionCount(selection) > 0
-                      ? selection
-                      : { itemIds: [item.id], shapeIds: [], textIds: [], strokeIds: [] };
-                  openDeskObjectMenu(e.clientX, e.clientY, next, buildMediaHref(sectionId, item.id));
-                }}
-              >
                 <div
-                  className="board-item-drag"
-                  onPointerDown={(e) => handleItemPointerDown(e, item, "move")}
-                />
-                <div
-                  className="board-item-body"
-                  style={{ transform: boardItemTransform(item) }}
+                  key={item.id}
+                  className={`board-item ${isVideo ? "board-item--video" : ""} ${item.locked ? "locked" : ""} ${videoSelected ? "selected" : ""} ${!isVideo && singleImageSelection === item.id ? "board-item--image-tools" : ""} ${videoSelected && isVideo ? "board-item--video-active" : ""} ${highlightMediaId === item.id ? "board-item--link-target" : ""}`}
+                  style={{
+                    left: item.x,
+                    top: item.y,
+                    width: item.width,
+                    height: item.height,
+                  }}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const next =
+                      selection.itemIds.includes(item.id) &&
+                      selectionCount(selection) > 0
+                        ? selection
+                        : {
+                            itemIds: [item.id],
+                            shapeIds: [],
+                            textIds: [],
+                            strokeIds: [],
+                          };
+                    openDeskObjectMenu(
+                      e.clientX,
+                      e.clientY,
+                      next,
+                      buildMediaHref(sectionId, item.id),
+                    );
+                  }}
                 >
-                  <div className="board-item-frame" aria-hidden />
-                  <div className="board-item-visual">
-                    {isVideo && videoEmbedSrc ? (
-                      videoRender === "video" ? (
-                        <video
-                          className="board-item-video"
-                          src={videoEmbedSrc}
-                          controls
-                          playsInline
-                          preload="metadata"
+                  <div
+                    className="board-item-drag"
+                    onPointerDown={(e) =>
+                      handleItemPointerDown(e, item, "move")
+                    }
+                  />
+                  <div
+                    className="board-item-body"
+                    style={{ transform: boardItemTransform(item) }}
+                  >
+                    <div className="board-item-frame" aria-hidden />
+                    <div className="board-item-visual">
+                      {isVideo && videoEmbedSrc ? (
+                        videoRender === "video" ? (
+                          <video
+                            className="board-item-video"
+                            src={videoEmbedSrc}
+                            controls
+                            playsInline
+                            preload="metadata"
+                            draggable={false}
+                          />
+                        ) : (
+                          <BoardVideoIframe
+                            className="board-item-iframe"
+                            src={videoEmbedSrc}
+                            title={item.videoUrl ?? t("desk.videoEmbedTitle")}
+                          />
+                        )
+                      ) : (
+                        <img
+                          src={resolveItemSrc(item)}
+                          alt=""
                           draggable={false}
                         />
-                      ) : (
-                        <BoardVideoIframe
-                          className="board-item-iframe"
-                          src={videoEmbedSrc}
-                          title={item.videoUrl ?? t("desk.videoEmbedTitle")}
-                        />
-                      )
-                    ) : (
-                      <img src={resolveItemSrc(item)} alt="" draggable={false} />
-                    )}
-                  </div>
-                  <div className="board-item-handles">
-                    <button
-                      type="button"
-                      className="board-item-remove"
-                      disabled={item.locked}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (item.locked) return;
-                        onRemove(item.id);
-                        setSelection((prev) => ({
-                          itemIds: prev.itemIds.filter((id) => id !== item.id),
-                          shapeIds: prev.shapeIds,
-                          textIds: prev.textIds,
-                          strokeIds: prev.strokeIds,
-                        }));
-                      }}
-                      aria-label={isVideo ? t("desk.removeVideo") : t("desk.removeImage")}
-                    >
-                      ×
-                    </button>
-                    <div
-                      className="board-item-resize"
-                      onPointerDown={(e) => handleItemPointerDown(e, item, "resize")}
-                    />
-                    {!isVideo && singleImageSelection === item.id && !item.locked && (
+                      )}
+                    </div>
+                    <div className="board-item-handles">
+                      <button
+                        type="button"
+                        className="board-item-remove"
+                        disabled={item.locked}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (item.locked) return;
+                          onRemove(item.id);
+                          setSelection((prev) => ({
+                            itemIds: prev.itemIds.filter(
+                              (id) => id !== item.id,
+                            ),
+                            shapeIds: prev.shapeIds,
+                            textIds: prev.textIds,
+                            strokeIds: prev.strokeIds,
+                          }));
+                        }}
+                        aria-label={
+                          isVideo
+                            ? t("desk.removeVideo")
+                            : t("desk.removeImage")
+                        }
+                      >
+                        ×
+                      </button>
                       <div
-                        className="board-item-rotate"
-                        title={t("desk.rotate")}
-                        aria-label={t("desk.rotate")}
-                        onPointerDown={(e) => startItemRotate(e, item)}
+                        className="board-item-resize"
+                        onPointerDown={(e) =>
+                          handleItemPointerDown(e, item, "resize")
+                        }
                       />
-                    )}
+                      {!isVideo &&
+                        singleImageSelection === item.id &&
+                        !item.locked && (
+                          <div
+                            className="board-item-rotate"
+                            title={t("desk.rotate")}
+                            aria-label={t("desk.rotate")}
+                            onPointerDown={(e) => startItemRotate(e, item)}
+                          />
+                        )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
+              );
             })}
             <BoardShapesLayer
               canvasWidth={canvasWidth}
@@ -311,15 +350,31 @@ export function ImageBoard(props: ImageBoardProps) {
               onTextPointerDown={handleTextPointerDown}
               onTextContextMenu={(e, text) => {
                 const next =
-                  selection.textIds.includes(text.id) && selectionCount(selection) > 0
+                  selection.textIds.includes(text.id) &&
+                  selectionCount(selection) > 0
                     ? selection
-                    : { itemIds: [], shapeIds: [], textIds: [text.id], strokeIds: [] };
-                openDeskObjectMenu(e.clientX, e.clientY, next, buildTextHref(sectionId, text.id));
+                    : {
+                        itemIds: [],
+                        shapeIds: [],
+                        textIds: [text.id],
+                        strokeIds: [],
+                      };
+                openDeskObjectMenu(
+                  e.clientX,
+                  e.clientY,
+                  next,
+                  buildTextHref(sectionId, text.id),
+                );
               }}
               onTextDoubleClick={(textId) => {
                 const text = texts.find((t) => t.id === textId);
                 if (text?.locked) return;
-                setSelection({ itemIds: [], shapeIds: [], textIds: [textId], strokeIds: [] });
+                setSelection({
+                  itemIds: [],
+                  shapeIds: [],
+                  textIds: [textId],
+                  strokeIds: [],
+                });
                 setEditingTextId(textId);
               }}
               onTextCommit={commitTextContent}
@@ -339,8 +394,12 @@ export function ImageBoard(props: ImageBoardProps) {
                 style={{
                   left: Math.min(marqueePreview.start.x, marqueePreview.end.x),
                   top: Math.min(marqueePreview.start.y, marqueePreview.end.y),
-                  width: Math.abs(marqueePreview.end.x - marqueePreview.start.x),
-                  height: Math.abs(marqueePreview.end.y - marqueePreview.start.y),
+                  width: Math.abs(
+                    marqueePreview.end.x - marqueePreview.start.x,
+                  ),
+                  height: Math.abs(
+                    marqueePreview.end.y - marqueePreview.start.y,
+                  ),
                 }}
               />
             )}

@@ -1,5 +1,13 @@
-import { boardBoxBounds, resolveBoardPoint } from "@/features/board/lib/boardGeometry";
-import type { BoardItem, BoardPoint, BoardShape, BoardShapeType } from "@/shared/types";
+import {
+  boardBoxBounds,
+  resolveBoardPoint,
+} from "@/features/board/lib/boardGeometry";
+import type {
+  BoardItem,
+  BoardPoint,
+  BoardShape,
+  BoardShapeType,
+} from "@/shared/types";
 
 const SHAPE_LINE_HIT_WIDTH = 14;
 const SHAPE_BOX_HIT_PAD = 4;
@@ -17,7 +25,7 @@ interface BoardShapesLayerProps {
   onEndpointPointerDown: (
     e: React.PointerEvent,
     shapeId: string,
-    endpoint: "start" | "end"
+    endpoint: "start" | "end",
   ) => void;
 }
 
@@ -34,7 +42,7 @@ function ShapeView({
   onShapePointerDown: (e: React.PointerEvent) => void;
   onEndpointPointerDown: (
     e: React.PointerEvent,
-    endpoint: "start" | "end"
+    endpoint: "start" | "end",
   ) => void;
 }) {
   const a = resolveBoardPoint(shape.start, items);
@@ -48,7 +56,10 @@ function ShapeView({
     const hitX = x - SHAPE_BOX_HIT_PAD;
     const hitY = y - SHAPE_BOX_HIT_PAD;
     const hitWidth = Math.max(width + SHAPE_BOX_HIT_PAD * 2, SHAPE_BOX_MIN_HIT);
-    const hitHeight = Math.max(height + SHAPE_BOX_HIT_PAD * 2, SHAPE_BOX_MIN_HIT);
+    const hitHeight = Math.max(
+      height + SHAPE_BOX_HIT_PAD * 2,
+      SHAPE_BOX_MIN_HIT,
+    );
     return (
       <g
         className={`board-shape board-shape--box ${selected ? "selected" : ""}`}
@@ -82,8 +93,16 @@ function ShapeView({
         />
         {selected && (
           <>
-            <Handle cx={a.x} cy={a.y} onPointerDown={(e) => onEndpointPointerDown(e, "start")} />
-            <Handle cx={b.x} cy={b.y} onPointerDown={(e) => onEndpointPointerDown(e, "end")} />
+            <Handle
+              cx={a.x}
+              cy={a.y}
+              onPointerDown={(e) => onEndpointPointerDown(e, "start")}
+            />
+            <Handle
+              cx={b.x}
+              cy={b.y}
+              onPointerDown={(e) => onEndpointPointerDown(e, "end")}
+            />
           </>
         )}
       </g>
@@ -124,8 +143,16 @@ function ShapeView({
       />
       {selected && (
         <>
-          <Handle cx={a.x} cy={a.y} onPointerDown={(e) => onEndpointPointerDown(e, "start")} />
-          <Handle cx={b.x} cy={b.y} onPointerDown={(e) => onEndpointPointerDown(e, "end")} />
+          <Handle
+            cx={a.x}
+            cy={a.y}
+            onPointerDown={(e) => onEndpointPointerDown(e, "start")}
+          />
+          <Handle
+            cx={b.x}
+            cy={b.y}
+            onPointerDown={(e) => onEndpointPointerDown(e, "end")}
+          />
         </>
       )}
     </g>

@@ -1,6 +1,9 @@
 export {
   createDocument,
-  normalizeDocument,
   importAsNewProject,
+  normalizeDocument,
 } from "@/domain/document/document";
-export { loadDocument, saveDocument } from "@/infrastructure/persistence/webDocumentStorage";
+export {
+  loadDocument,
+  saveDocument,
+} from "@/infrastructure/persistence/webDocumentStorage";

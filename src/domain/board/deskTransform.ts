@@ -4,7 +4,7 @@ export function translateShapeForDrag(
   shape: BoardShape,
   dx: number,
   dy: number,
-  movedItemIds: Set<string>
+  movedItemIds: Set<string>,
 ): Pick<BoardShape, "start" | "end"> {
   const movePoint = (point: BoardPoint): BoardPoint => {
     if (point.attach?.itemId && movedItemIds.has(point.attach.itemId)) {

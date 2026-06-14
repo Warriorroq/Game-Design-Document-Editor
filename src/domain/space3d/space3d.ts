@@ -31,7 +31,12 @@ export function isGridEnabled(grid: Space3DGrid | undefined): boolean {
   return normalized.enabled === true && (normalized.step ?? 0) > 0;
 }
 
-function clampGridNumber(value: unknown, min: number, max: number, fallback: number): number {
+function clampGridNumber(
+  value: unknown,
+  min: number,
+  max: number,
+  fallback: number,
+): number {
   const n = typeof value === "number" ? value : Number(value);
   if (!Number.isFinite(n)) return fallback;
   return Math.min(max, Math.max(min, n));
@@ -50,7 +55,9 @@ function normalizeHexColor(value: unknown, fallback: string): string {
   return fallback;
 }
 
-export function normalizeSpace3DGrid(grid: Space3DGrid | undefined): Space3DGrid {
+export function normalizeSpace3DGrid(
+  grid: Space3DGrid | undefined,
+): Space3DGrid {
   const base = defaultSpace3DGrid();
   if (!grid) return base;
 
@@ -116,7 +123,9 @@ export function normalizeSpace3DObject(obj: Space3DObject): Space3DObject {
   };
 }
 
-export function normalizeSpace3DData(data: Space3DData | undefined): Space3DData {
+export function normalizeSpace3DData(
+  data: Space3DData | undefined,
+): Space3DData {
   const base = defaultSpace3DData();
   if (!data) return base;
   return {
@@ -134,7 +143,7 @@ export function isSpace3DSection(section: GddSection): boolean {
 
 export function createSpace3DPrimitive(
   type: "box" | "sphere",
-  index: number
+  index: number,
 ): Space3DObject {
   const offset = index * 1.5;
   return normalizeSpace3DObject({
@@ -152,7 +161,7 @@ export function createSpace3DPrimitive(
 
 export function createSpace3DModelObject(
   assetId: string,
-  index: number
+  index: number,
 ): Space3DObject {
   const offset = index * 2;
   return normalizeSpace3DObject({
@@ -168,7 +177,9 @@ export function createSpace3DModelObject(
   });
 }
 
-export function transformModeToControls(mode: Space3DEditMode): "translate" | "rotate" | "scale" {
+export function transformModeToControls(
+  mode: Space3DEditMode,
+): "translate" | "rotate" | "scale" {
   switch (mode) {
     case "scale":
       return "scale";

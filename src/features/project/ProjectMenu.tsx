@@ -1,14 +1,18 @@
-import { useEffect, useRef, useState, type ChangeEvent } from "react";
-import { useLocale } from "@/shared/context/LocaleContext";
-import { isDesktopApp } from "@/shared/lib/desktop";
-import { downloadGdeArchive, parseGdeArchive } from "@/features/project/lib/gdeArchive";
-import type { GitStatus } from "@/features/git/lib/git";
-import type { GddDocument } from "@/shared/types";
-import { useGitActions } from "@/features/git/hooks/useGitActions";
+import { type ChangeEvent, useEffect, useRef, useState } from "react";
+
 import { GitIndicators } from "@/features/git/components/GitIndicators";
+import { GitProgressDialog } from "@/features/git/components/GitProgressDialog";
 import { GitPromptDialog } from "@/features/git/components/GitPromptDialog";
 import { GitPullConfirmDialog } from "@/features/git/components/GitPullConfirmDialog";
-import { GitProgressDialog } from "@/features/git/components/GitProgressDialog";
+import { useGitActions } from "@/features/git/hooks/useGitActions";
+import type { GitStatus } from "@/features/git/lib/git";
+import {
+  downloadGdeArchive,
+  parseGdeArchive,
+} from "@/features/project/lib/gdeArchive";
+import { useLocale } from "@/shared/context/LocaleContext";
+import { isDesktopApp } from "@/shared/lib/desktop";
+import type { GddDocument } from "@/shared/types";
 
 interface ProjectMenuProps {
   doc: GddDocument;
@@ -54,8 +58,7 @@ export function ProjectMenu({
     onCloseMenu: () => setOpen(false),
   });
 
-  const showGitIndicators =
-    isDesktopApp && Boolean(folderPath) && gitAvailable;
+  const showGitIndicators = isDesktopApp && Boolean(folderPath) && gitAvailable;
 
   useEffect(() => {
     if (!open) return;
@@ -232,7 +235,9 @@ export function ProjectMenu({
                       type="button"
                       className="project-menu-item project-menu-item--nested"
                       role="menuitem"
-                      disabled={git.busy || git.syncProgress?.status === "running"}
+                      disabled={
+                        git.busy || git.syncProgress?.status === "running"
+                      }
                       onClick={git.handleCommitClick}
                     >
                       {t("git.commit")}
@@ -241,7 +246,9 @@ export function ProjectMenu({
                       type="button"
                       className="project-menu-item project-menu-item--nested"
                       role="menuitem"
-                      disabled={git.busy || git.syncProgress?.status === "running"}
+                      disabled={
+                        git.busy || git.syncProgress?.status === "running"
+                      }
                       onClick={() => void git.handleSetRemoteClick()}
                     >
                       {t("git.setRemote")}
@@ -250,7 +257,9 @@ export function ProjectMenu({
                       type="button"
                       className="project-menu-item project-menu-item--nested"
                       role="menuitem"
-                      disabled={git.busy || git.syncProgress?.status === "running"}
+                      disabled={
+                        git.busy || git.syncProgress?.status === "running"
+                      }
                       onClick={git.handlePush}
                     >
                       {t("git.push")}
@@ -259,26 +268,32 @@ export function ProjectMenu({
                       type="button"
                       className="project-menu-item project-menu-item--nested"
                       role="menuitem"
-                      disabled={git.busy || git.syncProgress?.status === "running"}
+                      disabled={
+                        git.busy || git.syncProgress?.status === "running"
+                      }
                       onClick={git.handlePull}
                     >
                       {t("git.pull")}
                     </button>
-                    {git.dirty && gitStatus?.files && gitStatus.files.length > 0 && (
-                      <div className="git-menu-changes">
-                        <span className="git-menu-changes-label">
-                          {t("git.changes")}
-                        </span>
-                        <ul>
-                          {gitStatus.files.slice(0, 6).map((file) => (
-                            <li key={`${file.status}-${file.path}`}>
-                              <span className="git-file-status">{file.status}</span>
-                              {file.path}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
+                    {git.dirty &&
+                      gitStatus?.files &&
+                      gitStatus.files.length > 0 && (
+                        <div className="git-menu-changes">
+                          <span className="git-menu-changes-label">
+                            {t("git.changes")}
+                          </span>
+                          <ul>
+                            {gitStatus.files.slice(0, 6).map((file) => (
+                              <li key={`${file.status}-${file.path}`}>
+                                <span className="git-file-status">
+                                  {file.status}
+                                </span>
+                                {file.path}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                   </>
                 )}
               </>

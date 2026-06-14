@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, type RefObject } from "react";
+import { type RefObject, useEffect, useLayoutEffect, useRef } from "react";
 
 const SAVE_DEBOUNCE_MS = 300;
 
@@ -13,11 +13,13 @@ export function useSectionEditorScroll(
   scrollRef: RefObject<HTMLDivElement | null>,
   sectionId: string,
   savedScrollTop: number | undefined,
-  onSaveScrollTop: (sectionId: string, scrollTop: number) => void
+  onSaveScrollTop: (sectionId: string, scrollTop: number) => void,
 ) {
   const prevSectionIdRef = useRef<string | null>(null);
   const scrollBySectionRef = useRef(new Map<string, number>());
-  const pendingTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const pendingTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
   const onSaveScrollTopRef = useRef(onSaveScrollTop);
   onSaveScrollTopRef.current = onSaveScrollTop;
 

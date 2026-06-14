@@ -1,4 +1,11 @@
-const { app, BrowserWindow, Menu, ipcMain, dialog, session } = require("electron");
+const {
+  app,
+  BrowserWindow,
+  Menu,
+  ipcMain,
+  dialog,
+  session,
+} = require("electron");
 const fs = require("fs");
 const path = require("path");
 const git = require("./git.cjs");
@@ -152,8 +159,7 @@ function registerIpcHandlers(win) {
     const parsedIdentity =
       identity && typeof identity === "object"
         ? {
-            name:
-              typeof identity.name === "string" ? identity.name.trim() : "",
+            name: typeof identity.name === "string" ? identity.name.trim() : "",
             email:
               typeof identity.email === "string" ? identity.email.trim() : "",
           }
@@ -310,12 +316,15 @@ function configureEmbedReferrer() {
     ],
   };
 
-  session.defaultSession.webRequest.onBeforeSendHeaders(filter, (details, callback) => {
-    const headers = { ...details.requestHeaders };
-    // file:// app pages send no Referer; YouTube embeds require one (error 153).
-    headers.Referer = embedReferer;
-    callback({ requestHeaders: headers });
-  });
+  session.defaultSession.webRequest.onBeforeSendHeaders(
+    filter,
+    (details, callback) => {
+      const headers = { ...details.requestHeaders };
+      // file:// app pages send no Referer; YouTube embeds require one (error 153).
+      headers.Referer = embedReferer;
+      callback({ requestHeaders: headers });
+    },
+  );
 }
 
 if (gotSingleInstanceLock) {

@@ -1,4 +1,9 @@
-import type { BoardItem, BoardText, GddDocument, GddSection } from "@/shared/types";
+import type {
+  BoardItem,
+  BoardText,
+  GddDocument,
+  GddSection,
+} from "@/shared/types";
 
 export type GddLink =
   | { type: "section"; sectionId: string }
@@ -74,7 +79,7 @@ export function parseGddHref(href: string): GddLink | null {
 
 export function findSection(
   doc: GddDocument,
-  sectionId: string
+  sectionId: string,
 ): GddSection | undefined {
   return doc.sections.find((s) => s.id === sectionId);
 }
@@ -82,7 +87,7 @@ export function findSection(
 export function findBoardItem(
   doc: GddDocument,
   sectionId: string,
-  itemId: string
+  itemId: string,
 ): BoardItem | undefined {
   return findSection(doc, sectionId)?.board.find((b) => b.id === itemId);
 }
@@ -90,7 +95,7 @@ export function findBoardItem(
 export function findBoardText(
   doc: GddDocument,
   sectionId: string,
-  textId: string
+  textId: string,
 ): BoardText | undefined {
   return findSection(doc, sectionId)?.texts.find((t) => t.id === textId);
 }
@@ -118,11 +123,15 @@ export function suggestLinkText(doc: GddDocument, href: string): string {
     const item = section.board.find((b) => b.id === link.itemId);
     const idx = section.board.findIndex((b) => b.id === link.itemId);
     const label = item?.kind === "video" ? "Video" : "Image";
-    return idx >= 0 ? `${label} ${idx + 1} · ${section.title}` : `${label} · ${section.title}`;
+    return idx >= 0
+      ? `${label} ${idx + 1} · ${section.title}`
+      : `${label} · ${section.title}`;
   }
 
   if (link.type === "text") {
-    const label = section.texts.find((t) => t.id === link.textId)?.content.trim();
+    const label = section.texts
+      .find((t) => t.id === link.textId)
+      ?.content.trim();
     if (label) {
       const short = label.replace(/\s+/g, " ").slice(0, 48);
       return short;
@@ -139,7 +148,8 @@ export function suggestLinkText(doc: GddDocument, href: string): string {
         const tag = el.tagName.toLowerCase();
         const text = (el.textContent ?? "").replace(/\s+/g, " ").trim();
         if (text) return text.slice(0, 80);
-        if (tag.startsWith("h")) return `${tag.toUpperCase()} · ${section.title}`;
+        if (tag.startsWith("h"))
+          return `${tag.toUpperCase()} · ${section.title}`;
       }
     }
     return `Block · ${section.title}`;

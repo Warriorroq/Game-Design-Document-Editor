@@ -90,9 +90,7 @@ export function applyEditorFormat(root: HTMLElement, action: FormatAction) {
 export function editorHasTextSelection(root: HTMLElement): boolean {
   const sel = window.getSelection();
   if (!sel || sel.isCollapsed || !sel.rangeCount) return false;
-  return (
-    root.contains(sel.anchorNode) && root.contains(sel.focusNode)
-  );
+  return root.contains(sel.anchorNode) && root.contains(sel.focusNode);
 }
 
 export function getEditorSelectionColor(root: HTMLElement): string | null {

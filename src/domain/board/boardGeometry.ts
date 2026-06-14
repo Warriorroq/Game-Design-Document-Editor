@@ -6,7 +6,7 @@ const CORNERS: BoardEdge[] = ["nw", "ne", "sw", "se"];
 
 export function pointFromAttach(
   item: BoardItem,
-  attach: BoardAttach
+  attach: BoardAttach,
 ): { x: number; y: number } {
   const { x, y, width: w, height: h } = item;
   const t = attach.t ?? 0.5;
@@ -36,7 +36,7 @@ export function pointFromAttach(
 
 export function resolveBoardPoint(
   point: BoardPoint,
-  items: BoardItem[]
+  items: BoardItem[],
 ): { x: number; y: number } {
   if (!point.attach) return { x: point.x, y: point.y };
   const item = items.find((i) => i.id === point.attach!.itemId);
@@ -59,7 +59,7 @@ function distToSegment(
   x1: number,
   y1: number,
   x2: number,
-  y2: number
+  y2: number,
 ): { dist: number; t: number } {
   const dx = x2 - x1;
   const dy = y2 - y1;
@@ -77,7 +77,7 @@ function hitsForItem(
   px: number,
   py: number,
   item: BoardItem,
-  threshold: number
+  threshold: number,
 ): EdgeHit[] {
   const { x, y, width: w, height: h } = item;
   const hits: EdgeHit[] = [];
@@ -87,7 +87,7 @@ function hitsForItem(
     x1: number,
     y1: number,
     x2: number,
-    y2: number
+    y2: number,
   ) => {
     const { dist, t } = distToSegment(px, py, x1, y1, x2, y2);
     if (dist <= threshold) {
@@ -132,7 +132,7 @@ export function snapBoardPoint(
   x: number,
   y: number,
   items: BoardItem[],
-  threshold = 14
+  threshold = 14,
 ): BoardPoint {
   let best: EdgeHit | null = null;
 
@@ -148,7 +148,11 @@ export function snapBoardPoint(
     itemId: best.itemId,
     edge: best.edge,
   };
-  if (best.t !== undefined && !CORNERS.includes(best.edge) && best.edge !== "center") {
+  if (
+    best.t !== undefined &&
+    !CORNERS.includes(best.edge) &&
+    best.edge !== "center"
+  ) {
     attach.t = best.t;
   }
 
@@ -157,7 +161,7 @@ export function snapBoardPoint(
 
 export function boardBoxBounds(
   start: { x: number; y: number },
-  end: { x: number; y: number }
+  end: { x: number; y: number },
 ) {
   const x = Math.min(start.x, end.x);
   const y = Math.min(start.y, end.y);

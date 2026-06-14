@@ -1,5 +1,5 @@
-import type { ShortcutActionId } from "@/shared/lib/shortcuts";
 import type { MessageKey } from "@/shared/i18n/messages";
+import type { ShortcutActionId } from "@/shared/lib/shortcuts";
 
 export function shortcutLabelKey(id: ShortcutActionId): MessageKey {
   return `shortcut.${id}.label` as MessageKey;
