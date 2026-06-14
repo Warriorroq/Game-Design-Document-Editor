@@ -5,6 +5,8 @@ repos:
       - id: check-merge-conflict
       - id: check-added-large-files
         args: [--maxkb=500]
+      - id: check-json
+        files: \.json$
       - id: mixed-line-ending
         args: [--fix=lf]
 
@@ -27,4 +29,5 @@ repos:
         entry: npm run typecheck
         language: system
         pass_filenames: false
+        files: \.(ts|tsx)$
         stages: [pre-commit]
