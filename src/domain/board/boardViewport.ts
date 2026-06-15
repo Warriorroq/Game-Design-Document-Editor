@@ -15,7 +15,7 @@ export function minBoardScale(
   viewW: number,
   viewH: number,
   canvasW: number,
-  canvasH: number,
+  canvasH: number
 ): number {
   if (viewW <= 0 || viewH <= 0 || canvasW <= 0 || canvasH <= 0) return 0.15;
   return Math.max(viewW / canvasW, viewH / canvasH);
@@ -26,14 +26,14 @@ export function constrainBoardViewport(
   viewW: number,
   viewH: number,
   canvasW: number,
-  canvasH: number,
+  canvasH: number
 ): BoardViewport {
   if (viewW <= 0 || viewH <= 0) return viewport;
 
   const scale = clamp(
     viewport.scale,
     minBoardScale(viewW, viewH, canvasW, canvasH),
-    BOARD_MAX_SCALE,
+    BOARD_MAX_SCALE
   );
   const contentW = canvasW * scale;
   const contentH = canvasH * scale;
@@ -60,11 +60,11 @@ export function fitBoardViewport(
   viewW: number,
   viewH: number,
   canvasW: number,
-  canvasH: number,
+  canvasH: number
 ): BoardViewport {
   const scale = Math.max(
     minBoardScale(viewW, viewH, canvasW, canvasH),
-    INITIAL_BOARD_SCALE,
+    INITIAL_BOARD_SCALE
   );
   return constrainBoardViewport(
     {
@@ -75,6 +75,6 @@ export function fitBoardViewport(
     viewW,
     viewH,
     canvasW,
-    canvasH,
+    canvasH
   );
 }

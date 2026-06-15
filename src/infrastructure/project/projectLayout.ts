@@ -128,7 +128,7 @@ function extensionForMime(mime: string): string {
 }
 
 function parseDataUrl(
-  src: string,
+  src: string
 ): { mime: string; dataBase64: string } | null {
   const match = /^data:([^;]+);base64,(.+)$/s.exec(src);
   if (!match) return null;
@@ -149,7 +149,7 @@ function assetFilePath(assetId: string, mime: string): string {
 
 function registryAssetToFolder(
   asset: { id: string; src: string },
-  assets: Map<string, FolderAsset>,
+  assets: Map<string, FolderAsset>
 ): void {
   const parsed = parseDataUrl(asset.src);
   if (!parsed) return;
@@ -166,7 +166,7 @@ function registryAssetToFolder(
 
 function collectBoardImageRegistryAssets(
   doc: GddDocument,
-  assets: Map<string, FolderAsset>,
+  assets: Map<string, FolderAsset>
 ): void {
   for (const asset of Object.values(doc.boardImages ?? {})) {
     registryAssetToFolder(asset, assets);
@@ -175,7 +175,7 @@ function collectBoardImageRegistryAssets(
 
 function collectSpace3DModelRegistryAssetsToFolder(
   doc: GddDocument,
-  assets: Map<string, FolderAsset>,
+  assets: Map<string, FolderAsset>
 ): void {
   for (const asset of collectSpace3DModelRegistryAssets(doc)) {
     registryAssetToFolder(asset, assets);
@@ -185,7 +185,7 @@ function collectSpace3DModelRegistryAssetsToFolder(
 function boardItemToFile(
   doc: GddDocument,
   item: BoardItem,
-  assets: Map<string, FolderAsset>,
+  assets: Map<string, FolderAsset>
 ): SectionFileBoardItem {
   if (isBoardVideoItem(item)) {
     const embedUrl = item.src;
@@ -210,7 +210,7 @@ function boardItemToFile(
   const assetId =
     item.assetId ??
     Object.entries(doc.boardImages ?? {}).find(
-      ([, asset]) => asset.src === src,
+      ([, asset]) => asset.src === src
     )?.[0];
   if (!assetId) {
     throw new Error(`Board item ${item.id} has no asset id`);
@@ -261,7 +261,7 @@ function boardItemToFile(
 function boardItemFromFile(
   item: SectionFileBoardItem,
   assetMap: Map<string, FolderAsset>,
-  registry: Record<string, BoardImageAsset>,
+  registry: Record<string, BoardImageAsset>
 ): BoardItem | null {
   if (item.kind === "video" && item.embedUrl) {
     return {
@@ -302,7 +302,7 @@ function boardItemFromFile(
 }
 
 export function documentToFolderPayload(
-  doc: GddDocument,
+  doc: GddDocument
 ): FolderProjectPayload {
   const updated = migrateBoardImages({
     ...doc,
@@ -329,7 +329,7 @@ export function documentToFolderPayload(
         ? { boardViewport: section.boardViewport }
         : {}),
       board: section.board.map((item) =>
-        boardItemToFile(updated, item, assets),
+        boardItemToFile(updated, item, assets)
       ),
       shapes: section.shapes,
       strokes: section.strokes,
@@ -391,7 +391,7 @@ export function documentToFolderPayload(
 }
 
 export function folderPayloadToDocument(
-  payload: FolderProjectPayload,
+  payload: FolderProjectPayload
 ): GddDocument {
   let manifest: ManifestFile;
   try {
@@ -408,10 +408,10 @@ export function folderPayloadToDocument(
   const boardImages: Record<string, BoardImageAsset> = {};
   const space3DModels: Record<string, Space3DModelAsset> = {};
   const modelMetaIds = new Set(
-    (manifest.space3DModels ?? []).map((meta) => meta.id),
+    (manifest.space3DModels ?? []).map((meta) => meta.id)
   );
   const sectionById = new Map(
-    payload.sections.map((entry) => [entry.id, entry.content]),
+    payload.sections.map((entry) => [entry.id, entry.content])
   );
 
   const sections: GddSection[] = manifest.sections
@@ -490,14 +490,14 @@ export function folderPayloadToDocument(
         order: folder.order,
         parentFolderId: folder.parentFolderId,
         collapsed: folder.collapsed,
-      }),
+      })
     ),
     sections,
   });
 }
 
 export function documentToFolderFiles(
-  doc: GddDocument,
+  doc: GddDocument
 ): Map<string, string | Uint8Array> {
   const payload = documentToFolderPayload(doc);
   const files = new Map<string, string | Uint8Array>();
@@ -507,7 +507,7 @@ export function documentToFolderFiles(
   }
   for (const asset of payload.assets) {
     const binary = Uint8Array.from(atob(asset.dataBase64), (c) =>
-      c.charCodeAt(0),
+      c.charCodeAt(0)
     );
     files.set(asset.path, binary);
   }
@@ -515,7 +515,7 @@ export function documentToFolderFiles(
 }
 
 export function folderFilesToDocument(
-  files: Map<string, string | Uint8Array>,
+  files: Map<string, string | Uint8Array>
 ): GddDocument {
   const manifest = files.get(MANIFEST_FILE);
   if (typeof manifest !== "string") {

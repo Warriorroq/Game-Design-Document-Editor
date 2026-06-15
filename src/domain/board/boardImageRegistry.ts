@@ -4,7 +4,7 @@ import type { BoardImageAsset, BoardItem, GddDocument } from "@/domain/types";
 const ASSETS_DIR = "assets";
 
 function parseDataUrl(
-  src: string,
+  src: string
 ): { mime: string; dataBase64: string } | null {
   const match = /^data:([^;]+);base64,(.+)$/s.exec(src);
   if (!match) return null;
@@ -40,7 +40,7 @@ export function resolveBoardItemSrc(doc: GddDocument, item: BoardItem): string {
 
 export function registerBoardImage(
   doc: GddDocument,
-  src: string,
+  src: string
 ): { doc: GddDocument; assetId: string } {
   const key = boardImageContentKey(src);
   const images = { ...(doc.boardImages ?? {}) };
@@ -61,7 +61,7 @@ export function registerBoardImage(
 
 export function prepareBoardItemForDoc(
   doc: GddDocument,
-  item: BoardItem,
+  item: BoardItem
 ): { doc: GddDocument; item: BoardItem } {
   if (isBoardVideoItem(item)) {
     if (!item.src) {
@@ -87,7 +87,7 @@ export function prepareBoardItemForDoc(
 
 export function prepareBoardItemsForDoc(
   doc: GddDocument,
-  items: BoardItem[],
+  items: BoardItem[]
 ): { doc: GddDocument; items: BoardItem[] } {
   let next = doc;
   const prepared: BoardItem[] = [];
@@ -175,7 +175,7 @@ export function normalizeAssetName(input: string): string | null {
 
 export function listBoardImageAssetReferences(
   doc: GddDocument,
-  assetId: string,
+  assetId: string
 ): BoardImageAssetReference[] {
   const refs: BoardImageAssetReference[] = [];
   for (const section of doc.sections) {
@@ -194,7 +194,7 @@ export function listBoardImageAssetReferences(
 
 export function listBoardImageAssetDesks(
   doc: GddDocument,
-  assetId: string,
+  assetId: string
 ): BoardImageAssetDeskReference[] {
   const bySection = new Map<string, BoardImageAssetDeskReference>();
   for (const section of doc.sections) {
@@ -214,7 +214,7 @@ export function listBoardImageAssetDesks(
 
 export function countBoardImageAssetUsage(
   doc: GddDocument,
-  assetId: string,
+  assetId: string
 ): number {
   return listBoardImageAssetReferences(doc, assetId).length;
 }
@@ -222,7 +222,7 @@ export function countBoardImageAssetUsage(
 export function updateBoardImageAssetName(
   doc: GddDocument,
   assetId: string,
-  name: string,
+  name: string
 ): GddDocument {
   const trimmed = name.trim();
   if (trimmed.length > 200) {
@@ -249,7 +249,7 @@ export function updateBoardImageAssetName(
 
 export function deleteBoardImageAsset(
   doc: GddDocument,
-  assetId: string,
+  assetId: string
 ): GddDocument {
   const images = doc.boardImages;
   if (!images?.[assetId]) return doc;
@@ -290,7 +290,7 @@ export function pruneUnusedBoardImages(doc: GddDocument): GddDocument {
 export function collectBoardImageAsset(
   registry: Record<string, BoardImageAsset>,
   assetId: string,
-  src: string,
+  src: string
 ): void {
   if (!registry[assetId]) {
     registry[assetId] = { id: assetId, src };

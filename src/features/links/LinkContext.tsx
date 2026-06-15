@@ -63,7 +63,7 @@ export function LinkProvider({
 }) {
   const [linkTarget, setLinkTarget] = useState<LinkTarget | null>(null);
   const [contextMenu, setContextMenu] = useState<ContextMenuRequest | null>(
-    null,
+    null
   );
   const [pasteDialog, setPasteDialog] = useState<PasteLinkRequest | null>(null);
 
@@ -86,7 +86,7 @@ export function LinkProvider({
       setLinkTarget(target);
       return true;
     },
-    [setActiveSectionId],
+    [setActiveSectionId]
   );
 
   const copyHref = useCallback(async (href: string) => {
@@ -134,7 +134,7 @@ export function LinkProvider({
       openPasteDialog,
       closePasteDialog,
       setActiveSectionId,
-    ],
+    ]
   );
 
   return <LinkContext.Provider value={value}>{children}</LinkContext.Provider>;

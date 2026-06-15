@@ -25,7 +25,7 @@ interface BoardShapesLayerProps {
   onEndpointPointerDown: (
     e: React.PointerEvent,
     shapeId: string,
-    endpoint: "start" | "end",
+    endpoint: "start" | "end"
   ) => void;
 }
 
@@ -42,7 +42,7 @@ function ShapeView({
   onShapePointerDown: (e: React.PointerEvent) => void;
   onEndpointPointerDown: (
     e: React.PointerEvent,
-    endpoint: "start" | "end",
+    endpoint: "start" | "end"
   ) => void;
 }) {
   const a = resolveBoardPoint(shape.start, items);
@@ -58,7 +58,7 @@ function ShapeView({
     const hitWidth = Math.max(width + SHAPE_BOX_HIT_PAD * 2, SHAPE_BOX_MIN_HIT);
     const hitHeight = Math.max(
       height + SHAPE_BOX_HIT_PAD * 2,
-      SHAPE_BOX_MIN_HIT,
+      SHAPE_BOX_MIN_HIT
     );
     return (
       <g

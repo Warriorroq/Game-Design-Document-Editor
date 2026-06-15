@@ -244,7 +244,7 @@ export function ImageBoard(props: ImageBoardProps) {
                       e.clientX,
                       e.clientY,
                       next,
-                      buildMediaHref(sectionId, item.id),
+                      buildMediaHref(sectionId, item.id)
                     );
                   }}
                 >
@@ -296,7 +296,7 @@ export function ImageBoard(props: ImageBoardProps) {
                           onRemove(item.id);
                           setSelection((prev) => ({
                             itemIds: prev.itemIds.filter(
-                              (id) => id !== item.id,
+                              (id) => id !== item.id
                             ),
                             shapeIds: prev.shapeIds,
                             textIds: prev.textIds,
@@ -363,7 +363,7 @@ export function ImageBoard(props: ImageBoardProps) {
                   e.clientX,
                   e.clientY,
                   next,
-                  buildTextHref(sectionId, text.id),
+                  buildTextHref(sectionId, text.id)
                 );
               }}
               onTextDoubleClick={(textId) => {
@@ -395,10 +395,10 @@ export function ImageBoard(props: ImageBoardProps) {
                   left: Math.min(marqueePreview.start.x, marqueePreview.end.x),
                   top: Math.min(marqueePreview.start.y, marqueePreview.end.y),
                   width: Math.abs(
-                    marqueePreview.end.x - marqueePreview.start.x,
+                    marqueePreview.end.x - marqueePreview.start.x
                   ),
                   height: Math.abs(
-                    marqueePreview.end.y - marqueePreview.start.y,
+                    marqueePreview.end.y - marqueePreview.start.y
                   ),
                 }}
               />

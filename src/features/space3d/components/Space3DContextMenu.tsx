@@ -87,6 +87,6 @@ export function Space3DContextMenu({
         {t("space3d.remove")}
       </button>
     </div>,
-    document.body,
+    document.body
   );
 }

@@ -189,13 +189,13 @@ export function EditorLayout({
     (sectionId: string, scrollTop: number) => {
       onUpdateSectionViewState(sectionId, { editorScrollTop: scrollTop });
     },
-    [onUpdateSectionViewState],
+    [onUpdateSectionViewState]
   );
   useSectionEditorScroll(
     editorScrollRef,
     activeSectionId,
     activeSection?.editorScrollTop,
-    saveEditorScrollTop,
+    saveEditorScrollTop
   );
 
   return (
@@ -385,7 +385,7 @@ export function EditorLayout({
                       itemIds,
                       shapeIds,
                       textIds,
-                      strokeIds,
+                      strokeIds
                     )
                   }
                   resolveItemSrc={(item) => resolveBoardItemSrc(doc, item)}

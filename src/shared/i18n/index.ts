@@ -40,7 +40,7 @@ export type TranslateParams = Record<string, string | number>;
 export function translate(
   lang: AppLanguage,
   key: MessageKey,
-  params?: TranslateParams,
+  params?: TranslateParams
 ): string {
   let text = MESSAGES[lang][key] ?? MESSAGES.en[key] ?? key;
   if (params) {

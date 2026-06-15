@@ -77,7 +77,7 @@ export function AppMain(props: DocumentStore) {
   const [imageAssetsOpen, setImageAssetsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFocus, setSearchFocus] = useState<SearchFocusTarget | null>(
-    null,
+    null
   );
   const lastSearchResultRef = useRef<{
     key: string;
@@ -89,7 +89,7 @@ export function AppMain(props: DocumentStore) {
   const { sidebarVisible, toggleSidebar } = useSidebarVisible();
   const searchResults = useMemo(
     () => searchDocument(doc, searchQuery, language),
-    [doc, searchQuery, language],
+    [doc, searchQuery, language]
   );
   const {
     mainRef,
@@ -151,7 +151,7 @@ export function AppMain(props: DocumentStore) {
         lastSearchResultRef.current = null;
       }
     },
-    [navigateToHref, searchQuery],
+    [navigateToHref, searchQuery]
   );
 
   useEffect(() => {
@@ -170,16 +170,16 @@ export function AppMain(props: DocumentStore) {
       projectFolder.closeFolder();
       replaceDocument(importAsNewProject(incoming));
     },
-    [projectFolder, replaceDocument],
+    [projectFolder, replaceDocument]
   );
 
   const handleDesktopArchiveError = useCallback(
     (message: string) => {
       window.alert(
-        message === "read_failed" ? t("project.readError") : message,
+        message === "read_failed" ? t("project.readError") : message
       );
     },
-    [t],
+    [t]
   );
 
   useDesktopArchiveOpen(handleImportProject, handleDesktopArchiveError);
@@ -231,7 +231,7 @@ export function AppMain(props: DocumentStore) {
     if (!projectFolder.folderPath) return;
     try {
       const imported = await projectFolder.loadFromFolder(
-        projectFolder.folderPath,
+        projectFolder.folderPath
       );
       replaceDocument(imported);
     } catch (err) {

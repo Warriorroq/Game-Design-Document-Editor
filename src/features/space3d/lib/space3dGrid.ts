@@ -64,15 +64,15 @@ function hexToColor(hex: string, fallback: number): THREE.Color {
 
 function applyGridMaterialUniforms(
   material: THREE.ShaderMaterial,
-  grid: Space3DGrid,
+  grid: Space3DGrid
 ) {
   const step = grid.step ?? 1;
   material.uniforms.uStep.value = step;
   material.uniforms.uCenterColor.value.copy(
-    hexToColor(grid.centerColor ?? "#3f3f46", 0x3f3f46),
+    hexToColor(grid.centerColor ?? "#3f3f46", 0x3f3f46)
   );
   material.uniforms.uLineColor.value.copy(
-    hexToColor(grid.lineColor ?? "#27272a", 0x27272a),
+    hexToColor(grid.lineColor ?? "#27272a", 0x27272a)
   );
 }
 
@@ -86,7 +86,7 @@ export function snapToGrid(value: number, step: number): number {
 
 export function snapTransformPatch(
   patch: Partial<Space3DObject>,
-  grid: Space3DGrid | undefined,
+  grid: Space3DGrid | undefined
 ): Partial<Space3DObject> {
   const step = grid?.step ?? 1;
   if (grid?.enabled !== true || !(step > 0)) return clampTransformPatch(patch);
@@ -121,7 +121,7 @@ export function createInfiniteGrid(grid: Space3DGrid): THREE.Mesh {
 
   const mesh = new THREE.Mesh(
     new THREE.PlaneGeometry(GRID_PLANE_SIZE, GRID_PLANE_SIZE),
-    material,
+    material
   );
   mesh.rotation.x = -Math.PI / 2;
   mesh.frustumCulled = false;
@@ -134,7 +134,7 @@ export function updateInfiniteGrid(
   mesh: THREE.Mesh,
   camera: THREE.Camera,
   target: THREE.Vector3,
-  grid: Space3DGrid,
+  grid: Space3DGrid
 ) {
   const step = grid.step ?? 1;
   if (!(step > 0)) return;

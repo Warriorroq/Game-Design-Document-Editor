@@ -5,7 +5,7 @@ import type { Space3DObject } from "@/domain/types";
 export const MIN_SCALE = 0.001;
 
 export function clampTransformPatch(
-  patch: Partial<Space3DObject>,
+  patch: Partial<Space3DObject>
 ): Partial<Space3DObject> {
   const next = { ...patch };
   for (const key of ["scaleX", "scaleY", "scaleZ"] as const) {
@@ -17,7 +17,7 @@ export function clampTransformPatch(
 }
 
 export function patchFromObject3D(
-  obj: THREE.Object3D,
+  obj: THREE.Object3D
 ): Pick<
   Space3DObject,
   | "x"
@@ -56,7 +56,7 @@ export function patchFromObject3D(
 
 export function applyObjectTransform(
   obj3d: THREE.Object3D,
-  obj: Space3DObject,
+  obj: Space3DObject
 ): void {
   obj3d.position.set(obj.x, obj.y, obj.z);
   const sx = Math.max(MIN_SCALE, Math.abs(obj.scaleX ?? 1));
@@ -66,7 +66,7 @@ export function applyObjectTransform(
   obj3d.rotation.set(
     THREE.MathUtils.degToRad(obj.rotationX ?? 0),
     THREE.MathUtils.degToRad(obj.rotationY ?? 0),
-    THREE.MathUtils.degToRad(obj.rotationZ ?? 0),
+    THREE.MathUtils.degToRad(obj.rotationZ ?? 0)
   );
 }
 

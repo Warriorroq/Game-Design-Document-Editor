@@ -14,7 +14,7 @@ function base64ToArrayBuffer(base64: string): ArrayBuffer {
 
 export function useDesktopArchiveOpen(
   onImport: (doc: GddDocument) => void,
-  onError: (message: string) => void,
+  onError: (message: string) => void
 ) {
   useEffect(() => {
     const projectApi = window.gddDesktop?.project;
@@ -28,7 +28,7 @@ export function useDesktopArchiveOpen(
           return;
         }
         const doc = await parseGdeArchive(
-          base64ToArrayBuffer(result.dataBase64),
+          base64ToArrayBuffer(result.dataBase64)
         );
         onImport(doc);
       } catch (err) {

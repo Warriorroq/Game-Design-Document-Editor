@@ -73,7 +73,7 @@ export function saveBoardSize(size: BoardSize): BoardSize {
 
 export function boardSizeMatchesPreset(
   size: BoardSize,
-  presetId: BoardSizePresetId,
+  presetId: BoardSizePresetId
 ): boolean {
   const preset = BOARD_SIZE_PRESETS[presetId];
   return size.width === preset.width && size.height === preset.height;

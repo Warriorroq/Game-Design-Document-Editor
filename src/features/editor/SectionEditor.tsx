@@ -102,14 +102,14 @@ export function SectionEditor({
 
     requestAnimationFrame(() => {
       const target = el.querySelector(
-        `#${CSS.escape(scrollToAnchorId)}`,
+        `#${CSS.escape(scrollToAnchorId)}`
       ) as HTMLElement | null;
       if (target) {
         target.scrollIntoView({ behavior: "smooth", block: "center" });
         target.classList.add("gdd-anchor-flash");
         window.setTimeout(
           () => target.classList.remove("gdd-anchor-flash"),
-          HIGHLIGHT_FLASH_MS,
+          HIGHLIGHT_FLASH_MS
         );
       }
       onScrollAnchorDone?.();
@@ -135,7 +135,7 @@ export function SectionEditor({
         cleanupHighlights = highlightQueryInElement(
           editorRef.current,
           query,
-          matchIndex,
+          matchIndex
         );
       } else if (
         kind === "anchor" &&
@@ -143,13 +143,13 @@ export function SectionEditor({
         editorRef.current
       ) {
         const target = editorRef.current.querySelector(
-          `#${CSS.escape(searchFocus.anchorId)}`,
+          `#${CSS.escape(searchFocus.anchorId)}`
         );
         if (target instanceof HTMLElement) {
           cleanupHighlights = highlightQueryInElement(
             target,
             query,
-            matchIndex,
+            matchIndex
           );
           flashElement(target, "gdd-anchor-flash");
         }
@@ -283,24 +283,24 @@ export function SectionEditor({
       if (!target) return;
 
       const addRowBtn = target.closest(
-        ".gdd-table-add-row",
+        ".gdd-table-add-row"
       ) as HTMLElement | null;
       const addColBtn = target.closest(
-        ".gdd-table-add-col",
+        ".gdd-table-add-col"
       ) as HTMLElement | null;
 
       const delRowBtn = target.closest(
-        ".gdd-table-del-row",
+        ".gdd-table-del-row"
       ) as HTMLElement | null;
       const delColBtn = target.closest(
-        ".gdd-table-del-col",
+        ".gdd-table-del-col"
       ) as HTMLElement | null;
 
       if (!addRowBtn && !addColBtn && !delRowBtn && !delColBtn) return;
 
       const wrap = target.closest(".gdd-table-wrap") as HTMLElement | null;
       const table = wrap?.querySelector(
-        "table.gdd-table",
+        "table.gdd-table"
       ) as HTMLTableElement | null;
       if (!table) return;
 
@@ -321,7 +321,7 @@ export function SectionEditor({
       deleteColFromDomTable,
       deleteRowFromDomTable,
       syncContent,
-    ],
+    ]
   );
 
   const handleTableControlMouseDown = useCallback((e: MouseEvent) => {
@@ -415,7 +415,7 @@ export function SectionEditor({
             editorRef.current,
             href,
             text,
-            savedSelectionRef.current,
+            savedSelectionRef.current
           );
           savedSelectionRef.current = null;
           syncContent();

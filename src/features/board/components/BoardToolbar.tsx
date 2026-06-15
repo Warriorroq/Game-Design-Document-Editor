@@ -27,7 +27,7 @@ interface BoardToolbarProps {
   onTextColorChange: (textIds: string[], color: string) => void;
   onTextStyleChange: (
     textIds: string[],
-    patch: Pick<BoardText, "bold" | "italic" | "strikethrough">,
+    patch: Pick<BoardText, "bold" | "italic" | "strikethrough">
   ) => void;
   onTextAlignChange: (textIds: string[], align: BoardTextAlign) => void;
 }

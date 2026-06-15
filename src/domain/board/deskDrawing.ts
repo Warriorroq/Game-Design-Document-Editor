@@ -24,7 +24,7 @@ export function shapeLongEnough(
   start: BoardPoint,
   end: BoardPoint,
   boardItems: BoardItem[],
-  type: BoardShapeType,
+  type: BoardShapeType
 ) {
   const a = resolveBoardPoint(start, boardItems);
   const b = resolveBoardPoint(end, boardItems);

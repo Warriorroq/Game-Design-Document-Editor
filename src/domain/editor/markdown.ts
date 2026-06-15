@@ -204,7 +204,7 @@ export function renderMarkdown(md: string): string {
       const trs = b.rows
         .map(
           (row) =>
-            `<tr>${row.map((c) => `<td>${renderInline(c)}</td>`).join("")}</tr>`,
+            `<tr>${row.map((c) => `<td>${renderInline(c)}</td>`).join("")}</tr>`
         )
         .join("");
       out.push(
@@ -217,7 +217,7 @@ export function renderMarkdown(md: string): string {
           `<button type='button' class='gdd-table-control gdd-table-del-row' contenteditable='false' tabindex='-1' aria-label='Delete row'>-</button>` +
           `<button type='button' class='gdd-table-control gdd-table-add-col' contenteditable='false' tabindex='-1' aria-label='Add column'>+</button>` +
           `<button type='button' class='gdd-table-control gdd-table-del-col' contenteditable='false' tabindex='-1' aria-label='Delete column'>-</button>` +
-          `</div>`,
+          `</div>`
       );
     }
   }

@@ -12,7 +12,7 @@ function reorderWithinSubset<T extends { id: string }>(
   arr: T[],
   id: string,
   predicate: (item: T) => boolean,
-  direction: Direction,
+  direction: Direction
 ): T[] {
   const subset = arr.filter(predicate);
   const idx = subset.findIndex((item) => item.id === id);
@@ -34,7 +34,7 @@ function reorderSelection<T extends { id: string }>(
   arr: T[],
   ids: string[],
   predicate: (item: T) => boolean,
-  direction: Direction,
+  direction: Direction
 ): T[] {
   const idSet = new Set(ids);
   const orderedIds = arr
@@ -48,7 +48,7 @@ function reorderSelection<T extends { id: string }>(
         result,
         orderedIds[i]!,
         predicate,
-        direction,
+        direction
       );
     }
   } else {
@@ -63,7 +63,7 @@ function canMoveInSubset<T extends { id: string }>(
   arr: T[],
   ids: string[],
   predicate: (item: T) => boolean,
-  direction: Direction,
+  direction: Direction
 ): boolean {
   const idSet = new Set(ids);
   const subset = arr.filter(predicate);
@@ -86,7 +86,7 @@ export interface DeskLayerState {
 export function reorderDeskLayer(
   state: DeskLayerState,
   selection: DeskSelection,
-  direction: Direction,
+  direction: Direction
 ): DeskLayerState {
   let { items, shapes, texts, strokes } = state;
 
@@ -97,17 +97,17 @@ export function reorderDeskLayer(
   if (selection.shapeIds.length > 0) {
     const shapeMap = new Map(shapes.map((s) => [s.id, s] as const));
     const boxIds = selection.shapeIds.filter(
-      (id) => shapeMap.get(id)?.type === "box",
+      (id) => shapeMap.get(id)?.type === "box"
     );
     const lineIds = selection.shapeIds.filter(
-      (id) => shapeMap.get(id)?.type !== "box",
+      (id) => shapeMap.get(id)?.type !== "box"
     );
     if (boxIds.length > 0) {
       shapes = reorderSelection(
         shapes,
         boxIds,
         (sh) => sh.type === "box",
-        direction,
+        direction
       );
     }
     if (lineIds.length > 0) {
@@ -115,7 +115,7 @@ export function reorderDeskLayer(
         shapes,
         lineIds,
         (sh) => sh.type !== "box",
-        direction,
+        direction
       );
     }
   }
@@ -129,7 +129,7 @@ export function reorderDeskLayer(
       strokes,
       selection.strokeIds,
       () => true,
-      direction,
+      direction
     );
   }
 
@@ -139,15 +139,15 @@ export function reorderDeskLayer(
 export function canReorderDeskLayer(
   state: DeskLayerState,
   selection: DeskSelection,
-  direction: Direction,
+  direction: Direction
 ): boolean {
   const { items, shapes, texts, strokes } = state;
   const shapeMap = new Map(shapes.map((s) => [s.id, s] as const));
   const boxIds = selection.shapeIds.filter(
-    (id) => shapeMap.get(id)?.type === "box",
+    (id) => shapeMap.get(id)?.type === "box"
   );
   const lineIds = selection.shapeIds.filter(
-    (id) => shapeMap.get(id)?.type !== "box",
+    (id) => shapeMap.get(id)?.type !== "box"
   );
 
   return (

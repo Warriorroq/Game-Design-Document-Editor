@@ -30,9 +30,9 @@ export function Space3DModelsDialog({
   const assets = useMemo(
     () =>
       Object.values(doc.space3DModels ?? {}).sort((a, b) =>
-        displaySpace3DModelName(a).localeCompare(displaySpace3DModelName(b)),
+        displaySpace3DModelName(a).localeCompare(displaySpace3DModelName(b))
       ),
-    [doc.space3DModels],
+    [doc.space3DModels]
   );
 
   useEffect(() => {
@@ -126,6 +126,6 @@ export function Space3DModelsDialog({
         </div>
       </div>
     </div>,
-    document.body,
+    document.body
   );
 }

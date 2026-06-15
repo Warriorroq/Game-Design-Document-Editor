@@ -22,7 +22,7 @@ export interface BoardRect {
 
 export function boardRectFromPoints(
   start: BoardPoint,
-  end: BoardPoint,
+  end: BoardPoint
 ): BoardRect {
   return boardBoxBounds(start, end);
 }
@@ -62,7 +62,7 @@ function shapeRect(shape: BoardShape, items: BoardItem[]): BoardRect {
   const pad = 4;
   return boardBoxBounds(
     { x: a.x - pad, y: a.y - pad },
-    { x: b.x + pad, y: b.y + pad },
+    { x: b.x + pad, y: b.y + pad }
   );
 }
 
@@ -91,7 +91,7 @@ function strokeRect(stroke: BoardStroke): BoardRect {
 
 function expandSelectionWithGroups(
   raw: DeskSelection,
-  groups: BoardGroup[],
+  groups: BoardGroup[]
 ): DeskSelection {
   let result: DeskSelection = {
     itemIds: [...raw.itemIds],
@@ -126,7 +126,7 @@ export function selectionFromMarqueeRect(
   strokes: BoardStroke[],
   groups: BoardGroup[],
   shiftKey: boolean,
-  prev: DeskSelection,
+  prev: DeskSelection
 ): DeskSelection {
   const raw: DeskSelection = {
     itemIds: items

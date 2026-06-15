@@ -24,7 +24,7 @@ export function ShortcutBindingInput({ actionId }: ShortcutBindingInputProps) {
 
   const binding = bindings[actionId];
   const defaultBinding = SHORTCUT_DEFINITIONS.find(
-    (d) => d.id === actionId,
+    (d) => d.id === actionId
   )!.defaultBinding;
   const isDefault = bindingsEqual(binding, defaultBinding);
 

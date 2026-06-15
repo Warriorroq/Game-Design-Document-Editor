@@ -13,12 +13,12 @@ export function useSectionEditorScroll(
   scrollRef: RefObject<HTMLDivElement | null>,
   sectionId: string,
   savedScrollTop: number | undefined,
-  onSaveScrollTop: (sectionId: string, scrollTop: number) => void,
+  onSaveScrollTop: (sectionId: string, scrollTop: number) => void
 ) {
   const prevSectionIdRef = useRef<string | null>(null);
   const scrollBySectionRef = useRef(new Map<string, number>());
   const pendingTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
-    undefined,
+    undefined
   );
   const onSaveScrollTopRef = useRef(onSaveScrollTop);
   onSaveScrollTopRef.current = onSaveScrollTop;

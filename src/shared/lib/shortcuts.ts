@@ -144,7 +144,7 @@ export function loadShortcutBindings(): Record<
 }
 
 export function saveShortcutBindings(
-  bindings: Record<ShortcutActionId, ShortcutBinding>,
+  bindings: Record<ShortcutActionId, ShortcutBinding>
 ): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(bindings));
@@ -161,7 +161,7 @@ export function normalizeEventKey(e: KeyboardEvent): string {
 }
 
 export function bindingFromKeyboardEvent(
-  e: KeyboardEvent,
+  e: KeyboardEvent
 ): ShortcutBinding | null {
   if (MODIFIER_KEYS.has(e.key)) return null;
   return {
@@ -184,7 +184,7 @@ export function bindingsEqual(a: ShortcutBinding, b: ShortcutBinding): boolean {
 export function findBindingConflict(
   bindings: Record<ShortcutActionId, ShortcutBinding>,
   actionId: ShortcutActionId,
-  candidate: ShortcutBinding,
+  candidate: ShortcutBinding
 ): ShortcutActionId | null {
   for (const id of SHORTCUT_ACTION_IDS) {
     if (id === actionId) continue;
@@ -195,7 +195,7 @@ export function findBindingConflict(
 
 export function eventMatchesBinding(
   e: KeyboardEvent,
-  binding: ShortcutBinding,
+  binding: ShortcutBinding
 ): boolean {
   const mod = e.ctrlKey || e.metaKey;
   if (binding.ctrlOrMeta !== mod) return false;

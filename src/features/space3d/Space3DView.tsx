@@ -71,7 +71,7 @@ export function Space3DView({
         },
       });
     },
-    [onChange, space3d],
+    [onChange, space3d]
   );
 
   const onObjectChange = useCallback(
@@ -80,11 +80,11 @@ export function Space3DView({
       const snapped = snapTransformPatch(clampTransformPatch(patch), grid);
       updateSpace3d({
         objects: space3d.objects.map((obj) =>
-          obj.id === objectId ? { ...obj, ...snapped } : obj,
+          obj.id === objectId ? { ...obj, ...snapped } : obj
         ),
       });
     },
-    [space3d.objects, space3d.grid, updateSpace3d],
+    [space3d.objects, space3d.grid, updateSpace3d]
   );
 
   const selectedObject =

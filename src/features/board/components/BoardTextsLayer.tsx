@@ -96,7 +96,7 @@ export function BoardTextsLayer({
                     e.preventDefault();
                     onTextCommit(
                       text.id,
-                      plainTextFromEditable(e.currentTarget),
+                      plainTextFromEditable(e.currentTarget)
                     );
                     onEditEnd();
                   }

@@ -57,7 +57,7 @@ export function LinkPreviewLayer() {
     const onOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement | null;
       const link = target?.closest(
-        "a.gdd-link, a[href^='gdd:'], a[href^='http']",
+        "a.gdd-link, a[href^='gdd:'], a[href^='http']"
       );
       if (!link || !(link instanceof HTMLAnchorElement)) {
         if (!anchorRef.current?.contains(target ?? null)) hide();
@@ -171,7 +171,7 @@ export function LinkPreviewLayer() {
     } else if (link.type === "anchor") {
       const frag = new DOMParser().parseFromString(
         section.content,
-        "text/html",
+        "text/html"
       );
       const el = frag.getElementById(link.anchorId);
       body = (

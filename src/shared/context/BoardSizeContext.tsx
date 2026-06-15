@@ -32,7 +32,7 @@ export function BoardSizeProvider({ children }: { children: ReactNode }) {
       height: size.height,
       setBoardSize,
     }),
-    [size.width, size.height, setBoardSize],
+    [size.width, size.height, setBoardSize]
   );
 
   return (

@@ -167,12 +167,12 @@ export function selectionIsInRoot(root: HTMLElement): boolean {
   const anchor = sel.anchorNode;
   const focus = sel.focusNode;
   return Boolean(
-    anchor && focus && root.contains(anchor) && root.contains(focus),
+    anchor && focus && root.contains(anchor) && root.contains(focus)
   );
 }
 
 export function getSelectionRichContent(
-  root: HTMLElement,
+  root: HTMLElement
 ): { html: string; plain: string } | null {
   if (!selectionIsInRoot(root)) return null;
   const sel = window.getSelection()!;
@@ -185,7 +185,7 @@ export function getSelectionRichContent(
 export function setClipboardRichContent(
   e: ClipboardEvent,
   html: string,
-  plain: string,
+  plain: string
 ): void {
   const data = e.clipboardData;
   if (!data) return;
@@ -209,7 +209,7 @@ export function deleteSelectionInRoot(root: HTMLElement): boolean {
 
 export function pasteRichContent(
   root: HTMLElement,
-  clipboard: DataTransfer,
+  clipboard: DataTransfer
 ): void {
   const html = clipboard.getData("text/html").trim();
   const plain = clipboard.getData("text/plain");

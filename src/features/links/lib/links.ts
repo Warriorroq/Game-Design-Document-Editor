@@ -79,7 +79,7 @@ export function parseGddHref(href: string): GddLink | null {
 
 export function findSection(
   doc: GddDocument,
-  sectionId: string,
+  sectionId: string
 ): GddSection | undefined {
   return doc.sections.find((s) => s.id === sectionId);
 }
@@ -87,7 +87,7 @@ export function findSection(
 export function findBoardItem(
   doc: GddDocument,
   sectionId: string,
-  itemId: string,
+  itemId: string
 ): BoardItem | undefined {
   return findSection(doc, sectionId)?.board.find((b) => b.id === itemId);
 }
@@ -95,7 +95,7 @@ export function findBoardItem(
 export function findBoardText(
   doc: GddDocument,
   sectionId: string,
-  textId: string,
+  textId: string
 ): BoardText | undefined {
   return findSection(doc, sectionId)?.texts.find((t) => t.id === textId);
 }

@@ -11,7 +11,7 @@ const BLOCK_TAGS = new Set([
 
 export function findBlockElement(
   node: Node | null,
-  root: HTMLElement,
+  root: HTMLElement
 ): HTMLElement | null {
   let current: Node | null = node;
   while (current && current !== root) {

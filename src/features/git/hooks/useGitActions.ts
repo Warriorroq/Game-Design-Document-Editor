@@ -49,7 +49,7 @@ export function useGitActions({
   const [promptKind, setPromptKind] = useState<GitPromptKind | null>(null);
   const [promptInitial, setPromptInitial] = useState("");
   const [syncProgress, setSyncProgress] = useState<GitSyncProgressState | null>(
-    null,
+    null
   );
   const [pullConfirmFiles, setPullConfirmFiles] = useState<
     GitFileStatus[] | null
@@ -103,7 +103,7 @@ export function useGitActions({
 
     if (result.ok) {
       setSyncProgress((prev) =>
-        prev ? { ...prev, status: "success", percent: 100 } : prev,
+        prev ? { ...prev, status: "success", percent: 100 } : prev
       );
       onRefreshStatus();
       if (operation === "pull") {
@@ -119,7 +119,7 @@ export function useGitActions({
             status: "error",
             error: formatGitError(result.error, t),
           }
-        : prev,
+        : prev
     );
   };
 

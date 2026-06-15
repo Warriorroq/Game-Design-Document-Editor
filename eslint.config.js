@@ -71,5 +71,5 @@ export default defineConfig(
       ...js.configs.recommended.rules,
     },
   },
-  eslintConfigPrettier,
+  eslintConfigPrettier
 );

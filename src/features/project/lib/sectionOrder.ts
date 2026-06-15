@@ -6,7 +6,7 @@ export function reorderSections(
   sections: GddSection[],
   activeId: string,
   overId: string,
-  position: SectionDropPosition,
+  position: SectionDropPosition
 ): GddSection[] {
   const sorted = [...sections].sort((a, b) => a.order - b.order);
   const fromIndex = sorted.findIndex((s) => s.id === activeId);

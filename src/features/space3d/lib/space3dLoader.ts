@@ -75,7 +75,7 @@ function loadGltf(src: string): Promise<THREE.Group> {
       src,
       (gltf) => resolve(prepareLoadedRoot(gltf.scene)),
       undefined,
-      reject,
+      reject
     );
   });
 }
@@ -86,7 +86,7 @@ function loadFbx(src: string): Promise<THREE.Group> {
       src,
       (object) => resolve(prepareLoadedRoot(object)),
       undefined,
-      reject,
+      reject
     );
   });
 }
@@ -97,7 +97,7 @@ function loadObj(src: string): Promise<THREE.Group> {
       src,
       (object) => resolve(prepareLoadedRoot(object)),
       undefined,
-      reject,
+      reject
     );
   });
 }

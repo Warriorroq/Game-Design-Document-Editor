@@ -113,7 +113,7 @@ export function GitSettingsPanel({
         if (gitStatus?.isRepo && accessToken.trim()) {
           const tokenResult = await storeGitAccessToken(
             folderPath,
-            accessToken.trim(),
+            accessToken.trim()
           );
           if (!tokenResult.ok) {
             setError(formatGitError(tokenResult.error, t));

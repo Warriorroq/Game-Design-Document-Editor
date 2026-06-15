@@ -27,7 +27,7 @@ function projectArchiveName(doc: GddDocument): string {
 }
 
 async function readZipFiles(
-  blob: Blob,
+  blob: Blob
 ): Promise<Map<string, string | Uint8Array>> {
   const zip = await JSZip.loadAsync(blob);
   const files = new Map<string, string | Uint8Array>();
@@ -61,7 +61,7 @@ export async function buildGdeArchive(doc: GddDocument): Promise<Blob> {
 }
 
 export async function parseGdeArchive(
-  input: Blob | ArrayBuffer,
+  input: Blob | ArrayBuffer
 ): Promise<GddDocument> {
   const blob = input instanceof Blob ? input : new Blob([input]);
   const bytes = new Uint8Array(await blob.arrayBuffer());

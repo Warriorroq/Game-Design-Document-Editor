@@ -14,13 +14,13 @@ function parentKey(folderId: string | null | undefined): string {
 
 function renumberSectionsInParent(
   sections: GddDocument["sections"],
-  folderId: string | null,
+  folderId: string | null
 ): GddDocument["sections"] {
   const siblings = sections
     .filter((section) => parentKey(section.folderId) === parentKey(folderId))
     .sort((a, b) => a.order - b.order);
   const orderMap = new Map(
-    siblings.map((section, index) => [section.id, index]),
+    siblings.map((section, index) => [section.id, index])
   );
   return sections.map((section) => {
     const order = orderMap.get(section.id);
@@ -29,7 +29,7 @@ function renumberSectionsInParent(
 }
 
 function normalizeFolders(
-  folders: GddSectionFolder[] | undefined,
+  folders: GddSectionFolder[] | undefined
 ): GddSectionFolder[] {
   const normalized = (folders ?? []).map((folder) => ({
     ...folder,
@@ -49,7 +49,7 @@ function normalizeFolders(
 }
 
 export function normalizeDocument(
-  doc: GddDocument & { board?: BoardItem[] },
+  doc: GddDocument & { board?: BoardItem[] }
 ): GddDocument {
   const legacyBoard = Array.isArray(doc.board) ? doc.board : [];
   let migrated = false;
@@ -98,7 +98,7 @@ export function normalizeDocument(
   let normalizedSections: GddSection[] = sections.map((section) =>
     section.folderId && !folderIds.has(section.folderId)
       ? { ...section, folderId: undefined }
-      : section,
+      : section
   );
 
   for (const folderId of folderIds) {

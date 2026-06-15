@@ -122,7 +122,7 @@ export function useSpace3DScene({
 
     const transformControls = new TransformControls(
       camera,
-      renderer.domElement,
+      renderer.domElement
     );
     transformControls.setMode(transformModeToControls(editMode));
     configureTransformControlsGizmo(transformControls);
@@ -220,7 +220,7 @@ export function useSpace3DScene({
           gridHelper,
           camera,
           controls.target,
-          normalizeSpace3DGrid(space3dRef.current.grid),
+          normalizeSpace3DGrid(space3dRef.current.grid)
         );
       }
       renderer.render(scene, camera);
@@ -331,7 +331,7 @@ export function useSpace3DScene({
     async function syncObjects() {
       syncingRef.current = true;
       const objects = space3dRef.current.objects.map((obj) =>
-        normalizeSpace3DObject(obj),
+        normalizeSpace3DObject(obj)
       );
       const nextIds = new Set(objects.map((obj) => obj.id));
 

@@ -223,7 +223,7 @@ export function SettingsPage({
                           </div>
                           <ShortcutBindingInput actionId={def.id} />
                         </li>
-                      ),
+                      )
                     )}
                   </ul>
                 </div>

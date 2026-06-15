@@ -44,14 +44,14 @@ export async function getGitStatus(folderPath: string): Promise<GitStatus> {
 }
 
 export async function initGitRepo(
-  folderPath: string,
+  folderPath: string
 ): Promise<{ ok: boolean; alreadyInitialized?: boolean; error?: string }> {
   const api = requireGitApi();
   return api.init(folderPath);
 }
 
 export function gitIdentityForCommit(
-  settings: GitSettings = loadGitSettings(),
+  settings: GitSettings = loadGitSettings()
 ): { name: string; email: string } | null {
   const name = settings.userName.trim();
   const email = settings.userEmail.trim();
@@ -60,7 +60,7 @@ export function gitIdentityForCommit(
 }
 
 export async function getGitIdentity(
-  folderPath: string,
+  folderPath: string
 ): Promise<{ name: string; email: string }> {
   const api = requireGitApi();
   const result = await api.getIdentity(folderPath);
@@ -73,7 +73,7 @@ export async function getGitIdentity(
 export async function setGitIdentity(
   folderPath: string,
   name: string,
-  email: string,
+  email: string
 ): Promise<{ ok: boolean; error?: string }> {
   const api = requireGitApi();
   return api.setIdentity(folderPath, name, email);
@@ -81,7 +81,7 @@ export async function setGitIdentity(
 
 export async function applyGitIdentity(
   folderPath: string,
-  settings: GitSettings = loadGitSettings(),
+  settings: GitSettings = loadGitSettings()
 ): Promise<{ ok: boolean; error?: string }> {
   const identity = gitIdentityForCommit(settings);
   if (!identity) return { ok: false, error: "missing_identity" };
@@ -91,7 +91,7 @@ export async function applyGitIdentity(
 export async function commitGitChanges(
   folderPath: string,
   message: string,
-  settings: GitSettings = loadGitSettings(),
+  settings: GitSettings = loadGitSettings()
 ): Promise<{ ok: boolean; error?: string }> {
   const api = requireGitApi();
   const identity = gitIdentityForCommit(settings);
@@ -100,7 +100,7 @@ export async function commitGitChanges(
 
 async function withGitProgress<T>(
   operation: () => Promise<T>,
-  onProgress?: (event: GitProgressEvent) => void,
+  onProgress?: (event: GitProgressEvent) => void
 ): Promise<T> {
   const api = window.gddDesktop?.git;
   const unsubscribe =
@@ -121,7 +121,7 @@ async function withGitProgress<T>(
 
 export async function pushGitChanges(
   folderPath: string,
-  onProgress?: (event: GitProgressEvent) => void,
+  onProgress?: (event: GitProgressEvent) => void
 ): Promise<{ ok: boolean; error?: string }> {
   const api = requireGitApi();
   return withGitProgress(() => api.push(folderPath), onProgress);
@@ -129,21 +129,21 @@ export async function pushGitChanges(
 
 export async function pullGitChanges(
   folderPath: string,
-  onProgress?: (event: GitProgressEvent) => void,
+  onProgress?: (event: GitProgressEvent) => void
 ): Promise<{ ok: boolean; error?: string }> {
   const api = requireGitApi();
   return withGitProgress(() => api.pull(folderPath), onProgress);
 }
 
 export async function stashGitChanges(
-  folderPath: string,
+  folderPath: string
 ): Promise<{ ok: boolean; stashed?: boolean; error?: string }> {
   const api = requireGitApi();
   return api.stash(folderPath);
 }
 
 export async function discardGitProjectChanges(
-  folderPath: string,
+  folderPath: string
 ): Promise<{ ok: boolean; error?: string }> {
   const api = requireGitApi();
   return api.discardProject(folderPath);
@@ -157,14 +157,14 @@ export async function getGitRemote(folderPath: string): Promise<string | null> {
 
 export async function setGitRemote(
   folderPath: string,
-  url: string,
+  url: string
 ): Promise<{ ok: boolean; error?: string }> {
   const api = requireGitApi();
   return api.setRemote(folderPath, url);
 }
 
 export async function authenticateGitRemote(
-  folderPath: string,
+  folderPath: string
 ): Promise<{ ok: boolean; error?: string }> {
   const api = requireGitApi();
   return api.authenticate(folderPath);
@@ -172,7 +172,7 @@ export async function authenticateGitRemote(
 
 export async function storeGitAccessToken(
   folderPath: string,
-  token: string,
+  token: string
 ): Promise<{ ok: boolean; error?: string }> {
   const api = requireGitApi();
   return api.storeToken(folderPath, token);
@@ -195,7 +195,7 @@ const GIT_ERROR_KEYS: Record<string, MessageKey> = {
 
 export function formatGitError(
   code: string | undefined,
-  t: (key: MessageKey) => string,
+  t: (key: MessageKey) => string
 ): string {
   if (!code) return t("git.errorGeneric");
   const key = GIT_ERROR_KEYS[code];

@@ -3,7 +3,7 @@ export const HIGHLIGHT_FLASH_MS = 800;
 
 export function flashElement(
   el: HTMLElement | null,
-  className = "gdd-search-flash",
+  className = "gdd-search-flash"
 ) {
   if (!el) return;
   el.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -48,7 +48,7 @@ interface TextMatchPosition {
 export function highlightQueryInElement(
   root: HTMLElement,
   query: string,
-  focusIndex = 0,
+  focusIndex = 0
 ): () => void {
   stripEphemeralEditorMarkup(root);
 

@@ -51,9 +51,7 @@ export function BoardAssetsDialog({
   const assets = useMemo(() => {
     const entries = Object.values(doc.boardImages ?? {});
     return entries.sort((a, b) =>
-      displayBoardImageAssetName(a).localeCompare(
-        displayBoardImageAssetName(b),
-      ),
+      displayBoardImageAssetName(a).localeCompare(displayBoardImageAssetName(b))
     );
   }, [doc.boardImages]);
 

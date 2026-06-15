@@ -142,7 +142,7 @@ function writeProjectFolder(dir, payload) {
       fs.writeFileSync(
         path.join(dir, SECTIONS_DIR, name),
         section.content,
-        "utf8",
+        "utf8"
       );
     }
 

@@ -26,7 +26,7 @@ const LocaleContext = createContext<LocaleContextValue | null>(null);
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<AppLanguage>(() =>
-    loadStoredLanguage(),
+    loadStoredLanguage()
   );
 
   const setLanguage = useCallback((lang: AppLanguage) => {
@@ -37,12 +37,12 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   const t = useCallback(
     (key: MessageKey, params?: TranslateParams) =>
       translate(language, key, params),
-    [language],
+    [language]
   );
 
   const value = useMemo(
     () => ({ language, setLanguage, t }),
-    [language, setLanguage, t],
+    [language, setLanguage, t]
   );
 
   return (

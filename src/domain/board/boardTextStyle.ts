@@ -3,7 +3,7 @@ import type { BoardText, BoardTextAlign } from "@/domain/types";
 /** `true` / `false` when uniform; `null` when mixed across selection. */
 export function uniformFlag(
   texts: BoardText[],
-  key: "bold" | "italic" | "strikethrough",
+  key: "bold" | "italic" | "strikethrough"
 ): boolean | null {
   if (texts.length === 0) return null;
   const values = texts.map((t) => Boolean(t[key]));

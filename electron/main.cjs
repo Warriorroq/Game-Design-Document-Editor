@@ -323,7 +323,7 @@ function configureEmbedReferrer() {
       // file:// app pages send no Referer; YouTube embeds require one (error 153).
       headers.Referer = embedReferer;
       callback({ requestHeaders: headers });
-    },
+    }
   );
 }
 

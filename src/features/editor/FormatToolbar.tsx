@@ -52,7 +52,7 @@ const TOOLS: { group: ToolButton[] }[] = [
 
 function measureContentColumn() {
   const col = document.querySelector(
-    ".content-column:not(.content-column--hidden)",
+    ".content-column:not(.content-column--hidden)"
   );
   if (!col) return { left: 0, width: 0 };
   const rect = col.getBoundingClientRect();
@@ -84,7 +84,7 @@ export function FormatToolbar({
     update();
 
     const col = document.querySelector(
-      ".content-column:not(.content-column--hidden)",
+      ".content-column:not(.content-column--hidden)"
     );
     const observer = new ResizeObserver(update);
     if (col) observer.observe(col);
