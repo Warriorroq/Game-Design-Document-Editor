@@ -14,12 +14,12 @@ export default defineConfig(
     files: ["**/*.{ts,tsx}", "eslint.config.js"],
     languageOptions: {
       ecmaVersion: 2022,
-      globals: globals.browser,
+      globals: globals.browser
     },
     plugins: {
       "react-hooks": reactHooks,
       "react-refresh": reactRefresh,
-      "simple-import-sort": simpleImportSort,
+      "simple-import-sort": simpleImportSort
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
@@ -27,49 +27,49 @@ export default defineConfig(
       "react-hooks/set-state-in-effect": "off",
       "react-refresh/only-export-components": [
         "error",
-        { allowConstantExport: true },
+        { allowConstantExport: true }
       ],
       "simple-import-sort/exports": "error",
       "simple-import-sort/imports": "error",
       "@typescript-eslint/consistent-type-imports": [
         "warn",
-        { prefer: "type-imports", fixStyle: "separate-type-imports" },
+        { prefer: "type-imports", fixStyle: "separate-type-imports" }
       ],
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-unused-vars": [
         "error",
         {
           argsIgnorePattern: "^_",
-          varsIgnorePattern: "^_",
-        },
-      ],
-    },
+          varsIgnorePattern: "^_"
+        }
+      ]
+    }
   },
   {
     files: [
       "src/shared/context/**/*.{ts,tsx}",
-      "src/features/links/LinkContext.tsx",
+      "src/features/links/LinkContext.tsx"
     ],
     rules: {
-      "react-refresh/only-export-components": "off",
-    },
+      "react-refresh/only-export-components": "off"
+    }
   },
   {
     files: ["*.config.{js,ts}"],
     languageOptions: {
-      globals: globals.node,
-    },
+      globals: globals.node
+    }
   },
   {
     files: ["electron/**/*.cjs"],
     languageOptions: {
       ecmaVersion: 2022,
       globals: globals.node,
-      sourceType: "commonjs",
+      sourceType: "commonjs"
     },
     rules: {
-      ...js.configs.recommended.rules,
-    },
+      ...js.configs.recommended.rules
+    }
   },
   eslintConfigPrettier
 );

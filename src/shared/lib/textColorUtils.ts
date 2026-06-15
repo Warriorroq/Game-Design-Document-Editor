@@ -1,6 +1,6 @@
 import {
   BOARD_TEXT_COLORS,
-  DEFAULT_BOARD_TEXT_COLOR,
+  DEFAULT_BOARD_TEXT_COLOR
 } from "@/features/board/lib/boardTextColors";
 
 export function normalizeColorToHex(value: string): string | null {

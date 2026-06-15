@@ -9,7 +9,7 @@ export const SHORTCUT_ACTION_IDS = [
   "desk.copy",
   "desk.paste",
   "desk.delete",
-  "desk.cancel",
+  "desk.cancel"
 ] as const;
 
 export type ShortcutActionId = (typeof SHORTCUT_ACTION_IDS)[number];
@@ -33,47 +33,47 @@ export const SHORTCUT_DEFINITIONS: ShortcutDefinition[] = [
   {
     id: "undo",
     group: "editor",
-    defaultBinding: { key: "z", ctrlOrMeta: true, shift: false, alt: false },
+    defaultBinding: { key: "z", ctrlOrMeta: true, shift: false, alt: false }
   },
   {
     id: "editor.format.bold",
     group: "editor",
-    defaultBinding: { key: "b", ctrlOrMeta: true, shift: false, alt: false },
+    defaultBinding: { key: "b", ctrlOrMeta: true, shift: false, alt: false }
   },
   {
     id: "editor.format.italic",
     group: "editor",
-    defaultBinding: { key: "i", ctrlOrMeta: true, shift: false, alt: false },
+    defaultBinding: { key: "i", ctrlOrMeta: true, shift: false, alt: false }
   },
   {
     id: "editor.format.h1",
     group: "editor",
-    defaultBinding: { key: "1", ctrlOrMeta: true, shift: false, alt: true },
+    defaultBinding: { key: "1", ctrlOrMeta: true, shift: false, alt: true }
   },
   {
     id: "editor.format.h2",
     group: "editor",
-    defaultBinding: { key: "2", ctrlOrMeta: true, shift: false, alt: true },
+    defaultBinding: { key: "2", ctrlOrMeta: true, shift: false, alt: true }
   },
   {
     id: "editor.format.h3",
     group: "editor",
-    defaultBinding: { key: "3", ctrlOrMeta: true, shift: false, alt: true },
+    defaultBinding: { key: "3", ctrlOrMeta: true, shift: false, alt: true }
   },
   {
     id: "editor.format.paragraph",
     group: "editor",
-    defaultBinding: { key: "0", ctrlOrMeta: true, shift: false, alt: true },
+    defaultBinding: { key: "0", ctrlOrMeta: true, shift: false, alt: true }
   },
   {
     id: "desk.copy",
     group: "desk",
-    defaultBinding: { key: "c", ctrlOrMeta: true, shift: false, alt: false },
+    defaultBinding: { key: "c", ctrlOrMeta: true, shift: false, alt: false }
   },
   {
     id: "desk.paste",
     group: "desk",
-    defaultBinding: { key: "v", ctrlOrMeta: true, shift: false, alt: false },
+    defaultBinding: { key: "v", ctrlOrMeta: true, shift: false, alt: false }
   },
   {
     id: "desk.delete",
@@ -82,8 +82,8 @@ export const SHORTCUT_DEFINITIONS: ShortcutDefinition[] = [
       key: "Delete",
       ctrlOrMeta: false,
       shift: false,
-      alt: false,
-    },
+      alt: false
+    }
   },
   {
     id: "desk.cancel",
@@ -92,9 +92,9 @@ export const SHORTCUT_DEFINITIONS: ShortcutDefinition[] = [
       key: "Escape",
       ctrlOrMeta: false,
       shift: false,
-      alt: false,
-    },
-  },
+      alt: false
+    }
+  }
 ];
 
 const STORAGE_KEY = "gdd-editor-shortcuts";
@@ -168,7 +168,7 @@ export function bindingFromKeyboardEvent(
     key: normalizeEventKey(e),
     ctrlOrMeta: e.ctrlKey || e.metaKey,
     shift: e.shiftKey,
-    alt: e.altKey,
+    alt: e.altKey
   };
 }
 

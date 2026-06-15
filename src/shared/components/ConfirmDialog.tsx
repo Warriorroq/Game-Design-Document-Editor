@@ -20,7 +20,7 @@ export function ConfirmDialog({
   message,
   confirmLabel,
   onClose,
-  onConfirm,
+  onConfirm
 }: ConfirmDialogProps) {
   const { t } = useLocale();
   const confirmRef = useRef<HTMLButtonElement>(null);

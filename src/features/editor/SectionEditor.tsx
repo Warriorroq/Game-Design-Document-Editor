@@ -3,30 +3,30 @@ import {
   useEffect,
   useLayoutEffect,
   useMemo,
-  useRef,
+  useRef
 } from "react";
 
 import {
   ensureBlockAnchor,
-  findBlockElement,
+  findBlockElement
 } from "@/features/editor/lib/editorAnchors";
 import {
   deleteSelectionInRoot,
   getSelectionRichContent,
   pasteRichContent,
-  setClipboardRichContent,
+  setClipboardRichContent
 } from "@/features/editor/lib/editorClipboard";
 import {
   contentForEditor,
   normalizeEditorDom,
   previewMissingTableControls,
-  serializeEditorHtml,
+  serializeEditorHtml
 } from "@/features/editor/lib/editorContent";
 import { applyEditorFormat } from "@/features/editor/lib/editorFormat";
 import { EDITOR_FORMAT_SHORTCUT_ACTIONS } from "@/features/editor/lib/editorFormatShortcuts";
 import {
   insertLinkInEditor,
-  saveEditorSelection,
+  saveEditorSelection
 } from "@/features/editor/lib/insertLink";
 import { buildAnchorHref, isNavigableHref } from "@/features/links/lib/links";
 import { useLinkContext } from "@/features/links/LinkContext";
@@ -37,7 +37,7 @@ import {
   flashElement,
   HIGHLIGHT_FLASH_MS,
   highlightQueryInElement,
-  stripEphemeralEditorMarkup,
+  stripEphemeralEditorMarkup
 } from "@/shared/lib/searchHighlight";
 import type { GddSection } from "@/shared/types";
 
@@ -63,7 +63,7 @@ export function SectionEditor({
   scrollToAnchorId,
   onScrollAnchorDone,
   searchFocus,
-  onSearchFocusDone,
+  onSearchFocusDone
 }: SectionEditorProps) {
   const { t } = useLocale();
   const { matches: shortcutMatches } = useShortcuts();
@@ -320,7 +320,7 @@ export function SectionEditor({
       addRowToDomTable,
       deleteColFromDomTable,
       deleteRowFromDomTable,
-      syncContent,
+      syncContent
     ]
   );
 
@@ -419,8 +419,8 @@ export function SectionEditor({
           );
           savedSelectionRef.current = null;
           syncContent();
-        },
-      },
+        }
+      }
     });
   };
 

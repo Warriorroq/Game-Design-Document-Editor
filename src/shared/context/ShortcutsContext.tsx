@@ -4,7 +4,7 @@ import {
   useCallback,
   useContext,
   useMemo,
-  useState,
+  useState
 } from "react";
 
 import {
@@ -16,7 +16,7 @@ import {
   saveShortcutBindings,
   SHORTCUT_DEFINITIONS,
   type ShortcutActionId,
-  type ShortcutBinding,
+  type ShortcutBinding
 } from "@/shared/lib/shortcuts";
 
 interface ShortcutsContextValue {
@@ -92,7 +92,7 @@ export function ShortcutsProvider({ children }: { children: ReactNode }) {
       resetBinding,
       resetAll,
       bindingFromEvent: bindingFromKeyboardEvent,
-      findConflict,
+      findConflict
     }),
     [bindings, matches, setBinding, resetBinding, resetAll, findConflict]
   );

@@ -13,7 +13,7 @@ import { LinkPreviewLayer } from "@/features/links/LinkPreviewLayer";
 import {
   type GlobalSearchResult,
   searchDocument,
-  type SearchFocusTarget,
+  type SearchFocusTarget
 } from "@/features/search/lib/globalSearch";
 import { SettingsPage } from "@/features/settings/SettingsPage";
 import { EditorLayout } from "@/presentation/shell/EditorLayout";
@@ -70,7 +70,7 @@ export function AppMain(props: DocumentStore) {
     beginTransient,
     endTransient,
     replaceDocument,
-    newProject,
+    newProject
   } = props;
 
   const [view, setView] = useState<AppView>("editor");
@@ -102,7 +102,7 @@ export function AppMain(props: DocumentStore) {
     onEditorSplitterDown,
     onBoardSplitterDown,
     onEditorSplitterDoubleClick,
-    onBoardSplitterDoubleClick,
+    onBoardSplitterDoubleClick
   } = useResizablePanels(sidebarVisible);
 
   const { linkTarget, clearLinkTarget, navigateToHref } = useLinkContext();
@@ -144,7 +144,7 @@ export function AppMain(props: DocumentStore) {
           kind: result.kind,
           matchIndex,
           matchCount,
-          anchorId: result.anchorId,
+          anchorId: result.anchorId
         });
       } else {
         setSearchFocus(null);

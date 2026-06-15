@@ -8,11 +8,11 @@ import {
   getGitIdentity,
   getGitRemote,
   setGitRemote,
-  storeGitAccessToken,
+  storeGitAccessToken
 } from "@/features/git/lib/git";
 import {
   loadGitSettings,
-  saveGitSettings,
+  saveGitSettings
 } from "@/features/git/lib/gitSettings";
 import { useLocale } from "@/shared/context/LocaleContext";
 import { isDesktopApp } from "@/shared/lib/desktop";
@@ -28,7 +28,7 @@ export function GitSettingsPanel({
   folderPath,
   gitAvailable,
   gitStatus,
-  onRefreshGitStatus,
+  onRefreshGitStatus
 }: GitSettingsPanelProps) {
   const { t } = useLocale();
   const [userName, setUserName] = useState("");
@@ -86,14 +86,14 @@ export function GitSettingsPanel({
 
     saveGitSettings({
       userName: trimmedName,
-      userEmail: trimmedEmail,
+      userEmail: trimmedEmail
     });
 
     if (folderPath && isDesktopApp) {
       try {
         const identityResult = await applyGitIdentity(folderPath, {
           userName: trimmedName,
-          userEmail: trimmedEmail,
+          userEmail: trimmedEmail
         });
         if (!identityResult.ok) {
           setError(formatGitError(identityResult.error, t));

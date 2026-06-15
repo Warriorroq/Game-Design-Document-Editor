@@ -9,7 +9,7 @@ interface BoardVideoIframeProps {
 export function BoardVideoIframe({
   src,
   title,
-  className,
+  className
 }: BoardVideoIframeProps) {
   return (
     <iframe

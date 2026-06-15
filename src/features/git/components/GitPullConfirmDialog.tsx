@@ -21,7 +21,7 @@ export function GitPullConfirmDialog({
   files,
   busy = false,
   onClose,
-  onConfirm,
+  onConfirm
 }: GitPullConfirmDialogProps) {
   const { t } = useLocale();
 

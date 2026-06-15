@@ -7,7 +7,7 @@ import {
   createSpace3DModelObject,
   createSpace3DPrimitive,
   normalizeSpace3DData,
-  normalizeSpace3DGrid,
+  normalizeSpace3DGrid
 } from "@/domain/space3d/space3d";
 import { Space3DContextMenu } from "@/features/space3d/components/Space3DContextMenu";
 import { Space3DGridPanel } from "@/features/space3d/components/Space3DGridPanel";
@@ -18,7 +18,7 @@ import { useSpace3DScene } from "@/features/space3d/hooks/useSpace3DScene";
 import { snapTransformPatch } from "@/features/space3d/lib/space3dGrid";
 import {
   isSupportedModelFileName,
-  readModelFile,
+  readModelFile
 } from "@/features/space3d/lib/space3dLoader";
 import { clampTransformPatch } from "@/features/space3d/lib/space3dObject";
 import { useLocale } from "@/shared/context/LocaleContext";
@@ -27,7 +27,7 @@ import type {
   GddSection,
   Space3DData,
   Space3DEditMode,
-  Space3DObject,
+  Space3DObject
 } from "@/shared/types";
 
 interface Space3DViewProps {
@@ -48,7 +48,7 @@ export function Space3DView({
   onAddModel,
   onRemoveModelAsset,
   onBeginTransientEdit,
-  onEndTransientEdit,
+  onEndTransientEdit
 }: Space3DViewProps) {
   const { t } = useLocale();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -67,8 +67,8 @@ export function Space3DView({
       onChange({
         space3d: {
           ...space3d,
-          ...patch,
-        },
+          ...patch
+        }
       });
     },
     [onChange, space3d]
@@ -81,7 +81,7 @@ export function Space3DView({
       updateSpace3d({
         objects: space3d.objects.map((obj) =>
           obj.id === objectId ? { ...obj, ...snapped } : obj
-        ),
+        )
       });
     },
     [space3d.objects, space3d.grid, updateSpace3d]
@@ -108,7 +108,7 @@ export function Space3DView({
     onObjectChange,
     onCameraChange: (camera) => updateSpace3d({ camera }),
     onBeginTransientEdit,
-    onEndTransientEdit,
+    onEndTransientEdit
   });
 
   useEffect(() => {
@@ -139,7 +139,7 @@ export function Space3DView({
   const removeSelected = useCallback(() => {
     if (!selectedId) return;
     updateSpace3d({
-      objects: space3d.objects.filter((obj) => obj.id !== selectedId),
+      objects: space3d.objects.filter((obj) => obj.id !== selectedId)
     });
     setSelectedId(null);
   }, [selectedId, space3d.objects, updateSpace3d]);
@@ -201,7 +201,7 @@ export function Space3DView({
           <span>{t("space3d.objects", { count: space3d.objects.length })}</span>
           <span>
             {t("space3d.modelsCount", {
-              count: Object.keys(doc.space3DModels ?? {}).length,
+              count: Object.keys(doc.space3DModels ?? {}).length
             })}
           </span>
           <span className="space3d-hint-inline">{t("space3d.hint")}</span>
@@ -221,7 +221,7 @@ export function Space3DView({
               grid={space3d.grid!}
               onChange={(patch) =>
                 updateSpace3d({
-                  grid: { ...space3d.grid, ...patch },
+                  grid: { ...space3d.grid, ...patch }
                 })
               }
             />

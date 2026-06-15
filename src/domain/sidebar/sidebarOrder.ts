@@ -32,14 +32,14 @@ export function childItems(
     .map((folder) => ({
       kind: "folder" as const,
       item: folder,
-      order: folder.order,
+      order: folder.order
     }));
   const sections = doc.sections
     .filter((section) => parentKey(section.folderId) === parent)
     .map((section) => ({
       kind: "section" as const,
       item: section,
-      order: section.order,
+      order: section.order
     }));
   return [...folders, ...sections]
     .sort((a, b) => a.order - b.order)
@@ -145,7 +145,7 @@ function applyChildOrders(
       if (parentKey(section.folderId) !== parent) return section;
       const order = sectionOrders.get(section.id);
       return order !== undefined ? { ...section, order } : section;
-    }),
+    })
   };
 }
 
@@ -165,7 +165,7 @@ function moveSectionToParent(
       entry.id === sectionId
         ? { ...entry, folderId: parentFolderId ?? undefined }
         : entry
-    ),
+    )
   };
 
   if (oldParent !== parentFolderId) {
@@ -205,7 +205,7 @@ function moveFolderToParent(
       entry.id === folderId
         ? { ...entry, parentFolderId: parentFolderId ?? undefined }
         : entry
-    ),
+    )
   };
 
   if (oldParent !== parentFolderId) {
@@ -328,7 +328,7 @@ export function removeSectionFromDoc(
   const sections = doc.sections.filter((section) => section.id !== sectionId);
   return {
     ...doc,
-    sections: renumberSectionsInParent(sections, parentFolderId),
+    sections: renumberSectionsInParent(sections, parentFolderId)
   };
 }
 
@@ -380,7 +380,7 @@ export function removeFolderFromDoc(
   const newParentOrder = [
     ...before.map((entry) => refreshChildItem(nextDoc, entry)),
     ...hoistedItems,
-    ...after.map((entry) => refreshChildItem(nextDoc, entry)),
+    ...after.map((entry) => refreshChildItem(nextDoc, entry))
   ];
 
   return applyChildOrders(nextDoc, parentId, newParentOrder);

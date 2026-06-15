@@ -3,7 +3,7 @@ import type {
   BoardItem,
   BoardShape,
   BoardStroke,
-  BoardText,
+  BoardText
 } from "@/domain/types";
 
 type Direction = "forward" | "backward";
@@ -23,7 +23,7 @@ function reorderWithinSubset<T extends { id: string }>(
   const nextSubset = [...subset];
   [nextSubset[idx], nextSubset[swapIdx]] = [
     nextSubset[swapIdx],
-    nextSubset[idx],
+    nextSubset[idx]
   ];
 
   let subsetIdx = 0;

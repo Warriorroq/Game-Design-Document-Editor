@@ -6,7 +6,7 @@ import {
   applyEditorTextColor,
   editorHasTextSelection,
   type FormatAction,
-  getEditorSelectionColor,
+  getEditorSelectionColor
 } from "@/features/editor/lib/editorFormat";
 import { TextColorSwatches } from "@/shared/components/TextColorSwatches";
 
@@ -25,29 +25,29 @@ const TOOLS: { group: ToolButton[] }[] = [
   {
     group: [
       { action: "bold", label: "B", title: "Bold" },
-      { action: "italic", label: "I", title: "Italic" },
-    ],
+      { action: "italic", label: "I", title: "Italic" }
+    ]
   },
   {
     group: [
       { action: "h1", label: "H1", title: "Heading 1" },
       { action: "h2", label: "H2", title: "Heading 2" },
       { action: "h3", label: "H3", title: "Heading 3" },
-      { action: "paragraph", label: "P", title: "Paragraph" },
-    ],
+      { action: "paragraph", label: "P", title: "Paragraph" }
+    ]
   },
   {
     group: [
       { action: "bulletList", label: "List", title: "Bullet list" },
-      { action: "orderedList", label: "1.", title: "Numbered list" },
-    ],
+      { action: "orderedList", label: "1.", title: "Numbered list" }
+    ]
   },
   {
     group: [
       { action: "hr", label: "Line", title: "Horizontal line" },
-      { action: "table", label: "Table", title: "Insert table" },
-    ],
-  },
+      { action: "table", label: "Table", title: "Insert table" }
+    ]
+  }
 ];
 
 function measureContentColumn() {
@@ -61,7 +61,7 @@ function measureContentColumn() {
 
 export function FormatToolbar({
   editorRef,
-  onContentChange,
+  onContentChange
 }: FormatToolbarProps) {
   const [dock, setDock] = useState(measureContentColumn);
   const [hasTextSelection, setHasTextSelection] = useState(false);

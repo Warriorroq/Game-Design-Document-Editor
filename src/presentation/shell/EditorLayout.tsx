@@ -148,7 +148,7 @@ export function EditorLayout({
   onEndTransientEdit,
   onAddSpace3DModel,
   onRemoveSpace3DModelAsset,
-  onRenameSpace3DModelAsset,
+  onRenameSpace3DModelAsset
 }: EditorLayoutProps) {
   const isSpace3D = activeSection ? isSpace3DSection(activeSection) : false;
   const resizingPanels = draggingEditor || draggingBoard;
@@ -171,7 +171,7 @@ export function EditorLayout({
     isSpace3D ? "main-panel--space3d" : "",
     showCompactSwitch
       ? `main-panel--compact main-panel--compact-${compactPane}`
-      : "",
+      : ""
   ]
     .filter(Boolean)
     .join(" ");
@@ -181,7 +181,7 @@ export function EditorLayout({
     alignSelf: "stretch",
     width: "100%",
     minWidth: "0",
-    flexShrink: 1,
+    flexShrink: 1
   } as const;
 
   const editorScrollRef = useRef<HTMLDivElement>(null);
@@ -324,7 +324,7 @@ export function EditorLayout({
                   savedBoardViewport={activeSection.boardViewport}
                   onBoardViewportChange={(boardViewport) =>
                     onUpdateSectionViewState(activeSection.id, {
-                      boardViewport,
+                      boardViewport
                     })
                   }
                   items={activeSection.board}

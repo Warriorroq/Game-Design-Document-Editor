@@ -1,7 +1,7 @@
 import { isDesktopApp } from "@/infrastructure/desktop/desktop";
 import {
   type GitSettings,
-  loadGitSettings,
+  loadGitSettings
 } from "@/infrastructure/git/gitSettings";
 import type { MessageKey } from "@/shared/i18n/messages";
 
@@ -66,7 +66,7 @@ export async function getGitIdentity(
   const result = await api.getIdentity(folderPath);
   return {
     name: result.name ?? "",
-    email: result.email ?? "",
+    email: result.email ?? ""
   };
 }
 
@@ -190,7 +190,7 @@ const GIT_ERROR_KEYS: Record<string, MessageKey> = {
   push_rejected_pull_first: "git.pushRejectedPullFirst",
   no_initial_commit: "git.noInitialCommit",
   not_a_repo: "git.notARepo",
-  remote_branch_not_found: "git.remoteBranchNotFound",
+  remote_branch_not_found: "git.remoteBranchNotFound"
 };
 
 export function formatGitError(

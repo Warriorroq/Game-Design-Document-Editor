@@ -3,7 +3,7 @@ import {
   APP_LANGUAGES,
   type AppLanguage,
   type MessageKey,
-  MESSAGES,
+  MESSAGES
 } from "@/shared/i18n/messages";
 import type { AppThemeId } from "@/shared/lib/themeTokens";
 

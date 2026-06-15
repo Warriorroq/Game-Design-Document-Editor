@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 
 import {
   countSpace3DModelUsage,
-  displaySpace3DModelName,
+  displaySpace3DModelName
 } from "@/domain/space3d/modelRegistry";
 import { useLocale } from "@/shared/context/LocaleContext";
 import type { GddDocument } from "@/shared/types";
@@ -23,7 +23,7 @@ export function Space3DModelsDialog({
   onClose,
   onImport,
   onPlace,
-  onDelete,
+  onDelete
 }: Space3DModelsDialogProps) {
   const { t } = useLocale();
   const fileRef = useRef<HTMLInputElement>(null);

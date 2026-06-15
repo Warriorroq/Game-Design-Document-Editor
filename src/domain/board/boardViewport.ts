@@ -70,7 +70,7 @@ export function fitBoardViewport(
     {
       scale,
       panX: viewW / 2 - (canvasW / 2) * scale,
-      panY: viewH / 2 - (canvasH / 2) * scale,
+      panY: viewH / 2 - (canvasH / 2) * scale
     },
     viewW,
     viewH,

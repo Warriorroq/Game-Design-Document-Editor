@@ -8,30 +8,30 @@ import {
   defaultSpace3DData,
   normalizeSpace3DGrid,
   normalizeSpace3DObject,
-  transformModeToControls,
+  transformModeToControls
 } from "@/domain/space3d/space3d";
 import type {
   GddDocument,
   Space3DData,
   Space3DEditMode,
-  Space3DObject,
+  Space3DObject
 } from "@/domain/types";
 import {
   createInfiniteGrid,
   disposeInfiniteGrid,
   snapTransformPatch,
-  updateInfiniteGrid,
+  updateInfiniteGrid
 } from "@/features/space3d/lib/space3dGrid";
 import {
   cloneModelInstance,
-  loadSpace3DModelTemplate,
+  loadSpace3DModelTemplate
 } from "@/features/space3d/lib/space3dLoader";
 import {
   applyObjectTransform,
   disposeObject3D,
   findObjectRoot,
   patchFromObject3D,
-  primitiveMesh,
+  primitiveMesh
 } from "@/features/space3d/lib/space3dObject";
 import { configureTransformControlsGizmo } from "@/features/space3d/lib/space3dTransformControls";
 
@@ -72,7 +72,7 @@ export function useSpace3DScene({
   onObjectChange,
   onCameraChange,
   onBeginTransientEdit,
-  onEndTransientEdit,
+  onEndTransientEdit
 }: UseSpace3DSceneOptions) {
   const sceneRef = useRef<SceneContext | null>(null);
   const space3dRef = useRef(space3d);
@@ -117,7 +117,7 @@ export function useSpace3DScene({
     controls.mouseButtons = {
       LEFT: THREE.MOUSE.ROTATE,
       MIDDLE: THREE.MOUSE.DOLLY,
-      RIGHT: THREE.MOUSE.PAN,
+      RIGHT: THREE.MOUSE.PAN
     };
 
     const transformControls = new TransformControls(
@@ -156,7 +156,7 @@ export function useSpace3DScene({
           scaleZ: patch.scaleZ,
           rotationX: patch.rotationX,
           rotationY: patch.rotationY,
-          rotationZ: patch.rotationZ,
+          rotationZ: patch.rotationZ
         });
       }
       onObjectChangeRef.current(objectId, patch);
@@ -194,7 +194,7 @@ export function useSpace3DScene({
       selectionHelper,
       raycaster: new THREE.Raycaster(),
       pointer: new THREE.Vector2(),
-      gridHelper,
+      gridHelper
     };
     sceneRef.current = ctx;
 
@@ -232,13 +232,13 @@ export function useSpace3DScene({
         position: {
           x: camera.position.x,
           y: camera.position.y,
-          z: camera.position.z,
+          z: camera.position.z
         },
         target: {
           x: controls.target.x,
           y: controls.target.y,
-          z: controls.target.z,
-        },
+          z: controls.target.z
+        }
       });
     };
     const onOrbitStart = () => {

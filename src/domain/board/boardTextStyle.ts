@@ -35,6 +35,6 @@ export function boardTextStyleProps(text: BoardText): {
     fontWeight: text.bold ? 700 : undefined,
     fontStyle: text.italic ? "italic" : undefined,
     textDecoration: text.strikethrough ? "line-through" : undefined,
-    textAlign: textAlign === "left" ? undefined : textAlign,
+    textAlign: textAlign === "left" ? undefined : textAlign
   };
 }

@@ -6,7 +6,7 @@ const BLOCK_TAGS = new Set([
   "LI",
   "TD",
   "TH",
-  "BLOCKQUOTE",
+  "BLOCKQUOTE"
 ]);
 
 export function findBlockElement(

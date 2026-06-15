@@ -14,7 +14,7 @@ contextBridge.exposeInMainWorld("gddDesktop", {
       ipcRenderer.on("window:maximized-changed", handler);
       return () =>
         ipcRenderer.removeListener("window:maximized-changed", handler);
-    },
+    }
   },
   project: {
     pickFolder: () => ipcRenderer.invoke("project:pick-folder"),
@@ -28,7 +28,7 @@ contextBridge.exposeInMainWorld("gddDesktop", {
       const handler = (_event, filePath) => listener(String(filePath));
       ipcRenderer.on("project:open-archive", handler);
       return () => ipcRenderer.removeListener("project:open-archive", handler);
-    },
+    }
   },
   git: {
     isAvailable: () => ipcRenderer.invoke("git:is-available"),
@@ -56,6 +56,6 @@ contextBridge.exposeInMainWorld("gddDesktop", {
       const handler = (_event, payload) => listener(payload);
       ipcRenderer.on("git:progress", handler);
       return () => ipcRenderer.removeListener("git:progress", handler);
-    },
-  },
+    }
+  }
 });

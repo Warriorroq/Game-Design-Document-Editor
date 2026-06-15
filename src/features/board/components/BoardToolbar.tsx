@@ -3,12 +3,12 @@ import type { CSSProperties } from "react";
 import {
   BOARD_PEN_COLORS,
   BOARD_PEN_WIDTHS,
-  type BoardPenWidth,
+  type BoardPenWidth
 } from "@/features/board/lib/boardPen";
 import {
   nextUniformFlag,
   uniformFlag,
-  uniformTextAlign,
+  uniformTextAlign
 } from "@/features/board/lib/boardTextStyle";
 import { TextColorSwatches } from "@/shared/components/TextColorSwatches";
 import { useLocale } from "@/shared/context/LocaleContext";
@@ -43,7 +43,7 @@ export function BoardToolbar({
   texts,
   onTextColorChange,
   onTextStyleChange,
-  onTextAlignChange,
+  onTextAlignChange
 }: BoardToolbarProps) {
   const { t } = useLocale();
   const hasTextSelection = selectedTextIds.length > 0;
@@ -154,7 +154,7 @@ export function BoardToolbar({
                 aria-pressed={boldState === true}
                 onClick={() =>
                   onTextStyleChange(selectedTextIds, {
-                    bold: nextUniformFlag(boldState),
+                    bold: nextUniformFlag(boldState)
                   })
                 }
               >
@@ -168,7 +168,7 @@ export function BoardToolbar({
                 aria-pressed={italicState === true}
                 onClick={() =>
                   onTextStyleChange(selectedTextIds, {
-                    italic: nextUniformFlag(italicState),
+                    italic: nextUniformFlag(italicState)
                   })
                 }
               >
@@ -182,7 +182,7 @@ export function BoardToolbar({
                 aria-pressed={strikeState === true}
                 onClick={() =>
                   onTextStyleChange(selectedTextIds, {
-                    strikethrough: nextUniformFlag(strikeState),
+                    strikethrough: nextUniformFlag(strikeState)
                   })
                 }
               >
@@ -198,7 +198,7 @@ export function BoardToolbar({
                 [
                   ["left", "desk.textAlignLeft"],
                   ["center", "desk.textAlignCenter"],
-                  ["right", "desk.textAlignRight"],
+                  ["right", "desk.textAlignRight"]
                 ] as const
               ).map(([align, labelKey]) => (
                 <button

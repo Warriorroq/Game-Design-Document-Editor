@@ -3,7 +3,7 @@ import type {
   BoardDrawTool,
   BoardItem,
   BoardPoint,
-  BoardShapeType,
+  BoardShapeType
 } from "@/domain/types";
 
 export const DEFAULT_PLACE = { x: 120, y: 120 };

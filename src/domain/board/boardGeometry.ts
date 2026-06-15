@@ -112,7 +112,7 @@ function hitsForItem(
 
   const center = pointFromAttach(item, {
     itemId: item.id,
-    edge: "center",
+    edge: "center"
   });
   const cd = Math.hypot(px - center.x, py - center.y);
   if (cd <= threshold) {
@@ -121,7 +121,7 @@ function hitsForItem(
       edge: "center",
       x: center.x,
       y: center.y,
-      dist: cd,
+      dist: cd
     });
   }
 
@@ -146,7 +146,7 @@ export function snapBoardPoint(
 
   const attach: BoardAttach = {
     itemId: best.itemId,
-    edge: best.edge,
+    edge: best.edge
   };
   if (
     best.t !== undefined &&

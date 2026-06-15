@@ -45,7 +45,7 @@ function resolveGitPath() {
       execFileSync("git", ["--version"], {
         env: gitEnv(),
         windowsHide: true,
-        stdio: "ignore",
+        stdio: "ignore"
       });
       cachedGitPath = "git";
       return cachedGitPath;
@@ -66,7 +66,7 @@ function gitInstallDirs() {
     path.join(programFiles, "Git", "bin"),
     path.join(programFiles, "Git", "mingw64", "bin"),
     path.join(localAppData, "Programs", "Git", "cmd"),
-    path.join(localAppData, "Programs", "Git", "mingw64", "bin"),
+    path.join(localAppData, "Programs", "Git", "mingw64", "bin")
   ];
 }
 
@@ -92,7 +92,7 @@ function networkProcessOptions(extra = {}) {
     env: gitEnv(true),
     // GCM login dialogs fail when the Git child process is hidden on Windows.
     windowsHide: process.platform !== "win32",
-    ...extra,
+    ...extra
   };
 }
 
@@ -174,7 +174,7 @@ function pullArgs(branchName, hasTracking, options = {}) {
   const {
     ffOnly = true,
     allowUnrelated = false,
-    preferRemote = false,
+    preferRemote = false
   } = options;
   const args = ["pull", "--progress"];
   if (ffOnly) args.push("--ff-only");
@@ -216,7 +216,7 @@ async function resolveMergeConflictsPreferRemote(dir, onProgress) {
   const commitResult = await runGit(dir, [
     "commit",
     "-m",
-    "GDD Editor: merge remote project",
+    "GDD Editor: merge remote project"
   ]);
   if (!commitResult.ok) {
     return { ok: false, error: commitResult.error };
@@ -257,7 +257,7 @@ async function runGit(cwd, args, network = false) {
         cwd,
         env: gitEnv(false),
         maxBuffer: 10 * 1024 * 1024,
-        windowsHide: true,
+        windowsHide: true
       };
 
   try {
@@ -275,7 +275,7 @@ async function runGit(cwd, args, network = false) {
 function gcmExecutableCandidates() {
   const names = [
     "git-credential-manager.exe",
-    "git-credential-manager-core.exe",
+    "git-credential-manager-core.exe"
   ];
   const paths = [];
   for (const dir of gitInstallDirs()) {
@@ -312,7 +312,7 @@ async function runGcmLogin(host) {
     if (!fs.existsSync(gcmPath)) continue;
     try {
       await execFileAsync(gcmPath, [host, "login"], {
-        ...networkProcessOptions({ timeout: 300000 }),
+        ...networkProcessOptions({ timeout: 300000 })
       });
       return { ok: true };
     } catch {
@@ -348,7 +348,7 @@ function approveHttpsCredential(host, token) {
   return new Promise((resolve) => {
     const gitPath = resolveGitPath();
     const child = spawn(gitPath, ["credential", "approve"], {
-      ...networkProcessOptions({ stdio: ["pipe", "ignore", "pipe"] }),
+      ...networkProcessOptions({ stdio: ["pipe", "ignore", "pipe"] })
     });
 
     let stderr = "";
@@ -359,7 +359,7 @@ function approveHttpsCredential(host, token) {
     child.on("error", (err) => {
       resolve({
         ok: false,
-        error: normalizeGitError(err.message || "credential approve failed"),
+        error: normalizeGitError(err.message || "credential approve failed")
       });
     });
 
@@ -370,7 +370,7 @@ function approveHttpsCredential(host, token) {
       }
       resolve({
         ok: false,
-        error: normalizeGitError(stderr.trim() || "credential approve failed"),
+        error: normalizeGitError(stderr.trim() || "credential approve failed")
       });
     });
 
@@ -439,7 +439,7 @@ function runGitStream(cwd, args, onProgress, phase) {
     const gitPath = resolveGitPath();
     const child = spawn(gitPath, args, {
       cwd,
-      ...networkProcessOptions(),
+      ...networkProcessOptions()
     });
 
     let stdout = "";
@@ -461,7 +461,7 @@ function runGitStream(cwd, args, onProgress, phase) {
     child.on("error", (err) => {
       resolve({
         ok: false,
-        error: normalizeGitError(err.message || "Git process failed"),
+        error: normalizeGitError(err.message || "Git process failed")
       });
     });
 
@@ -492,7 +492,7 @@ async function getIdentity(dir) {
   return {
     ok: true,
     name: name.ok && name.stdout ? name.stdout : "",
-    email: email.ok && email.stdout ? email.stdout : "",
+    email: email.ok && email.stdout ? email.stdout : ""
   };
 }
 
@@ -563,7 +563,7 @@ async function getStatus(dir) {
     }
     files.push({
       path: line.slice(3),
-      status: line.slice(0, 2).trim(),
+      status: line.slice(0, 2).trim()
     });
   }
 
@@ -574,7 +574,7 @@ async function getStatus(dir) {
     ahead,
     behind,
     dirty: files.length > 0,
-    files,
+    files
   };
 }
 
@@ -650,7 +650,7 @@ async function restoreTrackedProjectFiles(dir) {
     "--staged",
     "--worktree",
     "--",
-    ...tracked,
+    ...tracked
   ]);
   if (!restore.ok && isPathspecMismatchError(restore.error)) {
     restore = await runGit(dir, ["checkout", "HEAD", "--", ...tracked]);
@@ -693,7 +693,7 @@ async function syncProjectFromRemote(dir, branchName, onProgress) {
     "--name-only",
     remoteRef,
     "--",
-    ...PROJECT_PATHS,
+    ...PROJECT_PATHS
   ]);
   if (!list.ok) return list;
 
@@ -710,7 +710,7 @@ async function syncProjectFromRemote(dir, branchName, onProgress) {
       "--worktree",
       "--staged",
       "--",
-      ...remoteFiles,
+      ...remoteFiles
     ]);
 
     if (!restore.ok) {
@@ -718,7 +718,7 @@ async function syncProjectFromRemote(dir, branchName, onProgress) {
         "checkout",
         remoteRef,
         "--",
-        ...remoteFiles,
+        ...remoteFiles
       ]);
     }
     if (!restore.ok) return restore;
@@ -764,7 +764,7 @@ async function stashChanges(dir, onProgress) {
     "push",
     "-m",
     "GDD Editor: before pull",
-    ...(tracked.length > 0 ? ["--", ...tracked] : ["-u"]),
+    ...(tracked.length > 0 ? ["--", ...tracked] : ["-u"])
   ];
   const result = await runGit(dir, stashArgs);
   if (!result.ok) {
@@ -777,7 +777,7 @@ async function stashChanges(dir, onProgress) {
         "push",
         "-u",
         "-m",
-        "GDD Editor: before pull",
+        "GDD Editor: before pull"
       ]);
       if (!fallback.ok) {
         if (/No local changes to save/i.test(fallback.error)) {
@@ -806,7 +806,7 @@ async function discardProjectChanges(dir, onProgress) {
         "--cached",
         "--ignore-unmatch",
         "--",
-        projectPath,
+        projectPath
       ]);
       if (!unstage.ok) return unstage;
     }
@@ -910,7 +910,7 @@ async function pull(dir, onProgress) {
       pullArgs(branchName, hasTracking, {
         ffOnly: false,
         allowUnrelated: true,
-        preferRemote: true,
+        preferRemote: true
       }),
       onProgress,
       "pull"
@@ -983,5 +983,5 @@ module.exports = {
   getRemoteUrl,
   setRemoteUrl,
   authenticateRemote,
-  storeAccessToken,
+  storeAccessToken
 };

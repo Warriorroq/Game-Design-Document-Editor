@@ -13,14 +13,14 @@ import {
   pullGitChanges,
   pushGitChanges,
   setGitRemote,
-  stashGitChanges,
+  stashGitChanges
 } from "@/features/git/lib/git";
 import { parseGitProgressPercent } from "@/features/git/lib/gitProgress";
 import { useLocale } from "@/shared/context/LocaleContext";
 
 import {
   type GitSyncOperation,
-  type GitSyncProgressState,
+  type GitSyncProgressState
 } from "../components/GitProgressDialog";
 import type { GitPromptKind } from "../components/GitPromptDialog";
 import type { GitPullConfirmAction } from "../components/GitPullConfirmDialog";
@@ -42,7 +42,7 @@ export function useGitActions({
   onRefreshStatus,
   onAfterPull,
   onFlushProject,
-  onCloseMenu,
+  onCloseMenu
 }: UseGitActionsOptions) {
   const { t } = useLocale();
   const [busy, setBusy] = useState(false);
@@ -77,7 +77,7 @@ export function useGitActions({
       return {
         ...prev,
         lines: [...prev.lines.slice(-80), line],
-        percent,
+        percent
       };
     });
   };
@@ -89,7 +89,7 @@ export function useGitActions({
       operation,
       lines: [],
       percent: null,
-      status: "running",
+      status: "running"
     });
 
     const onProgress = (event: { line: string }) => {
@@ -117,7 +117,7 @@ export function useGitActions({
         ? {
             ...prev,
             status: "error",
-            error: formatGitError(result.error, t),
+            error: formatGitError(result.error, t)
           }
         : prev
     );
@@ -252,6 +252,6 @@ export function useGitActions({
     handlePull,
     pullConfirmFiles,
     handlePullConfirm,
-    handlePullConfirmClose,
+    handlePullConfirmClose
   };
 }

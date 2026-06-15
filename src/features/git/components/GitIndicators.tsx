@@ -7,7 +7,7 @@ interface GitIndicatorsProps {
 export function GitIndicators({
   branch,
   dirty,
-  uncommittedLabel,
+  uncommittedLabel
 }: GitIndicatorsProps) {
   return (
     <span

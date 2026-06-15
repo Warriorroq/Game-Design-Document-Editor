@@ -7,7 +7,7 @@ import {
   bindingsEqual,
   formatShortcut,
   SHORTCUT_DEFINITIONS,
-  type ShortcutActionId,
+  type ShortcutActionId
 } from "@/shared/lib/shortcuts";
 
 interface ShortcutBindingInputProps {
@@ -93,7 +93,7 @@ export function ShortcutBindingInput({ actionId }: ShortcutBindingInputProps) {
       {conflictId && (
         <span className="shortcut-conflict" role="alert">
           {t("settings.shortcutsConflict", {
-            action: t(shortcutLabelKey(conflictId)),
+            action: t(shortcutLabelKey(conflictId))
           })}
         </span>
       )}

@@ -1,12 +1,12 @@
 import {
   displayBoardImageAssetName,
-  listBoardImageAssetDesks,
+  listBoardImageAssetDesks
 } from "@/features/board/lib/boardImageRegistry";
 import {
   buildAnchorHref,
   buildMediaHref,
   buildSectionHref,
-  buildTextHref,
+  buildTextHref
 } from "@/features/links/lib/links";
 import type { MessageKey } from "@/shared/i18n";
 import { type AppLanguage, translate } from "@/shared/i18n";
@@ -86,7 +86,7 @@ function pushResult(
 ) {
   results.push({
     ...item,
-    key: item.key ?? `${item.href}:${results.length}`,
+    key: item.key ?? `${item.href}:${results.length}`
   });
 }
 
@@ -97,7 +97,7 @@ const SEARCH_WHERE_KEYS: Record<GlobalSearchMatchKind, MessageKey> = {
   "folder-title": "search.where.folderTitle",
   anchor: "search.where.anchor",
   "desk-text": "search.where.deskText",
-  "board-image": "search.where.boardImage",
+  "board-image": "search.where.boardImage"
 };
 
 function searchSection(
@@ -116,7 +116,7 @@ function searchSection(
       kind: "section-title",
       where: translate(lang, SEARCH_WHERE_KEYS["section-title"]),
       snippet: snippetAround(section.title, query),
-      matchCount: countMatches(section.title, query),
+      matchCount: countMatches(section.title, query)
     });
   }
 
@@ -128,7 +128,7 @@ function searchSection(
       kind: "section-description",
       where: translate(lang, SEARCH_WHERE_KEYS["section-description"]),
       snippet: snippetAround(section.description, query),
-      matchCount: countMatches(section.description, query),
+      matchCount: countMatches(section.description, query)
     });
   }
 
@@ -141,7 +141,7 @@ function searchSection(
       kind: "section-content",
       where: translate(lang, SEARCH_WHERE_KEYS["section-content"]),
       snippet: snippetAround(bodyText, query),
-      matchCount: countMatches(bodyText, query),
+      matchCount: countMatches(bodyText, query)
     });
   }
 
@@ -164,7 +164,7 @@ function searchSection(
         where: translate(lang, SEARCH_WHERE_KEYS.anchor),
         snippet: snippetAround(text, query),
         matchCount: countMatches(text, query),
-        anchorId,
+        anchorId
       });
     });
   }
@@ -181,7 +181,7 @@ function searchSection(
       where: translate(lang, SEARCH_WHERE_KEYS["desk-text"]),
       snippet: snippetAround(content, query),
       matchCount: countMatches(content, query),
-      textId: text.id,
+      textId: text.id
     });
   }
 }
@@ -206,7 +206,7 @@ function searchBoardImages(
         kind: "board-image",
         where: translate(lang, SEARCH_WHERE_KEYS["board-image"]),
         snippet: snippetAround(displayName, query),
-        matchCount: countMatches(displayName, query),
+        matchCount: countMatches(displayName, query)
       });
       continue;
     }
@@ -221,7 +221,7 @@ function searchBoardImages(
         where: translate(lang, SEARCH_WHERE_KEYS["board-image"]),
         snippet: snippetAround(displayName, query),
         matchCount: countMatches(displayName, query),
-        mediaId: desk.itemId,
+        mediaId: desk.itemId
       });
     }
   }
@@ -247,7 +247,7 @@ function searchFolders(
       kind: "folder-title",
       where: translate(lang, SEARCH_WHERE_KEYS["folder-title"]),
       snippet: snippetAround(folder.title, query),
-      matchCount: countMatches(folder.title, query),
+      matchCount: countMatches(folder.title, query)
     });
   }
 }

@@ -24,7 +24,7 @@ export function GitPromptDialog({
   kind,
   initialValue = "",
   onClose,
-  onSubmit,
+  onSubmit
 }: GitPromptDialogProps) {
   const { t } = useLocale();
   const [value, setValue] = useState(initialValue);

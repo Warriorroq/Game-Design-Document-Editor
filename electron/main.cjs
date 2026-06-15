@@ -4,7 +4,7 @@ const {
   Menu,
   ipcMain,
   dialog,
-  session,
+  session
 } = require("electron");
 const fs = require("fs");
 const path = require("path");
@@ -96,7 +96,7 @@ function registerIpcHandlers(win) {
   ipcMain.handle("project:pick-folder", async () => {
     const result = await dialog.showOpenDialog(win, {
       properties: ["openDirectory", "createDirectory"],
-      title: "Open GDD project folder",
+      title: "Open GDD project folder"
     });
     if (result.canceled || !result.filePaths[0]) {
       return { ok: false, canceled: true };
@@ -105,7 +105,7 @@ function registerIpcHandlers(win) {
     return {
       ok: true,
       folderPath,
-      hasProject: project.hasProjectFile(folderPath),
+      hasProject: project.hasProjectFile(folderPath)
     };
   });
 
@@ -161,7 +161,7 @@ function registerIpcHandlers(win) {
         ? {
             name: typeof identity.name === "string" ? identity.name.trim() : "",
             email:
-              typeof identity.email === "string" ? identity.email.trim() : "",
+              typeof identity.email === "string" ? identity.email.trim() : ""
           }
         : undefined;
     return git.commit(folderPath, message.trim(), parsedIdentity);
@@ -272,8 +272,8 @@ function createWindow() {
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
-      preload: path.join(__dirname, "preload.cjs"),
-    },
+      preload: path.join(__dirname, "preload.cjs")
+    }
   });
 
   mainWindow = win;
@@ -312,8 +312,8 @@ function configureEmbedReferrer() {
       "*://*.youtube.com/*",
       "*://*.youtube-nocookie.com/*",
       "*://*.googlevideo.com/*",
-      "*://*.ytimg.com/*",
-    ],
+      "*://*.ytimg.com/*"
+    ]
   };
 
   session.defaultSession.webRequest.onBeforeSendHeaders(

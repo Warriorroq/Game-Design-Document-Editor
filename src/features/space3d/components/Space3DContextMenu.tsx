@@ -24,7 +24,7 @@ export function Space3DContextMenu({
   onAddSphere,
   onOpenModels,
   onRemove,
-  onClose,
+  onClose
 }: Space3DContextMenuProps) {
   const { t } = useLocale();
   const menuRef = useRef<HTMLDivElement>(null);

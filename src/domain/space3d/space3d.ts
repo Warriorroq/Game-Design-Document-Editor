@@ -4,7 +4,7 @@ import type {
   Space3DEditMode,
   Space3DGrid,
   Space3DObject,
-  Space3DObjectType,
+  Space3DObjectType
 } from "@/domain/types";
 
 export const SPACE3D_COLORS = [
@@ -13,7 +13,7 @@ export const SPACE3D_COLORS = [
   "#f97316",
   "#ec4899",
   "#06b6d4",
-  "#eab308",
+  "#eab308"
 ] as const;
 
 export function defaultSpace3DGrid(): Space3DGrid {
@@ -22,7 +22,7 @@ export function defaultSpace3DGrid(): Space3DGrid {
     step: 1,
     size: 40,
     centerColor: "#3f3f46",
-    lineColor: "#27272a",
+    lineColor: "#27272a"
   };
 }
 
@@ -73,7 +73,7 @@ export function normalizeSpace3DGrid(
     step: clampGridNumber(grid.step ?? legacyStep, 0, 10, base.step!),
     size: clampGridNumber(grid.size, 4, 200, base.size!),
     centerColor: normalizeHexColor(grid.centerColor, base.centerColor!),
-    lineColor: normalizeHexColor(grid.lineColor, base.lineColor!),
+    lineColor: normalizeHexColor(grid.lineColor, base.lineColor!)
   };
 }
 
@@ -82,9 +82,9 @@ export function defaultSpace3DData(): Space3DData {
     objects: [],
     camera: {
       position: { x: 8, y: 6, z: 8 },
-      target: { x: 0, y: 0, z: 0 },
+      target: { x: 0, y: 0, z: 0 }
     },
-    grid: defaultSpace3DGrid(),
+    grid: defaultSpace3DGrid()
   };
 }
 
@@ -99,7 +99,7 @@ function readScale(obj: Space3DObject & { scale?: number }) {
   return {
     scaleX: obj.scaleX ?? legacy ?? 1,
     scaleY: obj.scaleY ?? legacy ?? 1,
-    scaleZ: obj.scaleZ ?? legacy ?? 1,
+    scaleZ: obj.scaleZ ?? legacy ?? 1
   };
 }
 
@@ -119,7 +119,7 @@ export function normalizeSpace3DObject(obj: Space3DObject): Space3DObject {
     rotationX: Number.isFinite(obj.rotationX) ? obj.rotationX : 0,
     rotationY: Number.isFinite(obj.rotationY) ? obj.rotationY : 0,
     rotationZ: Number.isFinite(obj.rotationZ) ? obj.rotationZ : 0,
-    assetId: type === "model" ? obj.assetId : undefined,
+    assetId: type === "model" ? obj.assetId : undefined
   };
 }
 
@@ -133,7 +133,7 @@ export function normalizeSpace3DData(
     grid: normalizeSpace3DGrid(data.grid),
     objects: Array.isArray(data.objects)
       ? data.objects.map((obj) => normalizeSpace3DObject(obj))
-      : [],
+      : []
   };
 }
 
@@ -155,7 +155,7 @@ export function createSpace3DPrimitive(
     color: SPACE3D_COLORS[index % SPACE3D_COLORS.length],
     scaleX: 1,
     scaleY: 1,
-    scaleZ: 1,
+    scaleZ: 1
   });
 }
 
@@ -173,7 +173,7 @@ export function createSpace3DModelObject(
     z: 0,
     scaleX: 1,
     scaleY: 1,
-    scaleZ: 1,
+    scaleZ: 1
   });
 }
 

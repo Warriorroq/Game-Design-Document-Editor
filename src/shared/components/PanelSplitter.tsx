@@ -11,7 +11,7 @@ export function PanelSplitter({
   hidden,
   dragging,
   onPointerDown,
-  onDoubleClick,
+  onDoubleClick
 }: PanelSplitterProps) {
   const isStart = edge === "start";
   const label = isStart

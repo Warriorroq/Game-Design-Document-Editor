@@ -108,15 +108,15 @@ export function createInfiniteGrid(grid: Space3DGrid): THREE.Mesh {
     uniforms: {
       uStep: { value: step },
       uCenterColor: {
-        value: hexToColor(grid.centerColor ?? "#3f3f46", 0x3f3f46),
+        value: hexToColor(grid.centerColor ?? "#3f3f46", 0x3f3f46)
       },
       uLineColor: { value: hexToColor(grid.lineColor ?? "#27272a", 0x27272a) },
       uCameraPosition: { value: new THREE.Vector3() },
       uFadeNear: { value: 8 },
-      uFadeFar: { value: 140 },
+      uFadeFar: { value: 140 }
     },
     vertexShader: infiniteGridVertexShader,
-    fragmentShader: infiniteGridFragmentShader,
+    fragmentShader: infiniteGridFragmentShader
   });
 
   const mesh = new THREE.Mesh(

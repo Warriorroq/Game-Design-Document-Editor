@@ -4,13 +4,13 @@ import {
   useCallback,
   useContext,
   useMemo,
-  useState,
+  useState
 } from "react";
 
 import {
   type LinkTarget,
   linkTargetFromGddLink,
-  parseGddHref,
+  parseGddHref
 } from "@/features/links/lib/links";
 import type { GddDocument } from "@/shared/types";
 
@@ -55,7 +55,7 @@ const LinkContext = createContext<LinkContextValue | null>(null);
 export function LinkProvider({
   doc,
   setActiveSectionId,
-  children,
+  children
 }: {
   doc: GddDocument;
   setActiveSectionId: (id: string) => void;
@@ -119,7 +119,7 @@ export function LinkProvider({
       pasteDialog,
       openPasteDialog,
       closePasteDialog,
-      setActiveSectionId,
+      setActiveSectionId
     }),
     [
       doc,
@@ -133,7 +133,7 @@ export function LinkProvider({
       pasteDialog,
       openPasteDialog,
       closePasteDialog,
-      setActiveSectionId,
+      setActiveSectionId
     ]
   );
 

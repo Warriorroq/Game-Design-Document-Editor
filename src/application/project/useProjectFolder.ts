@@ -9,7 +9,7 @@ import {
   loadProjectFromFolder,
   pickProjectFolder,
   saveProjectToFolder,
-  setStoredProjectFolder,
+  setStoredProjectFolder
 } from "@/infrastructure/project/projectFolder";
 
 export function useProjectFolder() {
@@ -115,6 +115,6 @@ export function useProjectFolder() {
     saveDocTo,
     scheduleSaveDoc,
     closeFolder,
-    refreshGitStatus,
+    refreshGitStatus
   };
 }

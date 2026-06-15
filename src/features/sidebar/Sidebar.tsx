@@ -3,7 +3,7 @@ import {
   useCallback,
   useEffect,
   useRef,
-  useState,
+  useState
 } from "react";
 
 import { isSpace3DSection } from "@/domain/space3d/space3d";
@@ -12,7 +12,7 @@ import { useLinkContext } from "@/features/links/LinkContext";
 import {
   childItems,
   type SectionDropPosition,
-  type SidebarDropTarget,
+  type SidebarDropTarget
 } from "@/features/sidebar/lib/sidebarOrder";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
 import { useLocale } from "@/shared/context/LocaleContext";
@@ -92,7 +92,7 @@ function SidebarCreateMenu({
   onAddSection,
   onAddSpace3DSection,
   onAddFolder,
-  onClose,
+  onClose
 }: {
   parentFolderId: string | null;
   onAddSection: (folderId?: string) => void;
@@ -163,7 +163,7 @@ export function Sidebar({
   onRemoveFolder,
   onUpdateFolder,
   onToggleFolder,
-  onReorder,
+  onReorder
 }: SidebarProps) {
   const { t } = useLocale();
   const { openContextMenu } = useLinkContext();
@@ -337,7 +337,7 @@ export function Sidebar({
           active ? "active" : "",
           isDragging ? "section-item--dragging" : "",
           dropBefore ? "section-item--drop-before" : "",
-          dropAfter ? "section-item--drop-after" : "",
+          dropAfter ? "section-item--drop-after" : ""
         ]
           .filter(Boolean)
           .join(" ")}
@@ -347,7 +347,7 @@ export function Sidebar({
           openContextMenu({
             x: e.clientX,
             y: e.clientY,
-            copyHref: buildSectionHref(section.id),
+            copyHref: buildSectionHref(section.id)
           });
         }}
         onDragOver={(e) => {
@@ -360,14 +360,14 @@ export function Sidebar({
           setDropTarget({
             kind: "section",
             id: section.id,
-            position: dropPositionFromEvent(e),
+            position: dropPositionFromEvent(e)
           });
         }}
         onDrop={(e) =>
           handleDrop(e, {
             kind: "section",
             id: section.id,
-            position: dropPositionFromEvent(e),
+            position: dropPositionFromEvent(e)
           })
         }
         onDragLeave={(e) => {
@@ -425,7 +425,7 @@ export function Sidebar({
             setPendingRemove({
               kind: "section",
               id: section.id,
-              title: section.title,
+              title: section.title
             })
           }
           title={t("sidebar.removeSection")}
@@ -461,7 +461,7 @@ export function Sidebar({
             isDragging ? "section-item--dragging" : "",
             dropBefore ? "section-item--drop-before" : "",
             dropAfter ? "section-item--drop-after" : "",
-            dropInside ? "folder-item--drop-inside" : "",
+            dropInside ? "folder-item--drop-inside" : ""
           ]
             .filter(Boolean)
             .join(" ")}
@@ -475,14 +475,14 @@ export function Sidebar({
             setDropTarget({
               kind: "folder",
               id: folder.id,
-              position: folderDropPositionFromEvent(e),
+              position: folderDropPositionFromEvent(e)
             });
           }}
           onDrop={(e) =>
             handleDrop(e, {
               kind: "folder",
               id: folder.id,
-              position: folderDropPositionFromEvent(e),
+              position: folderDropPositionFromEvent(e)
             })
           }
           onDragLeave={(e) => {
@@ -552,7 +552,7 @@ export function Sidebar({
               setPendingRemove({
                 kind: "folder",
                 id: folder.id,
-                title: folder.title,
+                title: folder.title
               })
             }
             title={t("sidebar.removeFolder")}

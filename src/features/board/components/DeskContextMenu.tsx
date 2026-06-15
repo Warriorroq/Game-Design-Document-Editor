@@ -61,7 +61,7 @@ export function DeskContextMenu({
   onSendBackward,
   onFlipHorizontal,
   onFlipVertical,
-  onClose,
+  onClose
 }: DeskContextMenuProps) {
   const { t } = useLocale();
   const menuRef = useRef<HTMLDivElement>(null);

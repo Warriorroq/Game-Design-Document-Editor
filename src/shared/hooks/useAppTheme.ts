@@ -3,7 +3,7 @@ import { useCallback, useState } from "react";
 import {
   applyTheme,
   type AppThemeId,
-  loadStoredTheme,
+  loadStoredTheme
 } from "@/shared/lib/appTheme";
 
 export function useAppTheme() {

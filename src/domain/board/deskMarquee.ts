@@ -1,6 +1,6 @@
 import {
   boardBoxBounds,
-  resolveBoardPoint,
+  resolveBoardPoint
 } from "@/domain/board/boardGeometry";
 import type { DeskSelection } from "@/domain/board/deskClipboard";
 import { mergeSelections, selectionFromGroup } from "@/domain/board/deskGroups";
@@ -10,7 +10,7 @@ import type {
   BoardPoint,
   BoardShape,
   BoardStroke,
-  BoardText,
+  BoardText
 } from "@/domain/types";
 
 export interface BoardRect {
@@ -49,7 +49,7 @@ function textRect(text: BoardText): BoardRect {
     x: text.x,
     y: text.y,
     width: text.width,
-    height: Math.max(lineHeight, lines * lineHeight) + padding,
+    height: Math.max(lineHeight, lines * lineHeight) + padding
   };
 }
 
@@ -85,7 +85,7 @@ function strokeRect(stroke: BoardStroke): BoardRect {
     x: minX - pad,
     y: minY - pad,
     width: maxX - minX + pad * 2,
-    height: maxY - minY + pad * 2,
+    height: maxY - minY + pad * 2
   };
 }
 
@@ -97,7 +97,7 @@ function expandSelectionWithGroups(
     itemIds: [...raw.itemIds],
     shapeIds: [...raw.shapeIds],
     textIds: [...raw.textIds],
-    strokeIds: [...raw.strokeIds],
+    strokeIds: [...raw.strokeIds]
   };
 
   for (const group of groups) {
@@ -140,7 +140,7 @@ export function selectionFromMarqueeRect(
       .map((text) => text.id),
     strokeIds: strokes
       .filter((stroke) => rectsIntersect(rect, strokeRect(stroke)))
-      .map((stroke) => stroke.id),
+      .map((stroke) => stroke.id)
   };
 
   const expanded = expandSelectionWithGroups(raw, groups);

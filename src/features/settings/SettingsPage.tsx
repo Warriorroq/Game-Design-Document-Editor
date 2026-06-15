@@ -10,13 +10,13 @@ import { APP_LANGUAGES } from "@/shared/i18n";
 import { themeDescKey, themeNameKey } from "@/shared/i18n";
 import {
   shortcutDescKey,
-  shortcutLabelKey,
+  shortcutLabelKey
 } from "@/shared/i18n/shortcutMessages";
 import { APP_THEME_IDS, themePreview } from "@/shared/lib/appTheme";
 import { isDesktopApp } from "@/shared/lib/desktop";
 import {
   SHORTCUT_DEFINITIONS,
-  type ShortcutGroup,
+  type ShortcutGroup
 } from "@/shared/lib/shortcuts";
 
 import { ShortcutBindingInput } from "./ShortcutBindingInput";
@@ -40,7 +40,7 @@ export function SettingsPage({
   projectFolderPath = null,
   gitAvailable = false,
   gitStatus = null,
-  onRefreshGitStatus,
+  onRefreshGitStatus
 }: SettingsPageProps) {
   const [tab, setTab] = useState<SettingsTab>("general");
   const { themeId, setTheme } = useAppTheme();
@@ -57,7 +57,7 @@ export function SettingsPage({
       git: "settings.tab.git",
       styles: "settings.tab.styles",
       shortcuts: "settings.tab.shortcuts",
-      languages: "settings.tab.languages",
+      languages: "settings.tab.languages"
     };
     return order.map((id) => ({ id, labelKey: labelKeys[id] }));
   }, []);

@@ -6,7 +6,7 @@ import { parseGdeProject } from "@/infrastructure/project/projectFile";
 import {
   documentToFolderFiles,
   folderFilesToDocument,
-  MANIFEST_FILE,
+  MANIFEST_FILE
 } from "@/infrastructure/project/projectLayout";
 
 const ZIP_MAGIC = [0x50, 0x4b];
@@ -56,7 +56,7 @@ export async function buildGdeArchive(doc: GddDocument): Promise<Blob> {
   return zip.generateAsync({
     type: "blob",
     compression: "DEFLATE",
-    compressionOptions: { level: 6 },
+    compressionOptions: { level: 6 }
   });
 }
 

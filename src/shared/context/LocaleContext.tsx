@@ -4,7 +4,7 @@ import {
   useCallback,
   useContext,
   useMemo,
-  useState,
+  useState
 } from "react";
 
 import {
@@ -13,7 +13,7 @@ import {
   type MessageKey,
   saveLanguage,
   translate,
-  type TranslateParams,
+  type TranslateParams
 } from "@/shared/i18n";
 
 interface LocaleContextValue {

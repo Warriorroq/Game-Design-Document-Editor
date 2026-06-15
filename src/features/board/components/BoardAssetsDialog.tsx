@@ -7,11 +7,11 @@ import { createPortal } from "react-dom";
 import {
   countBoardImageAssetUsage,
   displayBoardImageAssetName,
-  listBoardImageAssetDesks,
+  listBoardImageAssetDesks
 } from "@/features/board/lib/boardImageRegistry";
 import {
   buildAssetDeskClipboard,
-  type DeskClipboard,
+  type DeskClipboard
 } from "@/features/board/lib/deskClipboard";
 import { buildMediaHref } from "@/features/links/lib/links";
 import { useLinkContext } from "@/features/links/LinkContext";
@@ -35,7 +35,7 @@ export function BoardAssetsDialog({
   onClose,
   onDeleteAsset,
   onUpdateAssetName,
-  onCopyAsset,
+  onCopyAsset
 }: BoardAssetsDialogProps) {
   const { t } = useLocale();
   const { navigateToHref } = useLinkContext();

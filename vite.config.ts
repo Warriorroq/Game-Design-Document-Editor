@@ -7,17 +7,17 @@ export default defineConfig({
   base: "./",
   server: {
     headers: {
-      "Referrer-Policy": "strict-origin-when-cross-origin",
-    },
+      "Referrer-Policy": "strict-origin-when-cross-origin"
+    }
   },
   preview: {
     headers: {
-      "Referrer-Policy": "strict-origin-when-cross-origin",
-    },
+      "Referrer-Policy": "strict-origin-when-cross-origin"
+    }
   },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
-  },
+      "@": path.resolve(__dirname, "./src")
+    }
+  }
 });

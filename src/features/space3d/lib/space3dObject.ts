@@ -39,7 +39,7 @@ export function patchFromObject3D(
     scaleZ: obj.scale.z,
     rotationX: THREE.MathUtils.radToDeg(obj.rotation.x),
     rotationY: THREE.MathUtils.radToDeg(obj.rotation.y),
-    rotationZ: THREE.MathUtils.radToDeg(obj.rotation.z),
+    rotationZ: THREE.MathUtils.radToDeg(obj.rotation.z)
   }) as Pick<
     Space3DObject,
     | "x"
@@ -79,7 +79,7 @@ export function primitiveMesh(obj: Space3DObject): THREE.Mesh {
       ? new THREE.SphereGeometry(0.5, 24, 16)
       : new THREE.BoxGeometry(1, 1, 1);
   const material = new THREE.MeshStandardMaterial({
-    color: obj.color ?? "#6366f1",
+    color: obj.color ?? "#6366f1"
   });
   const mesh = new THREE.Mesh(geometry, material);
   mesh.scale.set(sx, sy, sz);

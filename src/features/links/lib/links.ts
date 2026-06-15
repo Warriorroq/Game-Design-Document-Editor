@@ -2,7 +2,7 @@ import type {
   BoardItem,
   BoardText,
   GddDocument,
-  GddSection,
+  GddSection
 } from "@/shared/types";
 
 export type GddLink =
@@ -164,6 +164,6 @@ export function linkTargetFromGddLink(link: GddLink): LinkTarget | null {
     sectionId: link.sectionId,
     anchorId: link.type === "anchor" ? link.anchorId : undefined,
     mediaId: link.type === "media" ? link.itemId : undefined,
-    textId: link.type === "text" ? link.textId : undefined,
+    textId: link.type === "text" ? link.textId : undefined
   };
 }

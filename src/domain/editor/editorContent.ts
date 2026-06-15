@@ -1,11 +1,11 @@
 import {
   previewMissingTableControls,
-  renderMarkdown,
+  renderMarkdown
 } from "@/domain/editor/markdown";
 import { isExternalHref } from "@/features/links/lib/links";
 import {
   stripEphemeralEditorMarkup,
-  stripEphemeralFromHtml,
+  stripEphemeralFromHtml
 } from "@/shared/lib/searchHighlight";
 
 export { previewMissingTableControls };

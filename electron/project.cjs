@@ -29,7 +29,7 @@ function mimeFromPath(filePath) {
     jpeg: "image/jpeg",
     png: "image/png",
     webp: "image/webp",
-    gif: "image/gif",
+    gif: "image/gif"
   };
   return map[ext] ?? "application/octet-stream";
 }
@@ -45,7 +45,7 @@ function readLegacyProject(dir) {
   } catch (err) {
     return {
       ok: false,
-      error: err instanceof Error ? err.message : "read_failed",
+      error: err instanceof Error ? err.message : "read_failed"
     };
   }
 }
@@ -70,7 +70,7 @@ function readProjectFolder(dir) {
         sections.push({
           id,
           path: `${SECTIONS_DIR}/${name}`,
-          content,
+          content
         });
       }
     }
@@ -83,7 +83,7 @@ function readProjectFolder(dir) {
         assets.push({
           path: `${ASSETS_DIR}/${name}`,
           mime: mimeFromPath(filePath),
-          dataBase64: readBinaryFile(filePath),
+          dataBase64: readBinaryFile(filePath)
         });
       }
     }
@@ -91,12 +91,12 @@ function readProjectFolder(dir) {
     return {
       ok: true,
       legacy: false,
-      payload: { manifest, sections, assets },
+      payload: { manifest, sections, assets }
     };
   } catch (err) {
     return {
       ok: false,
-      error: err instanceof Error ? err.message : "read_failed",
+      error: err instanceof Error ? err.message : "read_failed"
     };
   }
 }
@@ -166,7 +166,7 @@ function writeProjectFolder(dir, payload) {
   } catch (err) {
     return {
       ok: false,
-      error: err instanceof Error ? err.message : "write_failed",
+      error: err instanceof Error ? err.message : "write_failed"
     };
   }
 }
@@ -186,12 +186,12 @@ function readGdeArchiveFile(filePath) {
     return {
       ok: true,
       filePath,
-      dataBase64: data.toString("base64"),
+      dataBase64: data.toString("base64")
     };
   } catch (err) {
     return {
       ok: false,
-      error: err instanceof Error ? err.message : "read_failed",
+      error: err instanceof Error ? err.message : "read_failed"
     };
   }
 }
@@ -201,5 +201,5 @@ module.exports = {
   hasProjectFile,
   readProjectFolder,
   writeProjectFolder,
-  readGdeArchiveFile,
+  readGdeArchiveFile
 };

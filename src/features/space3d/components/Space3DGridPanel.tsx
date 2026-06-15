@@ -14,7 +14,7 @@ function NumRow({
   step,
   min,
   max,
-  onCommit,
+  onCommit
 }: {
   label: string;
   value: number;

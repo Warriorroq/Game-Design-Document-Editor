@@ -17,7 +17,7 @@ const YOUTUBE_HOSTS = new Set([
   "youtube-nocookie.com",
   "www.youtube-nocookie.com",
   "m.youtube.com",
-  "music.youtube.com",
+  "music.youtube.com"
 ]);
 
 /** Embed origin sent to YouTube when the app has no http(s) origin (e.g. Electron file://). */
@@ -131,7 +131,7 @@ export function parseVideoEmbed(input: string): VideoEmbed | null {
       render: "iframe",
       src: buildYouTubeEmbedSrc(youtubeId),
       originalUrl: normalized,
-      provider: "youtube",
+      provider: "youtube"
     };
   }
 
@@ -142,7 +142,7 @@ export function parseVideoEmbed(input: string): VideoEmbed | null {
       render: "iframe",
       src: `https://player.vimeo.com/video/${vimeoId}`,
       originalUrl: normalized,
-      provider: "vimeo",
+      provider: "vimeo"
     };
   }
 
@@ -152,7 +152,7 @@ export function parseVideoEmbed(input: string): VideoEmbed | null {
       render: "video",
       src: normalized,
       originalUrl: normalized,
-      provider: "direct",
+      provider: "direct"
     };
   }
 

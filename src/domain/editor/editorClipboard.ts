@@ -37,7 +37,7 @@ const ALLOWED_TAGS = new Set([
   "TD",
   "SUP",
   "SUB",
-  "BUTTON",
+  "BUTTON"
 ]);
 
 const GLOBAL_ATTRS = new Set([
@@ -46,7 +46,7 @@ const GLOBAL_ATTRS = new Set([
   "contenteditable",
   "tabindex",
   "aria-label",
-  "role",
+  "role"
 ]);
 
 const TAG_ATTRS: Record<string, Set<string>> = {
@@ -61,8 +61,8 @@ const TAG_ATTRS: Record<string, Set<string>> = {
     "class",
     "contenteditable",
     "tabindex",
-    "aria-label",
-  ]),
+    "aria-label"
+  ])
 };
 
 function escapeHtml(text: string): string {

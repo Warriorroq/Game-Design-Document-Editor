@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import {
   clampTransformPatch,
-  MIN_SCALE,
+  MIN_SCALE
 } from "@/features/space3d/lib/space3dObject";
 import { useLocale } from "@/shared/context/LocaleContext";
 import type { Space3DObject } from "@/shared/types";
@@ -28,7 +28,7 @@ function NumRow({
   value,
   step,
   min,
-  onCommit,
+  onCommit
 }: {
   label: string;
   value: number;
@@ -76,7 +76,7 @@ function NumRow({
 
 export function Space3DObjectInspector({
   object,
-  onChange,
+  onChange
 }: Space3DObjectInspectorProps) {
   const { t } = useLocale();
 

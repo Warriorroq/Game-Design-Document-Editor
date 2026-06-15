@@ -1,12 +1,12 @@
 import {
   boardBoxBounds,
-  resolveBoardPoint,
+  resolveBoardPoint
 } from "@/features/board/lib/boardGeometry";
 import type {
   BoardItem,
   BoardPoint,
   BoardShape,
-  BoardShapeType,
+  BoardShapeType
 } from "@/shared/types";
 
 const SHAPE_LINE_HIT_WIDTH = 14;
@@ -34,7 +34,7 @@ function ShapeView({
   items,
   selected,
   onShapePointerDown,
-  onEndpointPointerDown,
+  onEndpointPointerDown
 }: {
   shape: BoardShape;
   items: BoardItem[];
@@ -162,7 +162,7 @@ function ShapeView({
 function Handle({
   cx,
   cy,
-  onPointerDown,
+  onPointerDown
 }: {
   cx: number;
   cy: number;
@@ -191,7 +191,7 @@ export function BoardShapesLayer({
   selectedShapeIds,
   className = "board-shapes-layer",
   onShapePointerDown,
-  onEndpointPointerDown,
+  onEndpointPointerDown
 }: BoardShapesLayerProps) {
   return (
     <svg
@@ -233,7 +233,7 @@ export function BoardShapesLayer({
             id: "__preview",
             type: preview.type,
             start: preview.start,
-            end: preview.end,
+            end: preview.end
           }}
           items={items}
           selected={false}

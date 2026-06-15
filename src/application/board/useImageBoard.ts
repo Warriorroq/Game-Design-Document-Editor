@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   DEFAULT_VIDEO_HEIGHT,
   DEFAULT_VIDEO_WIDTH,
-  isBoardVideoItem,
+  isBoardVideoItem
 } from "@/domain/board/boardItem";
 import {
   clamp,
@@ -12,7 +12,7 @@ import {
   isShapeTool,
   PASTE_OFFSET,
   shapeLongEnough,
-  ZOOM_INTENSITY,
+  ZOOM_INTENSITY
 } from "@/domain/board/deskDrawing";
 import { parseVideoEmbed } from "@/domain/board/videoEmbed";
 import type {
@@ -23,43 +23,43 @@ import type {
   BoardShape,
   BoardShapeType,
   BoardStroke,
-  BoardText,
+  BoardText
 } from "@/domain/types";
 import { snapBoardPoint } from "@/features/board/lib/boardGeometry";
 import {
   pointerAngleRad,
   rotationDeltaDeg,
-  snapRotationAngle,
+  snapRotationAngle
 } from "@/features/board/lib/boardItemTransform";
 import {
   appendPenPoint,
   DEFAULT_PEN_COLOR,
   DEFAULT_PEN_WIDTH,
-  penStrokeLongEnough,
+  penStrokeLongEnough
 } from "@/features/board/lib/boardPen";
 import {
   BOARD_MAX_SCALE,
   type BoardViewport,
   constrainBoardViewport,
-  fitBoardViewport,
+  fitBoardViewport
 } from "@/features/board/lib/boardViewport";
 import {
   buildDeskClipboard,
   type DeskClipboard,
   type DeskSelection,
-  pasteDeskClipboard,
+  pasteDeskClipboard
 } from "@/features/board/lib/deskClipboard";
 import {
   applyDeskSelectClick,
   armDragAfterThreshold,
   groupsTouchingSelection,
   isSingleImageSelection,
-  selectionCount,
+  selectionCount
 } from "@/features/board/lib/deskGroups";
 import { canReorderDeskLayer } from "@/features/board/lib/deskLayerOrder";
 import {
   boardRectFromPoints,
-  selectionFromMarqueeRect,
+  selectionFromMarqueeRect
 } from "@/features/board/lib/deskMarquee";
 import { translateStroke } from "@/features/board/lib/deskStrokeTransform";
 import { translateShapeForDrag } from "@/features/board/lib/deskTransform";
@@ -70,7 +70,7 @@ import { useShortcuts } from "@/shared/context/ShortcutsContext";
 import {
   blobToDataUrl,
   getImageFromClipboard,
-  loadImageDimensions,
+  loadImageDimensions
 } from "@/shared/lib/imageUtils";
 import { HIGHLIGHT_FLASH_MS } from "@/shared/lib/searchHighlight";
 
@@ -133,7 +133,7 @@ const EMPTY_SELECTION: DeskSelection = {
   itemIds: [],
   shapeIds: [],
   textIds: [],
-  strokeIds: [],
+  strokeIds: []
 };
 
 export function useImageBoard({
@@ -170,7 +170,7 @@ export function useImageBoard({
   onEndTransientEdit,
   resolveItemSrc,
   deskClipboard,
-  onStoreDeskClipboard,
+  onStoreDeskClipboard
 }: ImageBoardProps) {
   const { t } = useLocale();
   const { width: canvasWidth, height: canvasHeight } = useBoardSize();
@@ -226,7 +226,7 @@ export function useImageBoard({
   const [viewport, setViewport] = useState<BoardViewport>({
     scale: 1,
     panX: 0,
-    panY: 0,
+    panY: 0
   });
   const viewportRef = useRef(viewport);
   viewportRef.current = viewport;
@@ -294,7 +294,7 @@ export function useImageBoard({
       item: (id: string) => Boolean(itemMap.get(id)?.locked),
       shape: (id: string) => Boolean(shapeMap.get(id)?.locked),
       text: (id: string) => Boolean(textMap.get(id)?.locked),
-      stroke: (id: string) => Boolean(strokeMap.get(id)?.locked),
+      stroke: (id: string) => Boolean(strokeMap.get(id)?.locked)
     };
   }, [items, shapes, texts, strokes]);
 
@@ -303,7 +303,7 @@ export function useImageBoard({
       ...selection.itemIds.map((id) => ({ kind: "item" as const, id })),
       ...selection.shapeIds.map((id) => ({ kind: "shape" as const, id })),
       ...selection.textIds.map((id) => ({ kind: "text" as const, id })),
-      ...selection.strokeIds.map((id) => ({ kind: "stroke" as const, id })),
+      ...selection.strokeIds.map((id) => ({ kind: "stroke" as const, id }))
     ];
     const total = selectedIds.length;
     const locked = selectedIds.filter(({ kind, id }) =>
@@ -332,8 +332,8 @@ export function useImageBoard({
       ...clip,
       items: clip.items.map((item) => ({
         ...item,
-        src: resolveItemSrc(item),
-      })),
+        src: resolveItemSrc(item)
+      }))
     });
     // Replace any stale image in the system clipboard so paste prefers desk content.
     void navigator.clipboard.writeText("").catch(() => {});
@@ -345,7 +345,7 @@ export function useImageBoard({
     groups,
     selection,
     onStoreDeskClipboard,
-    resolveItemSrc,
+    resolveItemSrc
   ]);
 
   const pasteDesk = useCallback(() => {
@@ -356,7 +356,7 @@ export function useImageBoard({
       shapes: result.shapes,
       texts: result.texts,
       strokes: result.strokes,
-      groups: result.groups,
+      groups: result.groups
     });
     setSelection(result.selection);
     surfaceRef.current?.focus();
@@ -369,7 +369,7 @@ export function useImageBoard({
       memberItemIds: [...selection.itemIds],
       memberShapeIds: [...selection.shapeIds],
       memberTextIds: [...selection.textIds],
-      memberStrokeIds: [...selection.strokeIds],
+      memberStrokeIds: [...selection.strokeIds]
     });
   }, [onAddGroup, selection, selectionSize]);
 
@@ -438,7 +438,7 @@ export function useImageBoard({
       textIds: selection.textIds.filter((id) => isSelectionLocked.text(id)),
       strokeIds: selection.strokeIds.filter((id) =>
         isSelectionLocked.stroke(id)
-      ),
+      )
     });
   }, [onRemoveSelection, selection, selectionSize, isSelectionLocked]);
 
@@ -475,7 +475,7 @@ export function useImageBoard({
             itemIds: [singleImageSelection],
             shapeIds: [],
             textIds: [],
-            strokeIds: [],
+            strokeIds: []
           }
         : EMPTY_SELECTION,
     [singleImageSelection]
@@ -513,7 +513,7 @@ export function useImageBoard({
     canBringForward,
     onReorderLayer,
     singleImageLayerSelection,
-    singleImageSelection,
+    singleImageSelection
   ]);
 
   const sendSelectionBackward = useCallback(() => {
@@ -523,7 +523,7 @@ export function useImageBoard({
     canSendBackward,
     onReorderLayer,
     singleImageLayerSelection,
-    singleImageSelection,
+    singleImageSelection
   ]);
 
   const flipSelectionHorizontal = useCallback(() => {
@@ -559,7 +559,7 @@ export function useImageBoard({
             id: "desk.copy",
             label: t("menu.copy"),
             onClick: copyDesk,
-            disabled: selectionCount(nextSelection) === 0,
+            disabled: selectionCount(nextSelection) === 0
           },
           {
             id: "desk.lock",
@@ -567,7 +567,7 @@ export function useImageBoard({
             onClick: lockSelection,
             disabled:
               selectionCount(nextSelection) === 0 ||
-              selectionLockSummary.unlocked === 0,
+              selectionLockSummary.unlocked === 0
           },
           {
             id: "desk.unlock",
@@ -575,7 +575,7 @@ export function useImageBoard({
             onClick: unlockSelection,
             disabled:
               selectionCount(nextSelection) === 0 ||
-              selectionLockSummary.locked === 0,
+              selectionLockSummary.locked === 0
           },
           ...(isSingleImageSelection(nextSelection)
             ? [
@@ -589,10 +589,10 @@ export function useImageBoard({
                       itemIds: [nextSelection.itemIds[0]!],
                       shapeIds: [],
                       textIds: [],
-                      strokeIds: [],
+                      strokeIds: []
                     },
                     "forward"
-                  ),
+                  )
                 },
                 {
                   id: "desk.sendBackward",
@@ -604,26 +604,26 @@ export function useImageBoard({
                       itemIds: [nextSelection.itemIds[0]!],
                       shapeIds: [],
                       textIds: [],
-                      strokeIds: [],
+                      strokeIds: []
                     },
                     "backward"
-                  ),
+                  )
                 },
                 {
                   id: "desk.flipHorizontal",
                   label: t("desk.flipHorizontal"),
                   onClick: flipSelectionHorizontal,
-                  disabled: isSelectionLocked.item(nextSelection.itemIds[0]!),
+                  disabled: isSelectionLocked.item(nextSelection.itemIds[0]!)
                 },
                 {
                   id: "desk.flipVertical",
                   label: t("desk.flipVertical"),
                   onClick: flipSelectionVertical,
-                  disabled: isSelectionLocked.item(nextSelection.itemIds[0]!),
-                },
+                  disabled: isSelectionLocked.item(nextSelection.itemIds[0]!)
+                }
               ]
-            : []),
-        ],
+            : [])
+        ]
       });
     },
     [
@@ -639,7 +639,7 @@ export function useImageBoard({
       selectionLockSummary.unlocked,
       sendSelectionBackward,
       t,
-      unlockSelection,
+      unlockSelection
     ]
   );
 
@@ -660,7 +660,7 @@ export function useImageBoard({
       if (!rect) return { x: 0, y: 0 };
       return {
         x: (clientX - rect.left - viewport.panX) / viewport.scale,
-        y: (clientY - rect.top - viewport.panY) / viewport.scale,
+        y: (clientY - rect.top - viewport.panY) / viewport.scale
       };
     },
     [viewport.panX, viewport.panY, viewport.scale]
@@ -678,7 +678,7 @@ export function useImageBoard({
       itemIds: [item.id],
       shapeIds: [],
       textIds: [],
-      strokeIds: [],
+      strokeIds: []
     });
     const { w, h } = surfaceSizeRef.current;
     if (w > 0 && h > 0) {
@@ -690,7 +690,7 @@ export function useImageBoard({
           {
             scale,
             panX: w / 2 - cx * scale,
-            panY: h / 2 - cy * scale,
+            panY: h / 2 - cy * scale
           },
           w,
           h,
@@ -719,7 +719,7 @@ export function useImageBoard({
       itemIds: [],
       shapeIds: [],
       textIds: [text.id],
-      strokeIds: [],
+      strokeIds: []
     });
     const { w, h } = surfaceSizeRef.current;
     if (w > 0 && h > 0) {
@@ -731,7 +731,7 @@ export function useImageBoard({
           {
             scale,
             panX: w / 2 - cx * scale,
-            panY: h / 2 - cy * scale,
+            panY: h / 2 - cy * scale
           },
           w,
           h,
@@ -753,7 +753,7 @@ export function useImageBoard({
     const n = pasteCount.current++;
     return {
       x: base.x + (n % 6) * PASTE_OFFSET,
-      y: base.y + Math.floor(n / 6) * PASTE_OFFSET,
+      y: base.y + Math.floor(n / 6) * PASTE_OFFSET
     };
   }, []);
 
@@ -774,7 +774,7 @@ export function useImageBoard({
         x: Math.max(0, Math.min(pos.x, canvasWidth - width)),
         y: Math.max(0, Math.min(pos.y, canvasHeight - height)),
         width,
-        height,
+        height
       });
       setSelection({ itemIds: [id], shapeIds: [], textIds: [], strokeIds: [] });
       setPasteHint(false);
@@ -801,7 +801,7 @@ export function useImageBoard({
         x: Math.max(0, Math.min(pos.x, canvasWidth - width)),
         y: Math.max(0, Math.min(pos.y, canvasHeight - height)),
         width,
-        height,
+        height
       });
       setSelection({ itemIds: [id], shapeIds: [], textIds: [], strokeIds: [] });
       setPasteHint(false);
@@ -868,7 +868,7 @@ export function useImageBoard({
         return {
           scale: nextScale,
           panX: mouseX - worldX * nextScale,
-          panY: mouseY - worldY * nextScale,
+          panY: mouseY - worldY * nextScale
         };
       });
     },
@@ -1015,7 +1015,7 @@ export function useImageBoard({
     isDeskFocused,
     selectionSize,
     ungroupSelection,
-    editingTextId,
+    editingTextId
   ]);
 
   const commitDraw = useCallback(
@@ -1028,13 +1028,13 @@ export function useImageBoard({
           id,
           type: session.type,
           start: session.start,
-          end,
+          end
         });
         setSelection({
           itemIds: [],
           shapeIds: [id],
           textIds: [],
-          strokeIds: [],
+          strokeIds: []
         });
       }
       drawSession.current = null;
@@ -1056,7 +1056,7 @@ export function useImageBoard({
       id,
       points: session.points,
       color: penColor,
-      width: penWidth,
+      width: penWidth
     });
     penSession.current = null;
     setPenPreview(null);
@@ -1115,7 +1115,7 @@ export function useImageBoard({
       for (const orig of itemOrigins) {
         onUpdate(orig.id, {
           x: Math.max(0, orig.x + dx),
-          y: Math.max(0, orig.y + dy),
+          y: Math.max(0, orig.y + dy)
         });
       }
       for (const orig of shapeOrigins) {
@@ -1124,7 +1124,7 @@ export function useImageBoard({
       for (const orig of textOrigins) {
         onUpdateText(orig.id, {
           x: Math.max(0, orig.x + dx),
-          y: Math.max(0, orig.y + dy),
+          y: Math.max(0, orig.y + dy)
         });
       }
       for (const orig of strokeOrigins) {
@@ -1149,7 +1149,7 @@ export function useImageBoard({
         onRemoveText(textId);
         setSelection((prev) => ({
           ...prev,
-          textIds: prev.textIds.filter((id) => id !== textId),
+          textIds: prev.textIds.filter((id) => id !== textId)
         }));
         return;
       }
@@ -1166,7 +1166,7 @@ export function useImageBoard({
       content: "Text",
       x: Math.max(0, pos.x),
       y: Math.max(0, pos.y),
-      width: DEFAULT_TEXT_WIDTH,
+      width: DEFAULT_TEXT_WIDTH
     });
     setSelection({ itemIds: [], shapeIds: [], textIds: [id], strokeIds: [] });
     setEditingTextId(id);
@@ -1194,7 +1194,7 @@ export function useImageBoard({
       const dy = (ev.clientY - startY) / scale;
       onUpdateText(text.id, {
         x: Math.max(0, orig.x + dx),
-        y: Math.max(0, orig.y + dy),
+        y: Math.max(0, orig.y + dy)
       });
     };
 
@@ -1252,12 +1252,12 @@ export function useImageBoard({
       if (mode === "move") {
         onUpdate(item.id, {
           x: Math.max(0, orig.x + dx),
-          y: Math.max(0, orig.y + dy),
+          y: Math.max(0, orig.y + dy)
         });
       } else {
         onUpdate(item.id, {
           width: Math.max(80, orig.width + dx),
-          height: Math.max(60, orig.height + dy),
+          height: Math.max(60, orig.height + dy)
         });
       }
     };
@@ -1341,7 +1341,7 @@ export function useImageBoard({
 
     const onUp = (ev: PointerEvent) => {
       onUpdate(item.id, {
-        rotation: snapRotationAngle(rotationAt(ev.clientX, ev.clientY)),
+        rotation: snapRotationAngle(rotationAt(ev.clientX, ev.clientY))
       });
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
@@ -1496,7 +1496,7 @@ export function useImageBoard({
       itemIds: [],
       shapeIds: [shapeId],
       textIds: [],
-      strokeIds: [],
+      strokeIds: []
     });
 
     const shape = shapes.find((s) => s.id === shapeId);
@@ -1594,7 +1594,7 @@ export function useImageBoard({
       origPanX: viewport.panX,
       origPanY: viewport.panY,
       moved: false,
-      button: e.button,
+      button: e.button
     };
     surfaceRef.current?.setPointerCapture(e.pointerId);
   };
@@ -1636,7 +1636,7 @@ export function useImageBoard({
       penColor,
       penWidth,
       clearSelection,
-      items,
+      items
     ]
   );
 
@@ -1682,7 +1682,7 @@ export function useImageBoard({
     marqueeSession.current = {
       startWorld: world,
       shiftKey: e.shiftKey,
-      moved: false,
+      moved: false
     };
     setMarqueePreview({ start: world, end: world });
     surfaceRef.current?.setPointerCapture(e.pointerId);
@@ -1714,7 +1714,7 @@ export function useImageBoard({
         setPenPreview({
           points: nextPoints,
           color: penColor,
-          width: penWidth,
+          width: penWidth
         });
       }
       return;
@@ -1725,7 +1725,7 @@ export function useImageBoard({
       setDrawPreview({
         type: drawSession.current.type,
         start: drawSession.current.start,
-        end,
+        end
       });
       return;
     }
@@ -1740,7 +1740,7 @@ export function useImageBoard({
     applyViewport((v) => ({
       ...v,
       panX: session.origPanX + dx,
-      panY: session.origPanY + dy,
+      panY: session.origPanY + dy
     }));
   };
 
@@ -1893,7 +1893,7 @@ export function useImageBoard({
     drawPreview,
     setPasteHint,
     pickDeskTool,
-    placeVideo,
+    placeVideo
   };
 }
 

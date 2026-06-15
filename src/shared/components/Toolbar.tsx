@@ -53,7 +53,7 @@ export function Toolbar({
   onRefreshGitStatus,
   onAfterGitPull,
   onFlushProject,
-  onOpenImageAssets,
+  onOpenImageAssets
 }: ToolbarProps) {
   const { t } = useLocale();
   const [isMaximized, setIsMaximized] = useState(false);

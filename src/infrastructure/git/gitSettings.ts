@@ -7,7 +7,7 @@ export interface GitSettings {
 
 const DEFAULTS: GitSettings = {
   userName: "",
-  userEmail: "",
+  userEmail: ""
 };
 
 export function loadGitSettings(): GitSettings {
@@ -17,7 +17,7 @@ export function loadGitSettings(): GitSettings {
     const parsed = JSON.parse(raw) as Partial<GitSettings>;
     return {
       userName: typeof parsed.userName === "string" ? parsed.userName : "",
-      userEmail: typeof parsed.userEmail === "string" ? parsed.userEmail : "",
+      userEmail: typeof parsed.userEmail === "string" ? parsed.userEmail : ""
     };
   } catch {
     return { ...DEFAULTS };

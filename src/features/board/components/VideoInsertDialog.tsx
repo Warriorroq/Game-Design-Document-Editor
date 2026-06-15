@@ -15,7 +15,7 @@ interface VideoInsertDialogProps {
 export function VideoInsertDialog({
   open,
   onClose,
-  onInsert,
+  onInsert
 }: VideoInsertDialogProps) {
   const { t } = useLocale();
   const [url, setUrl] = useState("");

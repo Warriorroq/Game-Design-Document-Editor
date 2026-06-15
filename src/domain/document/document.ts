@@ -5,7 +5,7 @@ import type {
   BoardItem,
   GddDocument,
   GddSection,
-  GddSectionFolder,
+  GddSectionFolder
 } from "@/domain/types";
 
 function parentKey(folderId: string | null | undefined): string {
@@ -33,7 +33,7 @@ function normalizeFolders(
 ): GddSectionFolder[] {
   const normalized = (folders ?? []).map((folder) => ({
     ...folder,
-    title: folder.title || "Folder",
+    title: folder.title || "Folder"
   }));
   const folderIds = new Set(normalized.map((folder) => folder.id));
   return normalized.map((folder) => {
@@ -63,9 +63,7 @@ export function normalizeDocument(
     const groups = (Array.isArray(s.groups) ? s.groups : []).map((g) => ({
       ...g,
       memberTextIds: Array.isArray(g.memberTextIds) ? g.memberTextIds : [],
-      memberStrokeIds: Array.isArray(g.memberStrokeIds)
-        ? g.memberStrokeIds
-        : [],
+      memberStrokeIds: Array.isArray(g.memberStrokeIds) ? g.memberStrokeIds : []
     }));
     const folderId =
       s.folderId &&
@@ -84,7 +82,7 @@ export function normalizeDocument(
       content: s.kind === "space3d" ? s.content : ensureHtmlContent(s.content),
       kind: s.kind === "space3d" ? ("space3d" as const) : undefined,
       space3d:
-        s.kind === "space3d" ? normalizeSpace3DData(s.space3d) : undefined,
+        s.kind === "space3d" ? normalizeSpace3DData(s.space3d) : undefined
     };
   });
 
@@ -116,7 +114,7 @@ export function createDocument(): GddDocument {
     subtitle: "Game Design Document",
     lastModified: new Date().toISOString(),
     folders: [],
-    sections: [],
+    sections: []
   };
 }
 
@@ -126,6 +124,6 @@ export function importAsNewProject(doc: GddDocument): GddDocument {
   return {
     ...normalized,
     id: crypto.randomUUID(),
-    lastModified: new Date().toISOString(),
+    lastModified: new Date().toISOString()
   };
 }

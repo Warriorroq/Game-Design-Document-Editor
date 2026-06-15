@@ -8,7 +8,7 @@ export function translateStroke(
   return {
     points: stroke.points.map((p) => ({
       x: p.x + dx,
-      y: p.y + dy,
-    })),
+      y: p.y + dy
+    }))
   };
 }

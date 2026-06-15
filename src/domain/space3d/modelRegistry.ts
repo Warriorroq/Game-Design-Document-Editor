@@ -1,7 +1,7 @@
 import type {
   GddDocument,
   Space3DModelAsset,
-  Space3DObject,
+  Space3DObject
 } from "@/domain/types";
 
 const ASSETS_DIR = "assets";
@@ -56,7 +56,7 @@ export function registerSpace3DModel(
   models[assetId] = {
     id: assetId,
     src,
-    name: trimmed && trimmed !== assetId ? trimmed : undefined,
+    name: trimmed && trimmed !== assetId ? trimmed : undefined
   };
 
   return { doc: { ...doc, space3DModels: models }, assetId };
@@ -82,8 +82,8 @@ export function updateSpace3DModelAssetName(
     ...doc,
     space3DModels: {
       ...models,
-      [assetId]: { ...asset, name: nextName },
-    },
+      [assetId]: { ...asset, name: nextName }
+    }
   };
 }
 
@@ -98,7 +98,7 @@ export function deleteSpace3DModelAsset(
   delete next[assetId];
   return {
     ...doc,
-    space3DModels: Object.keys(next).length > 0 ? next : undefined,
+    space3DModels: Object.keys(next).length > 0 ? next : undefined
   };
 }
 
@@ -115,7 +115,7 @@ export function listSpace3DModelReferences(
         refs.push({
           sectionId: section.id,
           sectionTitle: section.title.trim() || section.id,
-          objectId: obj.id,
+          objectId: obj.id
         });
       }
     }

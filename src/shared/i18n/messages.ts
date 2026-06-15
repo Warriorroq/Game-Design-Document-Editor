@@ -374,7 +374,7 @@ const en = {
   "theme.solarized-light.name": "Solarized Light",
   "theme.solarized-light.desc": "Solarized light",
   "theme.neon.name": "Neon",
-  "theme.neon.desc": "Cyber high contrast",
+  "theme.neon.desc": "Cyber high contrast"
 } as const;
 
 const ru: Record<keyof typeof en, string> = {
@@ -752,14 +752,14 @@ const ru: Record<keyof typeof en, string> = {
   "theme.solarized-light.name": "Solarized Light",
   "theme.solarized-light.desc": "Светлая Solarized",
   "theme.neon.name": "Neon",
-  "theme.neon.desc": "Неоновый контраст",
+  "theme.neon.desc": "Неоновый контраст"
 };
 
 export type MessageKey = keyof typeof en;
 
 export const MESSAGES: Record<AppLanguage, Record<MessageKey, string>> = {
   en,
-  ru,
+  ru
 };
 
 export const APP_LANGUAGES: AppLanguage[] = ["en", "ru"];

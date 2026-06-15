@@ -51,7 +51,7 @@ export function LinkContextMenu() {
       openPasteDialog({
         ...paste,
         href: clip,
-        suggestedText: suggestLinkText(doc, clip),
+        suggestedText: suggestLinkText(doc, clip)
       });
     } catch {
       /* clipboard denied */

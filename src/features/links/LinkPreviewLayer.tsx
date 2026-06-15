@@ -6,7 +6,7 @@ import { createPortal } from "react-dom";
 import {
   boardVideoEmbedSrc,
   boardVideoRenderMode,
-  isBoardVideoItem,
+  isBoardVideoItem
 } from "@/domain/board/boardItem";
 import { BoardVideoIframe } from "@/features/board/components/BoardVideoIframe";
 import { resolveBoardItemSrc } from "@/features/board/lib/boardImageRegistry";
@@ -14,7 +14,7 @@ import {
   findBoardItem,
   findBoardText,
   findSection,
-  parseGddHref,
+  parseGddHref
 } from "@/features/links/lib/links";
 import { useLinkContext } from "@/features/links/LinkContext";
 import { useLocale } from "@/shared/context/LocaleContext";
@@ -75,7 +75,7 @@ export function LinkPreviewLayer() {
         setPreview({
           href,
           left: Math.min(rect.left, window.innerWidth - 320),
-          top: rect.bottom + 8,
+          top: rect.bottom + 8
         });
       }, HOVER_MS);
     };

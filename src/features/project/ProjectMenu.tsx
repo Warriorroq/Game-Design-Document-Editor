@@ -8,7 +8,7 @@ import { useGitActions } from "@/features/git/hooks/useGitActions";
 import type { GitStatus } from "@/features/git/lib/git";
 import {
   downloadGdeArchive,
-  parseGdeArchive,
+  parseGdeArchive
 } from "@/features/project/lib/gdeArchive";
 import { useLocale } from "@/shared/context/LocaleContext";
 import { isDesktopApp } from "@/shared/lib/desktop";
@@ -41,7 +41,7 @@ export function ProjectMenu({
   onRefreshGitStatus,
   onAfterGitPull,
   onFlushProject,
-  onOpenImageAssets,
+  onOpenImageAssets
 }: ProjectMenuProps) {
   const { t } = useLocale();
   const [open, setOpen] = useState(false);
@@ -55,7 +55,7 @@ export function ProjectMenu({
     onRefreshStatus: () => onRefreshGitStatus?.(),
     onAfterPull: onAfterGitPull,
     onFlushProject,
-    onCloseMenu: () => setOpen(false),
+    onCloseMenu: () => setOpen(false)
   });
 
   const showGitIndicators = isDesktopApp && Boolean(folderPath) && gitAvailable;

@@ -15,7 +15,7 @@ interface AppProvidersProps {
 export function AppProviders({
   doc,
   setActiveSectionId,
-  children,
+  children
 }: AppProvidersProps) {
   return (
     <LocaleProvider>

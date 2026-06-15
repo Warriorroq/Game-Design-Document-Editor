@@ -12,7 +12,7 @@ interface GlobalSearchProps {
 
 function SnippetHighlight({
   snippet,
-  query,
+  query
 }: {
   snippet: string;
   query: string;
@@ -39,7 +39,7 @@ export function GlobalSearch({
   query,
   onChange,
   results,
-  onSelectResult,
+  onSelectResult
 }: GlobalSearchProps) {
   const { t } = useLocale();
   const rootRef = useRef<HTMLDivElement>(null);

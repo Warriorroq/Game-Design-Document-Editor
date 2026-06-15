@@ -4,12 +4,12 @@ import { useState } from "react";
 
 import {
   type ImageBoardProps,
-  useImageBoard,
+  useImageBoard
 } from "@/application/board/useImageBoard";
 import {
   boardVideoEmbedSrc,
   boardVideoRenderMode,
-  isBoardVideoItem,
+  isBoardVideoItem
 } from "@/domain/board/boardItem";
 import { boardItemTransform } from "@/domain/board/boardItemTransform";
 import { selectionCount } from "@/domain/board/deskGroups";
@@ -108,7 +108,7 @@ export function ImageBoard(props: ImageBoardProps) {
     applyTextAlign,
     drawPreview,
     pickDeskTool,
-    placeVideo,
+    placeVideo
   } = useImageBoard(props);
 
   const [videoDialogOpen, setVideoDialogOpen] = useState(false);
@@ -123,7 +123,7 @@ export function ImageBoard(props: ImageBoardProps) {
           <span className="board-zoom">{zoomPercent}%</span>
           <span>
             {t("desk.images", {
-              count: items.filter((i) => !isBoardVideoItem(i)).length,
+              count: items.filter((i) => !isBoardVideoItem(i)).length
             })}
           </span>
           <span>
@@ -179,14 +179,14 @@ export function ImageBoard(props: ImageBoardProps) {
         <div
           className="board-viewport"
           style={{
-            transform: `translate(${viewport.panX}px, ${viewport.panY}px) scale(${viewport.scale})`,
+            transform: `translate(${viewport.panX}px, ${viewport.panY}px) scale(${viewport.scale})`
           }}
         >
           <div
             className="board-canvas"
             style={{
               width: canvasWidth,
-              height: canvasHeight,
+              height: canvasHeight
             }}
             onContextMenu={handleSurfaceContextMenu}
           >
@@ -225,7 +225,7 @@ export function ImageBoard(props: ImageBoardProps) {
                     left: item.x,
                     top: item.y,
                     width: item.width,
-                    height: item.height,
+                    height: item.height
                   }}
                   onContextMenu={(e) => {
                     e.preventDefault();
@@ -238,7 +238,7 @@ export function ImageBoard(props: ImageBoardProps) {
                             itemIds: [item.id],
                             shapeIds: [],
                             textIds: [],
-                            strokeIds: [],
+                            strokeIds: []
                           };
                     openDeskObjectMenu(
                       e.clientX,
@@ -300,7 +300,7 @@ export function ImageBoard(props: ImageBoardProps) {
                             ),
                             shapeIds: prev.shapeIds,
                             textIds: prev.textIds,
-                            strokeIds: prev.strokeIds,
+                            strokeIds: prev.strokeIds
                           }));
                         }}
                         aria-label={
@@ -357,7 +357,7 @@ export function ImageBoard(props: ImageBoardProps) {
                         itemIds: [],
                         shapeIds: [],
                         textIds: [text.id],
-                        strokeIds: [],
+                        strokeIds: []
                       };
                 openDeskObjectMenu(
                   e.clientX,
@@ -373,7 +373,7 @@ export function ImageBoard(props: ImageBoardProps) {
                   itemIds: [],
                   shapeIds: [],
                   textIds: [textId],
-                  strokeIds: [],
+                  strokeIds: []
                 });
                 setEditingTextId(textId);
               }}
@@ -399,7 +399,7 @@ export function ImageBoard(props: ImageBoardProps) {
                   ),
                   height: Math.abs(
                     marqueePreview.end.y - marqueePreview.start.y
-                  ),
+                  )
                 }}
               />
             )}

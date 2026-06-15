@@ -34,7 +34,7 @@ export const THEME_CSS_VAR_KEYS = [
   "--accent-soft",
   "--success",
   "--warning",
-  "--danger",
+  "--danger"
 ] as const;
 
 function hexToRgb(hex: string): { r: number; g: number; b: number } {
@@ -49,7 +49,7 @@ function hexToRgb(hex: string): { r: number; g: number; b: number } {
   return {
     r: parseInt(full.slice(0, 2), 16),
     g: parseInt(full.slice(2, 4), 16),
-    b: parseInt(full.slice(4, 6), 16),
+    b: parseInt(full.slice(4, 6), 16)
   };
 }
 
@@ -91,7 +91,7 @@ function darkTheme(p: Palette): ThemeCssVars {
     "--accent-soft": accentSoft(p.accent),
     "--success": p.success ?? "#4ade80",
     "--warning": p.warning ?? "#fbbf24",
-    "--danger": p.danger ?? "#f87171",
+    "--danger": p.danger ?? "#f87171"
   };
 }
 
@@ -112,7 +112,7 @@ function lightTheme(p: Palette): ThemeCssVars {
     "--accent-soft": accentSoft(p.accent),
     "--success": p.success ?? "#16a34a",
     "--warning": p.warning ?? "#ca8a04",
-    "--danger": p.danger ?? "#dc2626",
+    "--danger": p.danger ?? "#dc2626"
   };
 }
 
@@ -128,7 +128,7 @@ export const THEME_VARS = {
     accent: "#6b8cff",
     text: "#e8eaf0",
     muted: "#8b93ad",
-    dim: "#5c6478",
+    dim: "#5c6478"
   }),
   light: lightTheme({
     base: "#f0f2f6",
@@ -140,7 +140,7 @@ export const THEME_VARS = {
     accent: "#3b5bdb",
     text: "#1a1d26",
     muted: "#5c6478",
-    dim: "#8b93ad",
+    dim: "#8b93ad"
   }),
   slate: darkTheme({
     base: "#14171c",
@@ -152,7 +152,7 @@ export const THEME_VARS = {
     accent: "#7c9ab8",
     text: "#e2e6ec",
     muted: "#9aa3b2",
-    dim: "#6b7585",
+    dim: "#6b7585"
   }),
   graphite: darkTheme({
     base: "#121212",
@@ -164,7 +164,7 @@ export const THEME_VARS = {
     accent: "#b0b0b0",
     text: "#ececec",
     muted: "#a0a0a0",
-    dim: "#707070",
+    dim: "#707070"
   }),
   nord: darkTheme({
     base: "#2e3440",
@@ -179,7 +179,7 @@ export const THEME_VARS = {
     dim: "#81a1c1",
     success: "#a3be8c",
     warning: "#ebcb8b",
-    danger: "#bf616a",
+    danger: "#bf616a"
   }),
   warm: darkTheme({
     base: "#1a1612",
@@ -191,7 +191,7 @@ export const THEME_VARS = {
     accent: "#e8a54b",
     text: "#f0e6d8",
     muted: "#b8a894",
-    dim: "#7a6f5e",
+    dim: "#7a6f5e"
   }),
   paper: lightTheme({
     base: "#f6f1e8",
@@ -203,7 +203,7 @@ export const THEME_VARS = {
     accent: "#8b6914",
     text: "#2c2618",
     muted: "#6a6050",
-    dim: "#9a9080",
+    dim: "#9a9080"
   }),
   forest: darkTheme({
     base: "#0f1411",
@@ -215,7 +215,7 @@ export const THEME_VARS = {
     accent: "#5ecf8a",
     text: "#e2ebe4",
     muted: "#94a89a",
-    dim: "#5e7266",
+    dim: "#5e7266"
   }),
   ocean: darkTheme({
     base: "#0a1218",
@@ -227,7 +227,7 @@ export const THEME_VARS = {
     accent: "#3dd6c6",
     text: "#dff6f2",
     muted: "#8ab8b0",
-    dim: "#567a74",
+    dim: "#567a74"
   }),
   arctic: lightTheme({
     base: "#e8f4fc",
@@ -239,7 +239,7 @@ export const THEME_VARS = {
     accent: "#0284c7",
     text: "#0c3a5c",
     muted: "#4a7898",
-    dim: "#7aa0b8",
+    dim: "#7aa0b8"
   }),
   sunset: darkTheme({
     base: "#180e10",
@@ -251,7 +251,7 @@ export const THEME_VARS = {
     accent: "#ff7b54",
     text: "#ffe8e0",
     muted: "#c49a90",
-    dim: "#8a645c",
+    dim: "#8a645c"
   }),
   cherry: darkTheme({
     base: "#160a0e",
@@ -263,7 +263,7 @@ export const THEME_VARS = {
     accent: "#ff4d6d",
     text: "#ffe8ec",
     muted: "#c09098",
-    dim: "#805860",
+    dim: "#805860"
   }),
   rose: darkTheme({
     base: "#141018",
@@ -275,7 +275,7 @@ export const THEME_VARS = {
     accent: "#d48cff",
     text: "#ece6f0",
     muted: "#a89ab4",
-    dim: "#6e6278",
+    dim: "#6e6278"
   }),
   lavender: lightTheme({
     base: "#f3f0fa",
@@ -287,7 +287,7 @@ export const THEME_VARS = {
     accent: "#7c5cbf",
     text: "#2a2238",
     muted: "#6a6080",
-    dim: "#9a90a8",
+    dim: "#9a90a8"
   }),
   dracula: darkTheme({
     base: "#282a36",
@@ -302,7 +302,7 @@ export const THEME_VARS = {
     dim: "#6272a4",
     success: "#50fa7b",
     warning: "#f1fa8c",
-    danger: "#ff5555",
+    danger: "#ff5555"
   }),
   monokai: darkTheme({
     base: "#272822",
@@ -317,7 +317,7 @@ export const THEME_VARS = {
     dim: "#75715e",
     success: "#a6e22e",
     warning: "#e6db74",
-    danger: "#f92672",
+    danger: "#f92672"
   }),
   "solarized-dark": darkTheme({
     base: "#002b36",
@@ -332,7 +332,7 @@ export const THEME_VARS = {
     dim: "#657b83",
     success: "#859900",
     warning: "#b58900",
-    danger: "#dc322f",
+    danger: "#dc322f"
   }),
   "solarized-light": lightTheme({
     base: "#fdf6e3",
@@ -347,7 +347,7 @@ export const THEME_VARS = {
     dim: "#839496",
     success: "#859900",
     warning: "#b58900",
-    danger: "#dc322f",
+    danger: "#dc322f"
   }),
   neon: darkTheme({
     base: "#050508",
@@ -362,8 +362,8 @@ export const THEME_VARS = {
     dim: "#408060",
     success: "#00ff9f",
     warning: "#ffe600",
-    danger: "#ff2060",
-  }),
+    danger: "#ff2060"
+  })
 } as const satisfies Record<string, ThemeCssVars>;
 
 export type AppThemeId = keyof typeof THEME_VARS;
@@ -385,7 +385,7 @@ export const LEGACY_THEME_MAP: Record<string, AppThemeId> = {
   twilight: "midnight",
   dusk: "rose",
   blood: "cherry",
-  sage: "forest",
+  sage: "forest"
 };
 
 export function resolveThemeId(id: string): AppThemeId {

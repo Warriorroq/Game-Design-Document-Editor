@@ -142,8 +142,8 @@ export function copyImageSrcToClipboard(src: string): Promise<void> {
 
   return navigator.clipboard.write([
     new ClipboardItem({
-      "image/png": pngPromise,
-    }),
+      "image/png": pngPromise
+    })
   ]);
 }
 

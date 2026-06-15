@@ -34,7 +34,7 @@ export function groupMemberIds(group: BoardGroup): string[] {
     ...group.memberItemIds,
     ...group.memberShapeIds,
     ...group.memberTextIds,
-    ...group.memberStrokeIds,
+    ...group.memberStrokeIds
   ];
 }
 
@@ -43,7 +43,7 @@ export function selectionFromGroup(group: BoardGroup): DeskSelection {
     itemIds: [...group.memberItemIds],
     shapeIds: [...group.memberShapeIds],
     textIds: [...group.memberTextIds],
-    strokeIds: [...group.memberStrokeIds],
+    strokeIds: [...group.memberStrokeIds]
   };
 }
 
@@ -55,7 +55,7 @@ export function mergeSelections(
     itemIds: [...new Set([...a.itemIds, ...b.itemIds])],
     shapeIds: [...new Set([...a.shapeIds, ...b.shapeIds])],
     textIds: [...new Set([...a.textIds, ...b.textIds])],
-    strokeIds: [...new Set([...a.strokeIds, ...b.strokeIds])],
+    strokeIds: [...new Set([...a.strokeIds, ...b.strokeIds])]
   };
 }
 
@@ -77,7 +77,7 @@ export function removeMembersFromGroups(
       memberItemIds: g.memberItemIds.filter((id) => !itemSet.has(id)),
       memberShapeIds: g.memberShapeIds.filter((id) => !shapeSet.has(id)),
       memberTextIds: g.memberTextIds.filter((id) => !textSet.has(id)),
-      memberStrokeIds: g.memberStrokeIds.filter((id) => !strokeSet.has(id)),
+      memberStrokeIds: g.memberStrokeIds.filter((id) => !strokeSet.has(id))
     }))
     .filter(
       (g) =>
@@ -141,7 +141,7 @@ export function applyDeskSelectClick(
         itemIds: [...itemIds],
         shapeIds: [...prev.shapeIds],
         textIds: [...prev.textIds],
-        strokeIds: [...prev.strokeIds],
+        strokeIds: [...prev.strokeIds]
       };
     }
     if (kind === "shape") {
@@ -152,7 +152,7 @@ export function applyDeskSelectClick(
         itemIds: [...prev.itemIds],
         shapeIds: [...shapeIds],
         textIds: [...prev.textIds],
-        strokeIds: [...prev.strokeIds],
+        strokeIds: [...prev.strokeIds]
       };
     }
     if (kind === "text") {
@@ -163,7 +163,7 @@ export function applyDeskSelectClick(
         itemIds: [...prev.itemIds],
         shapeIds: [...prev.shapeIds],
         textIds: [...textIds],
-        strokeIds: [...prev.strokeIds],
+        strokeIds: [...prev.strokeIds]
       };
     }
     const strokeIds = new Set(prev.strokeIds);
@@ -173,7 +173,7 @@ export function applyDeskSelectClick(
       itemIds: [...prev.itemIds],
       shapeIds: [...prev.shapeIds],
       textIds: [...prev.textIds],
-      strokeIds: [...strokeIds],
+      strokeIds: [...strokeIds]
     };
   }
 

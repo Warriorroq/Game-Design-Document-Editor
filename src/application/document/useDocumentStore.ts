@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import type {
   DeskClipboard,
-  DeskSelection,
+  DeskSelection
 } from "@/domain/board/deskClipboard";
 import { createDocument, normalizeDocument } from "@/domain/document/document";
 import * as mutations from "@/domain/document/mutations";
@@ -16,11 +16,11 @@ import type {
   BoardText,
   GddDocument,
   GddSection,
-  GddSectionFolder,
+  GddSectionFolder
 } from "@/domain/types";
 import {
   loadDocument,
-  saveDocument,
+  saveDocument
 } from "@/infrastructure/persistence/webDocumentStorage";
 
 const MAX_UNDO = 50;
@@ -158,7 +158,7 @@ export function useDocumentStore() {
       patch: Partial<Pick<GddSection, "editorScrollTop" | "boardViewport">>
     ) => {
       mutateDoc((prev) => mutations.patchSection(prev, id, patch), {
-        recordHistory: false,
+        recordHistory: false
       });
     },
     [mutateDoc]
@@ -540,7 +540,7 @@ export function useDocumentStore() {
     beginTransient,
     endTransient,
     replaceDocument,
-    newProject,
+    newProject
   };
 }
 

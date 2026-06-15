@@ -11,7 +11,7 @@ interface TextColorSwatchesProps {
 export function TextColorSwatches({
   activeColor,
   onPick,
-  label = "Text color",
+  label = "Text color"
 }: TextColorSwatchesProps) {
   return (
     <div className="text-color-toolbar">

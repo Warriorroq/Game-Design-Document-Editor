@@ -4,7 +4,7 @@ import { documentFromLegacyJson } from "@/infrastructure/project/gdeArchive";
 import {
   documentToFolderPayload,
   folderPayloadToDocument,
-  type FolderProjectPayload,
+  type FolderProjectPayload
 } from "@/infrastructure/project/projectLayout";
 
 const FOLDER_STORAGE_KEY = "gdd-editor-project-folder";
@@ -44,7 +44,7 @@ export async function pickProjectFolder(): Promise<PickFolderResult | null> {
 
   return {
     folderPath: result.folderPath,
-    hasProject: Boolean(result.hasProject),
+    hasProject: Boolean(result.hasProject)
   };
 }
 

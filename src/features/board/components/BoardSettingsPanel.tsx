@@ -5,7 +5,7 @@ import {
   BOARD_SIZE_PRESETS,
   boardSizeMatchesPreset,
   type BoardSizePresetId,
-  normalizeBoardSize,
+  normalizeBoardSize
 } from "@/features/board/lib/boardSettings";
 import { useBoardSize } from "@/shared/context/BoardSizeContext";
 import { useLocale } from "@/shared/context/LocaleContext";

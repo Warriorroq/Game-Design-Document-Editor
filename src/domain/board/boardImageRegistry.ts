@@ -101,7 +101,7 @@ export function prepareBoardItemsForDoc(
 
 export function migrateBoardImages(doc: GddDocument): GddDocument {
   const images: Record<string, BoardImageAsset> = {
-    ...(doc.boardImages ?? {}),
+    ...(doc.boardImages ?? {})
   };
   const contentToAssetId = new Map<string, string>();
 
@@ -142,7 +142,7 @@ export function migrateBoardImages(doc: GddDocument): GddDocument {
       changed = true;
       const { src: _legacy, ...rest } = item;
       return { ...rest, assetId };
-    }),
+    })
   }));
 
   if (!changed) return doc;
@@ -184,7 +184,7 @@ export function listBoardImageAssetReferences(
         refs.push({
           sectionId: section.id,
           sectionTitle: section.title.trim() || section.id,
-          itemId: item.id,
+          itemId: item.id
         });
       }
     }
@@ -204,7 +204,7 @@ export function listBoardImageAssetDesks(
         bySection.set(section.id, {
           sectionId: section.id,
           sectionTitle: section.title.trim() || section.id,
-          itemId: item.id,
+          itemId: item.id
         });
       }
     }
@@ -241,9 +241,9 @@ export function updateBoardImageAssetName(
       ...images,
       [assetId]: {
         ...asset,
-        name: nextName,
-      },
-    },
+        name: nextName
+      }
+    }
   };
 }
 
@@ -258,7 +258,7 @@ export function deleteBoardImageAsset(
   delete nextImages[assetId];
   return {
     ...doc,
-    boardImages: Object.keys(nextImages).length > 0 ? nextImages : undefined,
+    boardImages: Object.keys(nextImages).length > 0 ? nextImages : undefined
   };
 }
 

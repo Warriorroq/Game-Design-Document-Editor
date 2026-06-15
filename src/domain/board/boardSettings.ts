@@ -11,7 +11,7 @@ export const BOARD_SIZE_PRESET_IDS: BoardSizePresetId[] = [
   "default",
   "hd",
   "wide",
-  "large",
+  "large"
 ];
 
 export const BOARD_SIZE_PRESETS: Record<
@@ -21,7 +21,7 @@ export const BOARD_SIZE_PRESETS: Record<
   default: { width: 3200, height: 2400 },
   hd: { width: 1920, height: 1080 },
   wide: { width: 3840, height: 2160 },
-  large: { width: 4800, height: 3600 },
+  large: { width: 4800, height: 3600 }
 };
 
 export interface BoardSize {
@@ -36,7 +36,7 @@ function clamp(n: number, min: number, max: number) {
 export function normalizeBoardSize(width: number, height: number): BoardSize {
   return {
     width: Math.round(clamp(width, MIN_BOARD_DIMENSION, MAX_BOARD_DIMENSION)),
-    height: Math.round(clamp(height, MIN_BOARD_DIMENSION, MAX_BOARD_DIMENSION)),
+    height: Math.round(clamp(height, MIN_BOARD_DIMENSION, MAX_BOARD_DIMENSION))
   };
 }
 
@@ -46,21 +46,21 @@ export function loadBoardSize(): BoardSize {
     if (!raw) {
       return {
         width: DEFAULT_BOARD_WIDTH,
-        height: DEFAULT_BOARD_HEIGHT,
+        height: DEFAULT_BOARD_HEIGHT
       };
     }
     const parsed = JSON.parse(raw) as Partial<BoardSize>;
     if (typeof parsed.width !== "number" || typeof parsed.height !== "number") {
       return {
         width: DEFAULT_BOARD_WIDTH,
-        height: DEFAULT_BOARD_HEIGHT,
+        height: DEFAULT_BOARD_HEIGHT
       };
     }
     return normalizeBoardSize(parsed.width, parsed.height);
   } catch {
     return {
       width: DEFAULT_BOARD_WIDTH,
-      height: DEFAULT_BOARD_HEIGHT,
+      height: DEFAULT_BOARD_HEIGHT
     };
   }
 }
