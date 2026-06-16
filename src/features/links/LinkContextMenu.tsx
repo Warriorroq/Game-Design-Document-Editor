@@ -9,8 +9,7 @@ import { useLocale } from "@/shared/context/LocaleContext";
 
 export function LinkContextMenu() {
   const { t } = useLocale();
-  const { contextMenu, closeContextMenu, copyHref, openPasteDialog, doc } =
-    useLinkContext();
+  const { contextMenu, closeContextMenu, copyHref, openPasteDialog, doc } = useLinkContext();
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -64,37 +63,20 @@ export function LinkContextMenu() {
   const canActions = actions.length > 0;
 
   const menu = (
-    <div
-      ref={menuRef}
-      className="link-context-menu"
-      style={{ left: contextMenu.x, top: contextMenu.y }}
-      role="menu"
-    >
+    <div ref={menuRef} className="link-context-menu" style={{ left: contextMenu.x, top: contextMenu.y }} role="menu">
       {canCopy && (
-        <button
-          type="button"
-          className="link-menu-item"
-          role="menuitem"
-          onClick={handleCopy}
-        >
+        <button type="button" className="link-menu-item" role="menuitem" onClick={handleCopy}>
           {t("menu.copyLink")}
         </button>
       )}
       {canPaste && (
-        <button
-          type="button"
-          className="link-menu-item"
-          role="menuitem"
-          onClick={handlePaste}
-        >
+        <button type="button" className="link-menu-item" role="menuitem" onClick={handlePaste}>
           {t("menu.pasteLink")}
         </button>
       )}
       {canActions && (
         <>
-          {(canCopy || canPaste) && (
-            <div className="board-menu-sep" role="separator" />
-          )}
+          {(canCopy || canPaste) && <div className="board-menu-sep" role="separator" />}
           {actions.map((action) => (
             <button
               key={action.id}

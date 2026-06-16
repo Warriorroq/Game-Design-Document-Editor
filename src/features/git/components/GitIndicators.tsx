@@ -4,16 +4,9 @@ interface GitIndicatorsProps {
   uncommittedLabel: string;
 }
 
-export function GitIndicators({
-  branch,
-  dirty,
-  uncommittedLabel
-}: GitIndicatorsProps) {
+export function GitIndicators({ branch, dirty, uncommittedLabel }: GitIndicatorsProps) {
   return (
-    <span
-      className="git-indicators"
-      aria-label={`${branch}${dirty ? `, ${uncommittedLabel}` : ""}`}
-    >
+    <span className="git-indicators" aria-label={`${branch}${dirty ? `, ${uncommittedLabel}` : ""}`}>
       <span className="git-indicators-icon" aria-hidden>
         ⎇
       </span>

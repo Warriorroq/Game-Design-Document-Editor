@@ -51,18 +51,13 @@ const TOOLS: { group: ToolButton[] }[] = [
 ];
 
 function measureContentColumn() {
-  const col = document.querySelector(
-    ".content-column:not(.content-column--hidden)"
-  );
+  const col = document.querySelector(".content-column:not(.content-column--hidden)");
   if (!col) return { left: 0, width: 0 };
   const rect = col.getBoundingClientRect();
   return { left: rect.left, width: rect.width };
 }
 
-export function FormatToolbar({
-  editorRef,
-  onContentChange
-}: FormatToolbarProps) {
+export function FormatToolbar({ editorRef, onContentChange }: FormatToolbarProps) {
   const [dock, setDock] = useState(measureContentColumn);
   const [hasTextSelection, setHasTextSelection] = useState(false);
   const [activeColor, setActiveColor] = useState<string | null>(null);
@@ -83,9 +78,7 @@ export function FormatToolbar({
     const update = () => setDock(measureContentColumn());
     update();
 
-    const col = document.querySelector(
-      ".content-column:not(.content-column--hidden)"
-    );
+    const col = document.querySelector(".content-column:not(.content-column--hidden)");
     const observer = new ResizeObserver(update);
     if (col) observer.observe(col);
 

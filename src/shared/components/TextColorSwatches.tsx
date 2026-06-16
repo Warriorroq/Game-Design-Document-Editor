@@ -8,11 +8,7 @@ interface TextColorSwatchesProps {
   label?: string;
 }
 
-export function TextColorSwatches({
-  activeColor,
-  onPick,
-  label = "Text color"
-}: TextColorSwatchesProps) {
+export function TextColorSwatches({ activeColor, onPick, label = "Text color" }: TextColorSwatchesProps) {
   return (
     <div className="text-color-toolbar">
       <span className="text-color-toolbar-label">{label}</span>

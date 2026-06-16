@@ -1,11 +1,4 @@
-const {
-  app,
-  BrowserWindow,
-  Menu,
-  ipcMain,
-  dialog,
-  session
-} = require("electron");
+const { app, BrowserWindow, Menu, ipcMain, dialog, session } = require("electron");
 const fs = require("fs");
 const path = require("path");
 const git = require("./git.cjs");
@@ -160,8 +153,7 @@ function registerIpcHandlers(win) {
       identity && typeof identity === "object"
         ? {
             name: typeof identity.name === "string" ? identity.name.trim() : "",
-            email:
-              typeof identity.email === "string" ? identity.email.trim() : ""
+            email: typeof identity.email === "string" ? identity.email.trim() : ""
           }
         : undefined;
     return git.commit(folderPath, message.trim(), parsedIdentity);
@@ -286,8 +278,7 @@ function createWindow() {
     ipcRegistered = true;
   }
 
-  const emitMaxChanged = () =>
-    win.webContents.send("window:maximized-changed", win.isMaximized());
+  const emitMaxChanged = () => win.webContents.send("window:maximized-changed", win.isMaximized());
   win.on("maximize", emitMaxChanged);
   win.on("unmaximize", emitMaxChanged);
 
@@ -308,23 +299,15 @@ function createWindow() {
 function configureEmbedReferrer() {
   const embedReferer = "https://localhost/";
   const filter = {
-    urls: [
-      "*://*.youtube.com/*",
-      "*://*.youtube-nocookie.com/*",
-      "*://*.googlevideo.com/*",
-      "*://*.ytimg.com/*"
-    ]
+    urls: ["*://*.youtube.com/*", "*://*.youtube-nocookie.com/*", "*://*.googlevideo.com/*", "*://*.ytimg.com/*"]
   };
 
-  session.defaultSession.webRequest.onBeforeSendHeaders(
-    filter,
-    (details, callback) => {
-      const headers = { ...details.requestHeaders };
-      // file:// app pages send no Referer; YouTube embeds require one (error 153).
-      headers.Referer = embedReferer;
-      callback({ requestHeaders: headers });
-    }
-  );
+  session.defaultSession.webRequest.onBeforeSendHeaders(filter, (details, callback) => {
+    const headers = { ...details.requestHeaders };
+    // file:// app pages send no Referer; YouTube embeds require one (error 153).
+    headers.Referer = embedReferer;
+    callback({ requestHeaders: headers });
+  });
 }
 
 if (gotSingleInstanceLock) {

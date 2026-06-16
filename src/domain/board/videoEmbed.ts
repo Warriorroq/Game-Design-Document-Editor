@@ -52,15 +52,9 @@ export function normalizeEmbedSrc(src: string): string {
   }
 
   const host = url.hostname.replace(/^www\./, "");
-  const bareHost = url.hostname.startsWith("www.")
-    ? url.hostname.slice(4)
-    : url.hostname;
+  const bareHost = url.hostname.startsWith("www.") ? url.hostname.slice(4) : url.hostname;
 
-  if (
-    YOUTUBE_HOSTS.has(url.hostname) ||
-    YOUTUBE_HOSTS.has(bareHost) ||
-    host === "youtu.be"
-  ) {
+  if (YOUTUBE_HOSTS.has(url.hostname) || YOUTUBE_HOSTS.has(bareHost) || host === "youtu.be") {
     const id =
       url.pathname.match(/^\/embed\/([^/?]+)/)?.[1] ??
       (host === "youtu.be" ? url.pathname.slice(1).split("/")[0] : null);
@@ -84,11 +78,7 @@ function parseYouTubeId(url: URL): string | null {
     const id = url.pathname.slice(1).split("/")[0];
     return id || null;
   }
-  if (
-    host === "youtube.com" ||
-    host === "m.youtube.com" ||
-    host === "music.youtube.com"
-  ) {
+  if (host === "youtube.com" || host === "m.youtube.com" || host === "music.youtube.com") {
     if (url.pathname === "/watch") {
       return url.searchParams.get("v");
     }

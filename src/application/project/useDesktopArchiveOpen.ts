@@ -12,10 +12,7 @@ function base64ToArrayBuffer(base64: string): ArrayBuffer {
   return bytes.buffer;
 }
 
-export function useDesktopArchiveOpen(
-  onImport: (doc: GddDocument) => void,
-  onError: (message: string) => void
-) {
+export function useDesktopArchiveOpen(onImport: (doc: GddDocument) => void, onError: (message: string) => void) {
   useEffect(() => {
     const projectApi = window.gddDesktop?.project;
     if (!projectApi?.onOpenArchive || !projectApi.readArchive) return;
@@ -27,9 +24,7 @@ export function useDesktopArchiveOpen(
           onError(result.error ?? "read_failed");
           return;
         }
-        const doc = await parseGdeArchive(
-          base64ToArrayBuffer(result.dataBase64)
-        );
+        const doc = await parseGdeArchive(base64ToArrayBuffer(result.dataBase64));
         onImport(doc);
       } catch (err) {
         onError(err instanceof Error ? err.message : "read_failed");

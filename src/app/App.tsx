@@ -8,10 +8,7 @@ export default function App() {
   const documentStore = useDocumentStore();
 
   return (
-    <AppProviders
-      doc={documentStore.doc}
-      setActiveSectionId={documentStore.setActiveSectionId}
-    >
+    <AppProviders doc={documentStore.doc} setActiveSectionId={documentStore.setActiveSectionId}>
       <AppMain {...documentStore} />
     </AppProviders>
   );

@@ -3,19 +3,10 @@ import "@/shared/styles/LinkMenus.css";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-import {
-  boardVideoEmbedSrc,
-  boardVideoRenderMode,
-  isBoardVideoItem
-} from "@/domain/board/boardItem";
+import { boardVideoEmbedSrc, boardVideoRenderMode, isBoardVideoItem } from "@/domain/board/boardItem";
 import { BoardVideoIframe } from "@/features/board/components/BoardVideoIframe";
 import { resolveBoardItemSrc } from "@/features/board/lib/boardImageRegistry";
-import {
-  findBoardItem,
-  findBoardText,
-  findSection,
-  parseGddHref
-} from "@/features/links/lib/links";
+import { findBoardItem, findBoardText, findSection, parseGddHref } from "@/features/links/lib/links";
 import { useLinkContext } from "@/features/links/LinkContext";
 import { useLocale } from "@/shared/context/LocaleContext";
 
@@ -56,9 +47,7 @@ export function LinkPreviewLayer() {
 
     const onOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement | null;
-      const link = target?.closest(
-        "a.gdd-link, a[href^='gdd:'], a[href^='http']"
-      );
+      const link = target?.closest("a.gdd-link, a[href^='gdd:'], a[href^='http']");
       if (!link || !(link instanceof HTMLAnchorElement)) {
         if (!anchorRef.current?.contains(target ?? null)) hide();
         return;
@@ -123,31 +112,15 @@ export function LinkPreviewLayer() {
       const embedSrc = boardVideoEmbedSrc(item);
       body = embedSrc ? (
         boardVideoRenderMode(item) === "video" ? (
-          <video
-            className="link-preview-video"
-            src={embedSrc}
-            controls
-            playsInline
-            preload="metadata"
-          />
+          <video className="link-preview-video" src={embedSrc} controls playsInline preload="metadata" />
         ) : (
-          <BoardVideoIframe
-            title={t("link.previewTitle")}
-            src={embedSrc}
-            className="link-preview-iframe"
-          />
+          <BoardVideoIframe title={t("link.previewTitle")} src={embedSrc} className="link-preview-iframe" />
         )
       ) : (
         <p className="link-preview-fallback">{t("link.videoNotFound")}</p>
       );
     } else {
-      body = (
-        <img
-          src={resolveBoardItemSrc(doc, item)}
-          alt=""
-          className="link-preview-image"
-        />
-      );
+      body = <img src={resolveBoardItemSrc(doc, item)} alt="" className="link-preview-image" />;
     }
   } else if (link.type === "text") {
     const boardText = findBoardText(doc, link.sectionId, link.textId);
@@ -155,9 +128,7 @@ export function LinkPreviewLayer() {
     body = boardText ? (
       <div className="link-preview-section">
         {section && <strong>{section.title}</strong>}
-        <p className="link-preview-desk-text">
-          {boardText.content || t("link.emptyText")}
-        </p>
+        <p className="link-preview-desk-text">{boardText.content || t("link.emptyText")}</p>
       </div>
     ) : (
       <p className="link-preview-fallback">{t("link.textNotFound")}</p>
@@ -165,32 +136,21 @@ export function LinkPreviewLayer() {
   } else {
     const section = findSection(doc, link.sectionId);
     if (!section) {
-      body = (
-        <p className="link-preview-fallback">{t("link.sectionNotFound")}</p>
-      );
+      body = <p className="link-preview-fallback">{t("link.sectionNotFound")}</p>;
     } else if (link.type === "anchor") {
-      const frag = new DOMParser().parseFromString(
-        section.content,
-        "text/html"
-      );
+      const frag = new DOMParser().parseFromString(section.content, "text/html");
       const el = frag.getElementById(link.anchorId);
       body = (
         <div className="link-preview-section">
           <strong>{section.title}</strong>
-          <p>
-            {el
-              ? plainSnippet(el.outerHTML, t("link.emptySection"), 160)
-              : t("link.blockNotFound")}
-          </p>
+          <p>{el ? plainSnippet(el.outerHTML, t("link.emptySection"), 160) : t("link.blockNotFound")}</p>
         </div>
       );
     } else {
       body = (
         <div className="link-preview-section">
           <strong>{section.title}</strong>
-          {section.description && (
-            <p className="link-preview-desc">{section.description}</p>
-          )}
+          {section.description && <p className="link-preview-desc">{section.description}</p>}
           <p>{plainSnippet(section.content, t("link.emptySection"))}</p>
         </div>
       );
@@ -198,11 +158,7 @@ export function LinkPreviewLayer() {
   }
 
   const popover = (
-    <div
-      className="link-preview-popover"
-      style={{ left: preview.left, top: preview.top }}
-      onMouseEnter={() => {}}
-    >
+    <div className="link-preview-popover" style={{ left: preview.left, top: preview.top }} onMouseEnter={() => {}}>
       {body}
     </div>
   );

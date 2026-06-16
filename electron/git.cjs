@@ -6,9 +6,7 @@ const os = require("os");
 
 const execFileAsync = promisify(execFile);
 
-const GITIGNORE = ["# GDD Editor project", ".DS_Store", "Thumbs.db", ""].join(
-  "\n"
-);
+const GITIGNORE = ["# GDD Editor project", ".DS_Store", "Thumbs.db", ""].join("\n");
 
 let cachedGitPath = null;
 
@@ -106,9 +104,7 @@ function normalizeGitError(message) {
     return "auth_failed";
   }
   if (
-    /could not resolve host|unable to access|Connection timed out|Failed to connect|network is unreachable/i.test(
-      text
-    )
+    /could not resolve host|unable to access|Connection timed out|Failed to connect|network is unreachable/i.test(text)
   ) {
     return "network_failed";
   }
@@ -149,9 +145,7 @@ function emitProgress(onProgress, phase, line) {
 }
 
 function isUntrackedOverwriteError(error) {
-  return /untracked working tree files would be overwritten/i.test(
-    String(error)
-  );
+  return /untracked working tree files would be overwritten/i.test(String(error));
 }
 
 function isUnrelatedHistoriesError(error) {
@@ -160,10 +154,7 @@ function isUnrelatedHistoriesError(error) {
 
 function isFfOnlyError(error) {
   const text = String(error);
-  return (
-    text === "ff_only_failed" ||
-    /Not possible to fast-forward|Cannot fast-forward|ff-only/i.test(text)
-  );
+  return text === "ff_only_failed" || /Not possible to fast-forward|Cannot fast-forward|ff-only/i.test(text);
 }
 
 function isMergeConflictError(error) {
@@ -171,11 +162,7 @@ function isMergeConflictError(error) {
 }
 
 function pullArgs(branchName, hasTracking, options = {}) {
-  const {
-    ffOnly = true,
-    allowUnrelated = false,
-    preferRemote = false
-  } = options;
+  const { ffOnly = true, allowUnrelated = false, preferRemote = false } = options;
   const args = ["pull", "--progress"];
   if (ffOnly) args.push("--ff-only");
   if (allowUnrelated) args.push("--allow-unrelated-histories");
@@ -187,11 +174,7 @@ function pullArgs(branchName, hasTracking, options = {}) {
 }
 
 async function resolveMergeConflictsPreferRemote(dir, onProgress) {
-  emitProgress(
-    onProgress,
-    "pull",
-    "Resolving conflicts (keeping remote files)"
-  );
+  emitProgress(onProgress, "pull", "Resolving conflicts (keeping remote files)");
 
   const status = await runGit(dir, ["status", "--porcelain"]);
   if (!status.ok) return { ok: false, error: status.error };
@@ -213,11 +196,7 @@ async function resolveMergeConflictsPreferRemote(dir, onProgress) {
   if (!add.ok) return { ok: false, error: add.error };
 
   await ensureGitIdentity(dir);
-  const commitResult = await runGit(dir, [
-    "commit",
-    "-m",
-    "GDD Editor: merge remote project"
-  ]);
+  const commitResult = await runGit(dir, ["commit", "-m", "GDD Editor: merge remote project"]);
   if (!commitResult.ok) {
     return { ok: false, error: commitResult.error };
   }
@@ -273,10 +252,7 @@ async function runGit(cwd, args, network = false) {
 }
 
 function gcmExecutableCandidates() {
-  const names = [
-    "git-credential-manager.exe",
-    "git-credential-manager-core.exe"
-  ];
+  const names = ["git-credential-manager.exe", "git-credential-manager-core.exe"];
   const paths = [];
   for (const dir of gitInstallDirs()) {
     for (const name of names) {
@@ -322,11 +298,7 @@ async function runGcmLogin(host) {
 
   const gitPath = resolveGitPath();
   try {
-    await execFileAsync(
-      gitPath,
-      ["credential-manager", host, "login"],
-      networkProcessOptions({ timeout: 300000 })
-    );
+    await execFileAsync(gitPath, ["credential-manager", host, "login"], networkProcessOptions({ timeout: 300000 }));
     return { ok: true };
   } catch (err) {
     const message =
@@ -470,8 +442,7 @@ function runGitStream(cwd, args, onProgress, phase) {
         resolve({ ok: true, stdout: stdout.trim(), stderr: stderr.trim() });
         return;
       }
-      const message =
-        stderr.trim() || stdout.trim() || `Git exited with code ${code}`;
+      const message = stderr.trim() || stdout.trim() || `Git exited with code ${code}`;
       resolve({ ok: false, error: normalizeGitError(message) });
     });
   });
@@ -645,13 +616,7 @@ async function restoreTrackedProjectFiles(dir) {
   const tracked = await listTrackedProjectFiles(dir);
   if (tracked.length === 0) return { ok: true };
 
-  let restore = await runGit(dir, [
-    "restore",
-    "--staged",
-    "--worktree",
-    "--",
-    ...tracked
-  ]);
+  let restore = await runGit(dir, ["restore", "--staged", "--worktree", "--", ...tracked]);
   if (!restore.ok && isPathspecMismatchError(restore.error)) {
     restore = await runGit(dir, ["checkout", "HEAD", "--", ...tracked]);
   }
@@ -687,14 +652,7 @@ async function syncProjectFromRemote(dir, branchName, onProgress) {
 
   emitProgress(onProgress, "pull", "Restoring project files from remote");
 
-  const list = await runGit(dir, [
-    "ls-tree",
-    "-r",
-    "--name-only",
-    remoteRef,
-    "--",
-    ...PROJECT_PATHS
-  ]);
+  const list = await runGit(dir, ["ls-tree", "-r", "--name-only", remoteRef, "--", ...PROJECT_PATHS]);
   if (!list.ok) return list;
 
   const remoteFiles = list.stdout
@@ -703,23 +661,10 @@ async function syncProjectFromRemote(dir, branchName, onProgress) {
     .filter(Boolean);
 
   if (remoteFiles.length > 0) {
-    let restore = await runGit(dir, [
-      "restore",
-      "--source",
-      remoteRef,
-      "--worktree",
-      "--staged",
-      "--",
-      ...remoteFiles
-    ]);
+    let restore = await runGit(dir, ["restore", "--source", remoteRef, "--worktree", "--staged", "--", ...remoteFiles]);
 
     if (!restore.ok) {
-      restore = await runGit(dir, [
-        "checkout",
-        remoteRef,
-        "--",
-        ...remoteFiles
-      ]);
+      restore = await runGit(dir, ["checkout", remoteRef, "--", ...remoteFiles]);
     }
     if (!restore.ok) return restore;
   }
@@ -749,11 +694,7 @@ async function syncProjectFromRemote(dir, branchName, onProgress) {
 async function stashChanges(dir, onProgress) {
   emitProgress(onProgress, "pull", "Stashing local changes");
   if (!(await repoHasCommits(dir))) {
-    const saved = await stageAndCommitLocal(
-      dir,
-      "GDD Editor: local snapshot before pull",
-      onProgress
-    );
+    const saved = await stageAndCommitLocal(dir, "GDD Editor: local snapshot before pull", onProgress);
     if (!saved.ok) return saved;
     return { ok: true, stashed: Boolean(saved.committed) };
   }
@@ -772,13 +713,7 @@ async function stashChanges(dir, onProgress) {
       return { ok: true, stashed: false };
     }
     if (isPathspecMismatchError(result.error)) {
-      const fallback = await runGit(dir, [
-        "stash",
-        "push",
-        "-u",
-        "-m",
-        "GDD Editor: before pull"
-      ]);
+      const fallback = await runGit(dir, ["stash", "push", "-u", "-m", "GDD Editor: before pull"]);
       if (!fallback.ok) {
         if (/No local changes to save/i.test(fallback.error)) {
           return { ok: true, stashed: false };
@@ -800,14 +735,7 @@ async function discardProjectChanges(dir, onProgress) {
     if (!restore.ok) return restore;
   } else {
     for (const projectPath of PROJECT_PATHS) {
-      const unstage = await runGit(dir, [
-        "rm",
-        "-rf",
-        "--cached",
-        "--ignore-unmatch",
-        "--",
-        projectPath
-      ]);
+      const unstage = await runGit(dir, ["rm", "-rf", "--cached", "--ignore-unmatch", "--", projectPath]);
       if (!unstage.ok) return unstage;
     }
   }
@@ -838,16 +766,10 @@ async function push(dir, onProgress) {
 
   emitProgress(onProgress, "push", "Connecting to remote");
 
-  const args = hasTracking
-    ? ["push", "--progress"]
-    : ["push", "--progress", "-u", "origin", branchName];
+  const args = hasTracking ? ["push", "--progress"] : ["push", "--progress", "-u", "origin", branchName];
 
   if (!hasTracking) {
-    emitProgress(
-      onProgress,
-      "push",
-      `Publishing branch ${branchName} to origin`
-    );
+    emitProgress(onProgress, "push", `Publishing branch ${branchName} to origin`);
   }
 
   const result = await runGitStream(dir, args, onProgress, "push");
@@ -874,24 +796,11 @@ async function pull(dir, onProgress) {
     emitProgress(onProgress, "pull", `Pulling origin/${branchName}`);
   }
 
-  let result = await runGitStream(
-    dir,
-    pullArgs(branchName, hasTracking, { ffOnly: true }),
-    onProgress,
-    "pull"
-  );
+  let result = await runGitStream(dir, pullArgs(branchName, hasTracking, { ffOnly: true }), onProgress, "pull");
 
   if (!result.ok && isUntrackedOverwriteError(result.error)) {
-    emitProgress(
-      onProgress,
-      "pull",
-      "Local files conflict with remote — saving local snapshot"
-    );
-    const saved = await stageAndCommitLocal(
-      dir,
-      "GDD Editor: local snapshot before pull",
-      onProgress
-    );
+    emitProgress(onProgress, "pull", "Local files conflict with remote — saving local snapshot");
+    const saved = await stageAndCommitLocal(dir, "GDD Editor: local snapshot before pull", onProgress);
     if (!saved.ok) return saved;
 
     emitProgress(onProgress, "pull", "Retrying pull with merge");
@@ -959,9 +868,7 @@ async function setRemoteUrl(dir, url) {
   }
 
   const existing = await runGit(dir, ["remote", "get-url", "origin"]);
-  const args = existing.ok
-    ? ["remote", "set-url", "origin", url]
-    : ["remote", "add", "origin", url];
+  const args = existing.ok ? ["remote", "set-url", "origin", url] : ["remote", "add", "origin", url];
 
   const result = await runGit(dir, args);
   if (!result.ok) return { ok: false, error: result.error };

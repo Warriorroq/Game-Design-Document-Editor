@@ -48,9 +48,7 @@ export async function pickProjectFolder(): Promise<PickFolderResult | null> {
   };
 }
 
-async function readFolderPayload(
-  folderPath: string
-): Promise<FolderProjectPayload> {
+async function readFolderPayload(folderPath: string): Promise<FolderProjectPayload> {
   if (!window.gddDesktop?.project) {
     throw new Error("Desktop project API is unavailable.");
   }
@@ -72,24 +70,16 @@ async function readFolderPayload(
   return result.payload;
 }
 
-export async function loadProjectFromFolder(
-  folderPath: string
-): Promise<GddDocument> {
+export async function loadProjectFromFolder(folderPath: string): Promise<GddDocument> {
   const payload = await readFolderPayload(folderPath);
   return folderPayloadToDocument(payload);
 }
 
-export async function saveProjectToFolder(
-  folderPath: string,
-  doc: GddDocument
-): Promise<void> {
+export async function saveProjectToFolder(folderPath: string, doc: GddDocument): Promise<void> {
   if (!window.gddDesktop?.project) return;
 
   const payload = documentToFolderPayload(doc);
-  const result = await window.gddDesktop.project.writeFolder(
-    folderPath,
-    payload
-  );
+  const result = await window.gddDesktop.project.writeFolder(folderPath, payload);
   if (!result.ok) {
     throw new Error(result.error ?? "Could not save project folder.");
   }

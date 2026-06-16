@@ -1,18 +1,6 @@
-const BLOCK_TAGS = new Set([
-  "H1",
-  "H2",
-  "H3",
-  "P",
-  "LI",
-  "TD",
-  "TH",
-  "BLOCKQUOTE"
-]);
+const BLOCK_TAGS = new Set(["H1", "H2", "H3", "P", "LI", "TD", "TH", "BLOCKQUOTE"]);
 
-export function findBlockElement(
-  node: Node | null,
-  root: HTMLElement
-): HTMLElement | null {
+export function findBlockElement(node: Node | null, root: HTMLElement): HTMLElement | null {
   let current: Node | null = node;
   while (current && current !== root) {
     if (current.nodeType === Node.ELEMENT_NODE) {

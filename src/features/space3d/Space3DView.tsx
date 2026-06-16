@@ -16,19 +16,10 @@ import { Space3DModeMenu } from "@/features/space3d/components/Space3DModeMenu";
 import { Space3DObjectInspector } from "@/features/space3d/components/Space3DObjectInspector";
 import { useSpace3DScene } from "@/features/space3d/hooks/useSpace3DScene";
 import { snapTransformPatch } from "@/features/space3d/lib/space3dGrid";
-import {
-  isSupportedModelFileName,
-  readModelFile
-} from "@/features/space3d/lib/space3dLoader";
+import { isSupportedModelFileName, readModelFile } from "@/features/space3d/lib/space3dLoader";
 import { clampTransformPatch } from "@/features/space3d/lib/space3dObject";
 import { useLocale } from "@/shared/context/LocaleContext";
-import type {
-  GddDocument,
-  GddSection,
-  Space3DData,
-  Space3DEditMode,
-  Space3DObject
-} from "@/shared/types";
+import type { GddDocument, GddSection, Space3DData, Space3DEditMode, Space3DObject } from "@/shared/types";
 
 interface Space3DViewProps {
   doc: GddDocument;
@@ -79,18 +70,13 @@ export function Space3DView({
       const grid = normalizeSpace3DGrid(space3d.grid);
       const snapped = snapTransformPatch(clampTransformPatch(patch), grid);
       updateSpace3d({
-        objects: space3d.objects.map((obj) =>
-          obj.id === objectId ? { ...obj, ...snapped } : obj
-        )
+        objects: space3d.objects.map((obj) => (obj.id === objectId ? { ...obj, ...snapped } : obj))
       });
     },
     [space3d.objects, space3d.grid, updateSpace3d]
   );
 
-  const selectedObject =
-    selectedId != null
-      ? (space3d.objects.find((obj) => obj.id === selectedId) ?? null)
-      : null;
+  const selectedObject = selectedId != null ? (space3d.objects.find((obj) => obj.id === selectedId) ?? null) : null;
 
   useEffect(() => {
     if (selectedId && !space3d.objects.some((obj) => obj.id === selectedId)) {
@@ -148,10 +134,7 @@ export function Space3DView({
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key !== "Delete") return;
       if (e.target instanceof HTMLElement && e.target.isContentEditable) return;
-      if (
-        e.target instanceof HTMLInputElement ||
-        e.target instanceof HTMLTextAreaElement
-      ) {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
         return;
       }
       removeSelected();

@@ -83,154 +83,73 @@ export function DeskContextMenu({
   }, [onClose]);
 
   const menu = (
-    <div
-      ref={menuRef}
-      className="link-context-menu desk-context-menu"
-      style={{ left: x, top: y }}
-      role="menu"
-    >
-      <button
-        type="button"
-        className="link-menu-item"
-        role="menuitem"
-        onClick={() => onPick("arrow")}
-      >
+    <div ref={menuRef} className="link-context-menu desk-context-menu" style={{ left: x, top: y }} role="menu">
+      <button type="button" className="link-menu-item" role="menuitem" onClick={() => onPick("arrow")}>
         {t("menu.addArrow")}
       </button>
-      <button
-        type="button"
-        className="link-menu-item"
-        role="menuitem"
-        onClick={() => onPick("line")}
-      >
+      <button type="button" className="link-menu-item" role="menuitem" onClick={() => onPick("line")}>
         {t("menu.addLine")}
       </button>
-      <button
-        type="button"
-        className="link-menu-item"
-        role="menuitem"
-        onClick={() => onPick("box")}
-      >
+      <button type="button" className="link-menu-item" role="menuitem" onClick={() => onPick("box")}>
         {t("menu.addBox")}
       </button>
-      <button
-        type="button"
-        className="link-menu-item"
-        role="menuitem"
-        onClick={onAddText}
-      >
+      <button type="button" className="link-menu-item" role="menuitem" onClick={onAddText}>
         {t("menu.addText")}
       </button>
-      <button
-        type="button"
-        className="link-menu-item"
-        role="menuitem"
-        onClick={onInsertVideo}
-      >
+      <button type="button" className="link-menu-item" role="menuitem" onClick={onInsertVideo}>
         {t("menu.insertVideo")}
       </button>
       <div className="board-menu-sep" role="separator" />
       {canCopy && (
-        <button
-          type="button"
-          className="link-menu-item"
-          role="menuitem"
-          onClick={onCopy}
-        >
+        <button type="button" className="link-menu-item" role="menuitem" onClick={onCopy}>
           {t("menu.copy")}
         </button>
       )}
       {canPaste && (
-        <button
-          type="button"
-          className="link-menu-item"
-          role="menuitem"
-          onClick={onPaste}
-        >
+        <button type="button" className="link-menu-item" role="menuitem" onClick={onPaste}>
           {t("menu.paste")}
         </button>
       )}
       {canLock && (
-        <button
-          type="button"
-          className="link-menu-item"
-          role="menuitem"
-          onClick={onLock}
-        >
+        <button type="button" className="link-menu-item" role="menuitem" onClick={onLock}>
           {t("desk.lock")}
         </button>
       )}
       {canUnlock && (
-        <button
-          type="button"
-          className="link-menu-item"
-          role="menuitem"
-          onClick={onUnlock}
-        >
+        <button type="button" className="link-menu-item" role="menuitem" onClick={onUnlock}>
           {t("desk.unlock")}
         </button>
       )}
-      {(canBringForward ||
-        canSendBackward ||
-        canFlipHorizontal ||
-        canFlipVertical) && <div className="board-menu-sep" role="separator" />}
+      {(canBringForward || canSendBackward || canFlipHorizontal || canFlipVertical) && (
+        <div className="board-menu-sep" role="separator" />
+      )}
       {canBringForward && (
-        <button
-          type="button"
-          className="link-menu-item"
-          role="menuitem"
-          onClick={onBringForward}
-        >
+        <button type="button" className="link-menu-item" role="menuitem" onClick={onBringForward}>
           {t("desk.bringForward")}
         </button>
       )}
       {canSendBackward && (
-        <button
-          type="button"
-          className="link-menu-item"
-          role="menuitem"
-          onClick={onSendBackward}
-        >
+        <button type="button" className="link-menu-item" role="menuitem" onClick={onSendBackward}>
           {t("desk.sendBackward")}
         </button>
       )}
       {canFlipHorizontal && (
-        <button
-          type="button"
-          className="link-menu-item"
-          role="menuitem"
-          onClick={onFlipHorizontal}
-        >
+        <button type="button" className="link-menu-item" role="menuitem" onClick={onFlipHorizontal}>
           {t("desk.flipHorizontal")}
         </button>
       )}
       {canFlipVertical && (
-        <button
-          type="button"
-          className="link-menu-item"
-          role="menuitem"
-          onClick={onFlipVertical}
-        >
+        <button type="button" className="link-menu-item" role="menuitem" onClick={onFlipVertical}>
           {t("desk.flipVertical")}
         </button>
       )}
       {canGroup && (
-        <button
-          type="button"
-          className="link-menu-item"
-          role="menuitem"
-          onClick={onGroup}
-        >
+        <button type="button" className="link-menu-item" role="menuitem" onClick={onGroup}>
           {t("desk.group")}
         </button>
       )}
       {canUngroup && (
-        <button
-          type="button"
-          className="link-menu-item"
-          role="menuitem"
-          onClick={onUngroup}
-        >
+        <button type="button" className="link-menu-item" role="menuitem" onClick={onUngroup}>
           {t("desk.ungroup")}
         </button>
       )}

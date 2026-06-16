@@ -10,22 +10,14 @@ import {
   normalizeSpace3DObject,
   transformModeToControls
 } from "@/domain/space3d/space3d";
-import type {
-  GddDocument,
-  Space3DData,
-  Space3DEditMode,
-  Space3DObject
-} from "@/domain/types";
+import type { GddDocument, Space3DData, Space3DEditMode, Space3DObject } from "@/domain/types";
 import {
   createInfiniteGrid,
   disposeInfiniteGrid,
   snapTransformPatch,
   updateInfiniteGrid
 } from "@/features/space3d/lib/space3dGrid";
-import {
-  cloneModelInstance,
-  loadSpace3DModelTemplate
-} from "@/features/space3d/lib/space3dLoader";
+import { cloneModelInstance, loadSpace3DModelTemplate } from "@/features/space3d/lib/space3dLoader";
 import {
   applyObjectTransform,
   disposeObject3D,
@@ -120,10 +112,7 @@ export function useSpace3DScene({
       RIGHT: THREE.MOUSE.PAN
     };
 
-    const transformControls = new TransformControls(
-      camera,
-      renderer.domElement
-    );
+    const transformControls = new TransformControls(camera, renderer.domElement);
     transformControls.setMode(transformModeToControls(editMode));
     configureTransformControlsGizmo(transformControls);
     scene.add(transformControls.getHelper());
@@ -216,12 +205,7 @@ export function useSpace3DScene({
       frameId = requestAnimationFrame(tick);
       controls.update();
       if (gridHelper.visible) {
-        updateInfiniteGrid(
-          gridHelper,
-          camera,
-          controls.target,
-          normalizeSpace3DGrid(space3dRef.current.grid)
-        );
+        updateInfiniteGrid(gridHelper, camera, controls.target, normalizeSpace3DGrid(space3dRef.current.grid));
       }
       renderer.render(scene, camera);
     };
@@ -330,9 +314,7 @@ export function useSpace3DScene({
 
     async function syncObjects() {
       syncingRef.current = true;
-      const objects = space3dRef.current.objects.map((obj) =>
-        normalizeSpace3DObject(obj)
-      );
+      const objects = space3dRef.current.objects.map((obj) => normalizeSpace3DObject(obj));
       const nextIds = new Set(objects.map((obj) => obj.id));
 
       for (const [id, root] of ctx!.instances) {
@@ -378,9 +360,7 @@ export function useSpace3DScene({
 
         if (existing) {
           const mesh = existing as THREE.Mesh;
-          const needsRebuild =
-            mesh.userData.primitiveType !== obj.type ||
-            mesh.userData.color !== obj.color;
+          const needsRebuild = mesh.userData.primitiveType !== obj.type || mesh.userData.color !== obj.color;
           if (needsRebuild) {
             ctx!.objectGroup.remove(existing);
             disposeObject3D(existing);

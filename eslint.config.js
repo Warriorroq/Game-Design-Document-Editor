@@ -25,10 +25,7 @@ export default defineConfig(
       ...reactHooks.configs.recommended.rules,
       "react-hooks/refs": "off",
       "react-hooks/set-state-in-effect": "off",
-      "react-refresh/only-export-components": [
-        "error",
-        { allowConstantExport: true }
-      ],
+      "react-refresh/only-export-components": ["error", { allowConstantExport: true }],
       "simple-import-sort/exports": "error",
       "simple-import-sort/imports": "error",
       "@typescript-eslint/consistent-type-imports": [
@@ -46,10 +43,7 @@ export default defineConfig(
     }
   },
   {
-    files: [
-      "src/shared/context/**/*.{ts,tsx}",
-      "src/features/links/LinkContext.tsx"
-    ],
+    files: ["src/shared/context/**/*.{ts,tsx}", "src/features/links/LinkContext.tsx"],
     rules: {
       "react-refresh/only-export-components": "off"
     }

@@ -10,10 +10,7 @@ import {
   setGitRemote,
   storeGitAccessToken
 } from "@/features/git/lib/git";
-import {
-  loadGitSettings,
-  saveGitSettings
-} from "@/features/git/lib/gitSettings";
+import { loadGitSettings, saveGitSettings } from "@/features/git/lib/gitSettings";
 import { useLocale } from "@/shared/context/LocaleContext";
 import { isDesktopApp } from "@/shared/lib/desktop";
 
@@ -24,12 +21,7 @@ interface GitSettingsPanelProps {
   onRefreshGitStatus?: () => void;
 }
 
-export function GitSettingsPanel({
-  folderPath,
-  gitAvailable,
-  gitStatus,
-  onRefreshGitStatus
-}: GitSettingsPanelProps) {
+export function GitSettingsPanel({ folderPath, gitAvailable, gitStatus, onRefreshGitStatus }: GitSettingsPanelProps) {
   const { t } = useLocale();
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
@@ -111,10 +103,7 @@ export function GitSettingsPanel({
         }
 
         if (gitStatus?.isRepo && accessToken.trim()) {
-          const tokenResult = await storeGitAccessToken(
-            folderPath,
-            accessToken.trim()
-          );
+          const tokenResult = await storeGitAccessToken(folderPath, accessToken.trim());
           if (!tokenResult.ok) {
             setError(formatGitError(tokenResult.error, t));
             setSaving(false);
@@ -217,9 +206,7 @@ export function GitSettingsPanel({
       <section className="settings-git-block">
         <h3 className="settings-git-block-title">{t("git.settingsRepo")}</h3>
         {!folderPath && <p className="settings-hint">{t("git.needFolder")}</p>}
-        {folderPath && !gitStatus?.isRepo && (
-          <p className="settings-hint">{t("git.notARepo")}</p>
-        )}
+        {folderPath && !gitStatus?.isRepo && <p className="settings-hint">{t("git.notARepo")}</p>}
         {folderPath && gitStatus?.isRepo && (
           <>
             <label className="settings-field">
@@ -236,9 +223,7 @@ export function GitSettingsPanel({
               />
             </label>
             {gitStatus.branch && (
-              <p className="settings-git-meta">
-                {t("git.settingsBranch", { branch: gitStatus.branch })}
-              </p>
+              <p className="settings-git-meta">{t("git.settingsBranch", { branch: gitStatus.branch })}</p>
             )}
           </>
         )}
@@ -255,9 +240,7 @@ export function GitSettingsPanel({
               disabled={connecting || !remoteUrl.trim()}
               onClick={() => void handleConnect()}
             >
-              {connecting
-                ? t("git.settingsConnecting")
-                : t("git.settingsConnect")}
+              {connecting ? t("git.settingsConnecting") : t("git.settingsConnect")}
             </button>
             <label className="settings-field settings-field--token">
               <span>{t("git.settingsToken")}</span>
@@ -274,25 +257,16 @@ export function GitSettingsPanel({
                 spellCheck={false}
               />
             </label>
-            <p className="settings-hint settings-hint--compact">
-              {t("git.settingsTokenHint")}
-            </p>
+            <p className="settings-hint settings-hint--compact">{t("git.settingsTokenHint")}</p>
           </>
         )}
       </section>
 
       {error && <p className="settings-git-error">{error}</p>}
       {saved && <p className="settings-git-saved">{t("git.settingsSaved")}</p>}
-      {connected && (
-        <p className="settings-git-saved">{t("git.settingsConnected")}</p>
-      )}
+      {connected && <p className="settings-git-saved">{t("git.settingsConnected")}</p>}
 
-      <button
-        type="button"
-        className="btn"
-        disabled={saving}
-        onClick={() => void handleSave()}
-      >
+      <button type="button" className="btn" disabled={saving} onClick={() => void handleSave()}>
         {saving ? t("git.settingsSaving") : t("git.settingsSave")}
       </button>
     </div>

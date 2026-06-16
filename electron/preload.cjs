@@ -12,18 +12,14 @@ contextBridge.exposeInMainWorld("gddDesktop", {
     onMaximizedChanged: (listener) => {
       const handler = (_event, maximized) => listener(Boolean(maximized));
       ipcRenderer.on("window:maximized-changed", handler);
-      return () =>
-        ipcRenderer.removeListener("window:maximized-changed", handler);
+      return () => ipcRenderer.removeListener("window:maximized-changed", handler);
     }
   },
   project: {
     pickFolder: () => ipcRenderer.invoke("project:pick-folder"),
-    readFolder: (folderPath) =>
-      ipcRenderer.invoke("project:read-folder", folderPath),
-    writeFolder: (folderPath, payload) =>
-      ipcRenderer.invoke("project:write-folder", folderPath, payload),
-    readArchive: (filePath) =>
-      ipcRenderer.invoke("project:read-archive", filePath),
+    readFolder: (folderPath) => ipcRenderer.invoke("project:read-folder", folderPath),
+    writeFolder: (folderPath, payload) => ipcRenderer.invoke("project:write-folder", folderPath, payload),
+    readArchive: (filePath) => ipcRenderer.invoke("project:read-archive", filePath),
     onOpenArchive: (listener) => {
       const handler = (_event, filePath) => listener(String(filePath));
       ipcRenderer.on("project:open-archive", handler);
@@ -34,24 +30,17 @@ contextBridge.exposeInMainWorld("gddDesktop", {
     isAvailable: () => ipcRenderer.invoke("git:is-available"),
     status: (folderPath) => ipcRenderer.invoke("git:status", folderPath),
     init: (folderPath) => ipcRenderer.invoke("git:init", folderPath),
-    commit: (folderPath, message, identity) =>
-      ipcRenderer.invoke("git:commit", folderPath, message, identity),
-    getIdentity: (folderPath) =>
-      ipcRenderer.invoke("git:get-identity", folderPath),
-    setIdentity: (folderPath, name, email) =>
-      ipcRenderer.invoke("git:set-identity", folderPath, name, email),
+    commit: (folderPath, message, identity) => ipcRenderer.invoke("git:commit", folderPath, message, identity),
+    getIdentity: (folderPath) => ipcRenderer.invoke("git:get-identity", folderPath),
+    setIdentity: (folderPath, name, email) => ipcRenderer.invoke("git:set-identity", folderPath, name, email),
     push: (folderPath) => ipcRenderer.invoke("git:push", folderPath),
     pull: (folderPath) => ipcRenderer.invoke("git:pull", folderPath),
     stash: (folderPath) => ipcRenderer.invoke("git:stash", folderPath),
-    discardProject: (folderPath) =>
-      ipcRenderer.invoke("git:discard-project", folderPath),
+    discardProject: (folderPath) => ipcRenderer.invoke("git:discard-project", folderPath),
     getRemote: (folderPath) => ipcRenderer.invoke("git:get-remote", folderPath),
-    setRemote: (folderPath, url) =>
-      ipcRenderer.invoke("git:set-remote", folderPath, url),
-    authenticate: (folderPath) =>
-      ipcRenderer.invoke("git:authenticate", folderPath),
-    storeToken: (folderPath, token) =>
-      ipcRenderer.invoke("git:store-token", folderPath, token),
+    setRemote: (folderPath, url) => ipcRenderer.invoke("git:set-remote", folderPath, url),
+    authenticate: (folderPath) => ipcRenderer.invoke("git:authenticate", folderPath),
+    storeToken: (folderPath, token) => ipcRenderer.invoke("git:store-token", folderPath, token),
     onProgress: (listener) => {
       const handler = (_event, payload) => listener(payload);
       ipcRenderer.on("git:progress", handler);

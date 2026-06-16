@@ -1,10 +1,7 @@
 /** How long search / link target highlights stay visible. */
 export const HIGHLIGHT_FLASH_MS = 800;
 
-export function flashElement(
-  el: HTMLElement | null,
-  className = "gdd-search-flash"
-) {
+export function flashElement(el: HTMLElement | null, className = "gdd-search-flash") {
   if (!el) return;
   el.scrollIntoView({ behavior: "smooth", block: "center" });
   el.classList.add(className);
@@ -27,11 +24,9 @@ export function stripEphemeralEditorMarkup(root: HTMLElement): void {
   root.querySelectorAll("mark.gdd-search-hit").forEach((node) => {
     unwrapMark(node as HTMLElement);
   });
-  root
-    .querySelectorAll(".gdd-anchor-flash, .gdd-search-flash")
-    .forEach((el) => {
-      el.classList.remove("gdd-anchor-flash", "gdd-search-flash");
-    });
+  root.querySelectorAll(".gdd-anchor-flash, .gdd-search-flash").forEach((el) => {
+    el.classList.remove("gdd-anchor-flash", "gdd-search-flash");
+  });
 }
 
 export function stripEphemeralFromHtml(html: string): string {
@@ -45,11 +40,7 @@ interface TextMatchPosition {
   idx: number;
 }
 
-export function highlightQueryInElement(
-  root: HTMLElement,
-  query: string,
-  focusIndex = 0
-): () => void {
+export function highlightQueryInElement(root: HTMLElement, query: string, focusIndex = 0): () => void {
   stripEphemeralEditorMarkup(root);
 
   const q = query.trim();
@@ -66,10 +57,7 @@ export function highlightQueryInElement(
 
   const positions: TextMatchPosition[] = [];
   for (const textNode of textNodes) {
-    if (
-      !textNode.parentElement ||
-      textNode.parentElement.closest("mark.gdd-search-hit")
-    ) {
+    if (!textNode.parentElement || textNode.parentElement.closest("mark.gdd-search-hit")) {
       continue;
     }
     const text = textNode.textContent ?? "";

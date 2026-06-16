@@ -1,17 +1,7 @@
-import {
-  boardBoxBounds,
-  resolveBoardPoint
-} from "@/domain/board/boardGeometry";
+import { boardBoxBounds, resolveBoardPoint } from "@/domain/board/boardGeometry";
 import type { DeskSelection } from "@/domain/board/deskClipboard";
 import { mergeSelections, selectionFromGroup } from "@/domain/board/deskGroups";
-import type {
-  BoardGroup,
-  BoardItem,
-  BoardPoint,
-  BoardShape,
-  BoardStroke,
-  BoardText
-} from "@/domain/types";
+import type { BoardGroup, BoardItem, BoardPoint, BoardShape, BoardStroke, BoardText } from "@/domain/types";
 
 export interface BoardRect {
   x: number;
@@ -20,20 +10,12 @@ export interface BoardRect {
   height: number;
 }
 
-export function boardRectFromPoints(
-  start: BoardPoint,
-  end: BoardPoint
-): BoardRect {
+export function boardRectFromPoints(start: BoardPoint, end: BoardPoint): BoardRect {
   return boardBoxBounds(start, end);
 }
 
 function rectsIntersect(a: BoardRect, b: BoardRect): boolean {
-  return (
-    a.x < b.x + b.width &&
-    a.x + a.width > b.x &&
-    a.y < b.y + b.height &&
-    a.y + a.height > b.y
-  );
+  return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
 }
 
 function itemRect(item: BoardItem): BoardRect {
@@ -60,10 +42,7 @@ function shapeRect(shape: BoardShape, items: BoardItem[]): BoardRect {
     return boardBoxBounds(a, b);
   }
   const pad = 4;
-  return boardBoxBounds(
-    { x: a.x - pad, y: a.y - pad },
-    { x: b.x + pad, y: b.y + pad }
-  );
+  return boardBoxBounds({ x: a.x - pad, y: a.y - pad }, { x: b.x + pad, y: b.y + pad });
 }
 
 function strokeRect(stroke: BoardStroke): BoardRect {
@@ -89,10 +68,7 @@ function strokeRect(stroke: BoardStroke): BoardRect {
   };
 }
 
-function expandSelectionWithGroups(
-  raw: DeskSelection,
-  groups: BoardGroup[]
-): DeskSelection {
+function expandSelectionWithGroups(raw: DeskSelection, groups: BoardGroup[]): DeskSelection {
   let result: DeskSelection = {
     itemIds: [...raw.itemIds],
     shapeIds: [...raw.shapeIds],
@@ -129,18 +105,10 @@ export function selectionFromMarqueeRect(
   prev: DeskSelection
 ): DeskSelection {
   const raw: DeskSelection = {
-    itemIds: items
-      .filter((item) => rectsIntersect(rect, itemRect(item)))
-      .map((item) => item.id),
-    shapeIds: shapes
-      .filter((shape) => rectsIntersect(rect, shapeRect(shape, items)))
-      .map((shape) => shape.id),
-    textIds: texts
-      .filter((text) => rectsIntersect(rect, textRect(text)))
-      .map((text) => text.id),
-    strokeIds: strokes
-      .filter((stroke) => rectsIntersect(rect, strokeRect(stroke)))
-      .map((stroke) => stroke.id)
+    itemIds: items.filter((item) => rectsIntersect(rect, itemRect(item))).map((item) => item.id),
+    shapeIds: shapes.filter((shape) => rectsIntersect(rect, shapeRect(shape, items))).map((shape) => shape.id),
+    textIds: texts.filter((text) => rectsIntersect(rect, textRect(text))).map((text) => text.id),
+    strokeIds: strokes.filter((stroke) => rectsIntersect(rect, strokeRect(stroke))).map((stroke) => stroke.id)
   };
 
   const expanded = expandSelectionWithGroups(raw, groups);

@@ -42,8 +42,7 @@ export function GitProgressDialog({ state, onClose }: GitProgressDialogProps) {
 
   if (!state) return null;
 
-  const title =
-    state.operation === "push" ? t("git.progressPush") : t("git.progressPull");
+  const title = state.operation === "push" ? t("git.progressPush") : t("git.progressPull");
 
   const statusLabel =
     state.status === "running"
@@ -53,10 +52,7 @@ export function GitProgressDialog({ state, onClose }: GitProgressDialogProps) {
         : t("git.progressFailed");
 
   const dialog = (
-    <div
-      className="link-dialog-backdrop"
-      onPointerDown={state.status === "running" ? undefined : onClose}
-    >
+    <div className="link-dialog-backdrop" onPointerDown={state.status === "running" ? undefined : onClose}>
       <div
         className="link-paste-dialog git-progress-dialog"
         role="dialog"
@@ -66,28 +62,16 @@ export function GitProgressDialog({ state, onClose }: GitProgressDialogProps) {
         <h3 id="git-progress-title" className="link-paste-title">
           {title}
         </h3>
-        <p
-          className={`git-progress-status git-progress-status--${state.status}`}
-        >
-          {statusLabel}
-        </p>
+        <p className={`git-progress-status git-progress-status--${state.status}`}>{statusLabel}</p>
         {state.percent !== null && state.status === "running" && (
           <div className="git-progress-bar" aria-hidden>
-            <div
-              className="git-progress-bar-fill"
-              style={{ width: `${Math.min(100, Math.max(0, state.percent))}%` }}
-            />
+            <div className="git-progress-bar-fill" style={{ width: `${Math.min(100, Math.max(0, state.percent))}%` }} />
           </div>
         )}
         {state.percent !== null && state.status === "running" && (
           <p className="git-progress-percent">{state.percent}%</p>
         )}
-        <div
-          className="git-progress-log"
-          ref={logRef}
-          role="log"
-          aria-live="polite"
-        >
+        <div className="git-progress-log" ref={logRef} role="log" aria-live="polite">
           {state.lines.length === 0 ? (
             <p className="git-progress-log-empty">{t("git.progressWaiting")}</p>
           ) : (

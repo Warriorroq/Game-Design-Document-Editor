@@ -1,13 +1,5 @@
-import {
-  boardBoxBounds,
-  resolveBoardPoint
-} from "@/features/board/lib/boardGeometry";
-import type {
-  BoardItem,
-  BoardPoint,
-  BoardShape,
-  BoardShapeType
-} from "@/shared/types";
+import { boardBoxBounds, resolveBoardPoint } from "@/features/board/lib/boardGeometry";
+import type { BoardItem, BoardPoint, BoardShape, BoardShapeType } from "@/shared/types";
 
 const SHAPE_LINE_HIT_WIDTH = 14;
 const SHAPE_BOX_HIT_PAD = 4;
@@ -22,11 +14,7 @@ interface BoardShapesLayerProps {
   selectedShapeIds: ReadonlySet<string>;
   className?: string;
   onShapePointerDown: (e: React.PointerEvent, shapeId: string) => void;
-  onEndpointPointerDown: (
-    e: React.PointerEvent,
-    shapeId: string,
-    endpoint: "start" | "end"
-  ) => void;
+  onEndpointPointerDown: (e: React.PointerEvent, shapeId: string, endpoint: "start" | "end") => void;
 }
 
 function ShapeView({
@@ -40,10 +28,7 @@ function ShapeView({
   items: BoardItem[];
   selected: boolean;
   onShapePointerDown: (e: React.PointerEvent) => void;
-  onEndpointPointerDown: (
-    e: React.PointerEvent,
-    endpoint: "start" | "end"
-  ) => void;
+  onEndpointPointerDown: (e: React.PointerEvent, endpoint: "start" | "end") => void;
 }) {
   const a = resolveBoardPoint(shape.start, items);
   const b = resolveBoardPoint(shape.end, items);
@@ -56,10 +41,7 @@ function ShapeView({
     const hitX = x - SHAPE_BOX_HIT_PAD;
     const hitY = y - SHAPE_BOX_HIT_PAD;
     const hitWidth = Math.max(width + SHAPE_BOX_HIT_PAD * 2, SHAPE_BOX_MIN_HIT);
-    const hitHeight = Math.max(
-      height + SHAPE_BOX_HIT_PAD * 2,
-      SHAPE_BOX_MIN_HIT
-    );
+    const hitHeight = Math.max(height + SHAPE_BOX_HIT_PAD * 2, SHAPE_BOX_MIN_HIT);
     return (
       <g
         className={`board-shape board-shape--box ${selected ? "selected" : ""}`}
@@ -93,24 +75,15 @@ function ShapeView({
         />
         {selected && (
           <>
-            <Handle
-              cx={a.x}
-              cy={a.y}
-              onPointerDown={(e) => onEndpointPointerDown(e, "start")}
-            />
-            <Handle
-              cx={b.x}
-              cy={b.y}
-              onPointerDown={(e) => onEndpointPointerDown(e, "end")}
-            />
+            <Handle cx={a.x} cy={a.y} onPointerDown={(e) => onEndpointPointerDown(e, "start")} />
+            <Handle cx={b.x} cy={b.y} onPointerDown={(e) => onEndpointPointerDown(e, "end")} />
           </>
         )}
       </g>
     );
   }
 
-  const markerEnd =
-    shape.type === "arrow" ? "url(#board-arrowhead)" : undefined;
+  const markerEnd = shape.type === "arrow" ? "url(#board-arrowhead)" : undefined;
 
   return (
     <g
@@ -143,31 +116,15 @@ function ShapeView({
       />
       {selected && (
         <>
-          <Handle
-            cx={a.x}
-            cy={a.y}
-            onPointerDown={(e) => onEndpointPointerDown(e, "start")}
-          />
-          <Handle
-            cx={b.x}
-            cy={b.y}
-            onPointerDown={(e) => onEndpointPointerDown(e, "end")}
-          />
+          <Handle cx={a.x} cy={a.y} onPointerDown={(e) => onEndpointPointerDown(e, "start")} />
+          <Handle cx={b.x} cy={b.y} onPointerDown={(e) => onEndpointPointerDown(e, "end")} />
         </>
       )}
     </g>
   );
 }
 
-function Handle({
-  cx,
-  cy,
-  onPointerDown
-}: {
-  cx: number;
-  cy: number;
-  onPointerDown: (e: React.PointerEvent) => void;
-}) {
+function Handle({ cx, cy, onPointerDown }: { cx: number; cy: number; onPointerDown: (e: React.PointerEvent) => void }) {
   return (
     <circle
       className="board-shape-handle"
@@ -194,12 +151,7 @@ export function BoardShapesLayer({
   onEndpointPointerDown
 }: BoardShapesLayerProps) {
   return (
-    <svg
-      className={className}
-      width={canvasWidth}
-      height={canvasHeight}
-      aria-hidden
-    >
+    <svg className={className} width={canvasWidth} height={canvasHeight} aria-hidden>
       <defs>
         <marker
           id="board-arrowhead"
@@ -221,9 +173,7 @@ export function BoardShapesLayer({
           items={items}
           selected={selectedShapeIds.has(shape.id)}
           onShapePointerDown={(e) => onShapePointerDown(e, shape.id)}
-          onEndpointPointerDown={(e, endpoint) =>
-            onEndpointPointerDown(e, shape.id, endpoint)
-          }
+          onEndpointPointerDown={(e, endpoint) => onEndpointPointerDown(e, shape.id, endpoint)}
         />
       ))}
 

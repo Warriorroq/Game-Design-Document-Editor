@@ -4,10 +4,7 @@ export type BoardEdge = BoardAttach["edge"];
 
 const CORNERS: BoardEdge[] = ["nw", "ne", "sw", "se"];
 
-export function pointFromAttach(
-  item: BoardItem,
-  attach: BoardAttach
-): { x: number; y: number } {
+export function pointFromAttach(item: BoardItem, attach: BoardAttach): { x: number; y: number } {
   const { x, y, width: w, height: h } = item;
   const t = attach.t ?? 0.5;
 
@@ -34,10 +31,7 @@ export function pointFromAttach(
   }
 }
 
-export function resolveBoardPoint(
-  point: BoardPoint,
-  items: BoardItem[]
-): { x: number; y: number } {
+export function resolveBoardPoint(point: BoardPoint, items: BoardItem[]): { x: number; y: number } {
   if (!point.attach) return { x: point.x, y: point.y };
   const item = items.find((i) => i.id === point.attach!.itemId);
   if (!item) return { x: point.x, y: point.y };
@@ -73,22 +67,11 @@ function distToSegment(
   return { dist: Math.hypot(px - cx, py - cy), t };
 }
 
-function hitsForItem(
-  px: number,
-  py: number,
-  item: BoardItem,
-  threshold: number
-): EdgeHit[] {
+function hitsForItem(px: number, py: number, item: BoardItem, threshold: number): EdgeHit[] {
   const { x, y, width: w, height: h } = item;
   const hits: EdgeHit[] = [];
 
-  const addEdge = (
-    edge: BoardEdge,
-    x1: number,
-    y1: number,
-    x2: number,
-    y2: number
-  ) => {
+  const addEdge = (edge: BoardEdge, x1: number, y1: number, x2: number, y2: number) => {
     const { dist, t } = distToSegment(px, py, x1, y1, x2, y2);
     if (dist <= threshold) {
       const cx = x1 + t * (x2 - x1);
@@ -128,12 +111,7 @@ function hitsForItem(
   return hits;
 }
 
-export function snapBoardPoint(
-  x: number,
-  y: number,
-  items: BoardItem[],
-  threshold = 14
-): BoardPoint {
+export function snapBoardPoint(x: number, y: number, items: BoardItem[], threshold = 14): BoardPoint {
   let best: EdgeHit | null = null;
 
   for (const item of items) {
@@ -148,21 +126,14 @@ export function snapBoardPoint(
     itemId: best.itemId,
     edge: best.edge
   };
-  if (
-    best.t !== undefined &&
-    !CORNERS.includes(best.edge) &&
-    best.edge !== "center"
-  ) {
+  if (best.t !== undefined && !CORNERS.includes(best.edge) && best.edge !== "center") {
     attach.t = best.t;
   }
 
   return { x: best.x, y: best.y, attach };
 }
 
-export function boardBoxBounds(
-  start: { x: number; y: number },
-  end: { x: number; y: number }
-) {
+export function boardBoxBounds(start: { x: number; y: number }, end: { x: number; y: number }) {
   const x = Math.min(start.x, end.x);
   const y = Math.min(start.y, end.y);
   const width = Math.abs(end.x - start.x);

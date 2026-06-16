@@ -7,14 +7,7 @@ import type {
   Space3DObjectType
 } from "@/domain/types";
 
-export const SPACE3D_COLORS = [
-  "#6366f1",
-  "#22c55e",
-  "#f97316",
-  "#ec4899",
-  "#06b6d4",
-  "#eab308"
-] as const;
+export const SPACE3D_COLORS = ["#6366f1", "#22c55e", "#f97316", "#ec4899", "#06b6d4", "#eab308"] as const;
 
 export function defaultSpace3DGrid(): Space3DGrid {
   return {
@@ -31,12 +24,7 @@ export function isGridEnabled(grid: Space3DGrid | undefined): boolean {
   return normalized.enabled === true && (normalized.step ?? 0) > 0;
 }
 
-function clampGridNumber(
-  value: unknown,
-  min: number,
-  max: number,
-  fallback: number
-): number {
+function clampGridNumber(value: unknown, min: number, max: number, fallback: number): number {
   const n = typeof value === "number" ? value : Number(value);
   if (!Number.isFinite(n)) return fallback;
   return Math.min(max, Math.max(min, n));
@@ -55,9 +43,7 @@ function normalizeHexColor(value: unknown, fallback: string): string {
   return fallback;
 }
 
-export function normalizeSpace3DGrid(
-  grid: Space3DGrid | undefined
-): Space3DGrid {
+export function normalizeSpace3DGrid(grid: Space3DGrid | undefined): Space3DGrid {
   const base = defaultSpace3DGrid();
   if (!grid) return base;
 
@@ -123,17 +109,13 @@ export function normalizeSpace3DObject(obj: Space3DObject): Space3DObject {
   };
 }
 
-export function normalizeSpace3DData(
-  data: Space3DData | undefined
-): Space3DData {
+export function normalizeSpace3DData(data: Space3DData | undefined): Space3DData {
   const base = defaultSpace3DData();
   if (!data) return base;
   return {
     camera: data.camera ?? base.camera,
     grid: normalizeSpace3DGrid(data.grid),
-    objects: Array.isArray(data.objects)
-      ? data.objects.map((obj) => normalizeSpace3DObject(obj))
-      : []
+    objects: Array.isArray(data.objects) ? data.objects.map((obj) => normalizeSpace3DObject(obj)) : []
   };
 }
 
@@ -141,10 +123,7 @@ export function isSpace3DSection(section: GddSection): boolean {
   return section.kind === "space3d";
 }
 
-export function createSpace3DPrimitive(
-  type: "box" | "sphere",
-  index: number
-): Space3DObject {
+export function createSpace3DPrimitive(type: "box" | "sphere", index: number): Space3DObject {
   const offset = index * 1.5;
   return normalizeSpace3DObject({
     id: crypto.randomUUID(),
@@ -159,10 +138,7 @@ export function createSpace3DPrimitive(
   });
 }
 
-export function createSpace3DModelObject(
-  assetId: string,
-  index: number
-): Space3DObject {
+export function createSpace3DModelObject(assetId: string, index: number): Space3DObject {
   const offset = index * 2;
   return normalizeSpace3DObject({
     id: crypto.randomUUID(),
@@ -177,9 +153,7 @@ export function createSpace3DModelObject(
   });
 }
 
-export function transformModeToControls(
-  mode: Space3DEditMode
-): "translate" | "rotate" | "scale" {
+export function transformModeToControls(mode: Space3DEditMode): "translate" | "rotate" | "scale" {
   switch (mode) {
     case "scale":
       return "scale";

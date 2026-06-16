@@ -13,11 +13,6 @@ export const EDITOR_FORMAT_SHORTCUT_ACTIONS: {
   { id: "editor.format.paragraph", action: "paragraph" }
 ];
 
-export function formatActionForShortcut(
-  id: ShortcutActionId
-): FormatAction | null {
-  return (
-    EDITOR_FORMAT_SHORTCUT_ACTIONS.find((entry) => entry.id === id)?.action ??
-    null
-  );
+export function formatActionForShortcut(id: ShortcutActionId): FormatAction | null {
+  return EDITOR_FORMAT_SHORTCUT_ACTIONS.find((entry) => entry.id === id)?.action ?? null;
 }

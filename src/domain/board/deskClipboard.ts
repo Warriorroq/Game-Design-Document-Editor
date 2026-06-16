@@ -1,11 +1,4 @@
-import type {
-  BoardGroup,
-  BoardItem,
-  BoardPoint,
-  BoardShape,
-  BoardStroke,
-  BoardText
-} from "@/domain/types";
+import type { BoardGroup, BoardItem, BoardPoint, BoardShape, BoardStroke, BoardText } from "@/domain/types";
 
 export interface DeskClipboard {
   items: BoardItem[];
@@ -53,12 +46,7 @@ export function buildAssetDeskClipboard(
   };
 }
 
-function clonePoint(
-  point: BoardPoint,
-  idMap: Map<string, string>,
-  dx: number,
-  dy: number
-): BoardPoint {
+function clonePoint(point: BoardPoint, idMap: Map<string, string>, dx: number, dy: number): BoardPoint {
   const next: BoardPoint = {
     x: point.x + dx,
     y: point.y + dy
@@ -85,12 +73,7 @@ export function buildDeskClipboard(
   const shapeSet = new Set(selection.shapeIds);
   const textSet = new Set(selection.textIds);
   const strokeSet = new Set(selection.strokeIds);
-  if (
-    itemSet.size === 0 &&
-    shapeSet.size === 0 &&
-    textSet.size === 0 &&
-    strokeSet.size === 0
-  ) {
+  if (itemSet.size === 0 && shapeSet.size === 0 && textSet.size === 0 && strokeSet.size === 0) {
     return null;
   }
 
@@ -107,12 +90,7 @@ export function buildDeskClipboard(
       memberStrokeIds: g.memberStrokeIds.filter((id) => strokeSet.has(id))
     }))
     .filter(
-      (g) =>
-        g.memberItemIds.length +
-          g.memberShapeIds.length +
-          g.memberTextIds.length +
-          g.memberStrokeIds.length >=
-        2
+      (g) => g.memberItemIds.length + g.memberShapeIds.length + g.memberTextIds.length + g.memberStrokeIds.length >= 2
     );
 
   return {
@@ -221,18 +199,10 @@ export function pasteDeskClipboard(
 
   const newGroups: BoardGroup[] = clipboard.groups.map((group) => ({
     id: crypto.randomUUID(),
-    memberItemIds: group.memberItemIds
-      .map((id) => idMap.get(id))
-      .filter((id): id is string => Boolean(id)),
-    memberShapeIds: group.memberShapeIds
-      .map((id) => idMap.get(id))
-      .filter((id): id is string => Boolean(id)),
-    memberTextIds: group.memberTextIds
-      .map((id) => idMap.get(id))
-      .filter((id): id is string => Boolean(id)),
-    memberStrokeIds: group.memberStrokeIds
-      .map((id) => idMap.get(id))
-      .filter((id): id is string => Boolean(id))
+    memberItemIds: group.memberItemIds.map((id) => idMap.get(id)).filter((id): id is string => Boolean(id)),
+    memberShapeIds: group.memberShapeIds.map((id) => idMap.get(id)).filter((id): id is string => Boolean(id)),
+    memberTextIds: group.memberTextIds.map((id) => idMap.get(id)).filter((id): id is string => Boolean(id)),
+    memberStrokeIds: group.memberStrokeIds.map((id) => idMap.get(id)).filter((id): id is string => Boolean(id))
   }));
 
   return {

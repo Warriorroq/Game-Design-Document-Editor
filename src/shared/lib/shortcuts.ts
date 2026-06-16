@@ -101,10 +101,7 @@ const STORAGE_KEY = "gdd-editor-shortcuts";
 
 const MODIFIER_KEYS = new Set(["Control", "Shift", "Alt", "Meta", "OS"]);
 
-export function defaultShortcutBindings(): Record<
-  ShortcutActionId,
-  ShortcutBinding
-> {
+export function defaultShortcutBindings(): Record<ShortcutActionId, ShortcutBinding> {
   const out = {} as Record<ShortcutActionId, ShortcutBinding>;
   for (const def of SHORTCUT_DEFINITIONS) {
     out[def.id] = { ...def.defaultBinding };
@@ -124,10 +121,7 @@ function isBinding(value: unknown): value is ShortcutBinding {
   );
 }
 
-export function loadShortcutBindings(): Record<
-  ShortcutActionId,
-  ShortcutBinding
-> {
+export function loadShortcutBindings(): Record<ShortcutActionId, ShortcutBinding> {
   const bindings = defaultShortcutBindings();
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -143,9 +137,7 @@ export function loadShortcutBindings(): Record<
   return bindings;
 }
 
-export function saveShortcutBindings(
-  bindings: Record<ShortcutActionId, ShortcutBinding>
-): void {
+export function saveShortcutBindings(bindings: Record<ShortcutActionId, ShortcutBinding>): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(bindings));
   } catch {
@@ -160,9 +152,7 @@ export function normalizeEventKey(e: KeyboardEvent): string {
   return e.key;
 }
 
-export function bindingFromKeyboardEvent(
-  e: KeyboardEvent
-): ShortcutBinding | null {
+export function bindingFromKeyboardEvent(e: KeyboardEvent): ShortcutBinding | null {
   if (MODIFIER_KEYS.has(e.key)) return null;
   return {
     key: normalizeEventKey(e),
@@ -173,12 +163,7 @@ export function bindingFromKeyboardEvent(
 }
 
 export function bindingsEqual(a: ShortcutBinding, b: ShortcutBinding): boolean {
-  return (
-    a.key === b.key &&
-    a.ctrlOrMeta === b.ctrlOrMeta &&
-    a.shift === b.shift &&
-    a.alt === b.alt
-  );
+  return a.key === b.key && a.ctrlOrMeta === b.ctrlOrMeta && a.shift === b.shift && a.alt === b.alt;
 }
 
 export function findBindingConflict(
@@ -193,10 +178,7 @@ export function findBindingConflict(
   return null;
 }
 
-export function eventMatchesBinding(
-  e: KeyboardEvent,
-  binding: ShortcutBinding
-): boolean {
+export function eventMatchesBinding(e: KeyboardEvent, binding: ShortcutBinding): boolean {
   const mod = e.ctrlKey || e.metaKey;
   if (binding.ctrlOrMeta !== mod) return false;
   if (binding.shift !== e.shiftKey) return false;

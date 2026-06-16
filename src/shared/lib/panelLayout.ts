@@ -31,10 +31,7 @@ export function loadBoardPanelHidden(): boolean {
 }
 
 export function clampBoardWidth(width: number): number {
-  return Math.min(
-    PANEL_MAX_BOARD,
-    Math.max(PANEL_MIN_BOARD, Math.round(width))
-  );
+  return Math.min(PANEL_MAX_BOARD, Math.max(PANEL_MIN_BOARD, Math.round(width)));
 }
 
 export function saveBoardPanelWidth(width: number): void {

@@ -12,11 +12,7 @@ interface AppProvidersProps {
   children: ReactNode;
 }
 
-export function AppProviders({
-  doc,
-  setActiveSectionId,
-  children
-}: AppProvidersProps) {
+export function AppProviders({ doc, setActiveSectionId, children }: AppProvidersProps) {
   return (
     <LocaleProvider>
       <BoardSizeProvider>

@@ -1,12 +1,8 @@
 export const isDesktopApp =
   typeof window !== "undefined" &&
-  Boolean(
-    (window as Window & { gddDesktop?: { isDesktop?: boolean } }).gddDesktop
-      ?.isDesktop
-  );
+  Boolean((window as Window & { gddDesktop?: { isDesktop?: boolean } }).gddDesktop?.isDesktop);
 
-export const isWindowsDesktopApp =
-  isDesktopApp && window.gddDesktop?.platform === "win32";
+export const isWindowsDesktopApp = isDesktopApp && window.gddDesktop?.platform === "win32";
 
 /** Restore renderer focus after a native Electron dialog (or similar) stole it. */
 export function restoreAppFocus() {
@@ -18,10 +14,6 @@ export function restoreAppFocus() {
     }
     void window.gddDesktop?.window?.focus?.();
     window.focus();
-    document
-      .querySelector<HTMLElement>(
-        ".markdown-preview--editable, .editor-empty .btn"
-      )
-      ?.focus();
+    document.querySelector<HTMLElement>(".markdown-preview--editable, .editor-empty .btn")?.focus();
   });
 }

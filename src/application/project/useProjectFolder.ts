@@ -13,9 +13,7 @@ import {
 } from "@/infrastructure/project/projectFolder";
 
 export function useProjectFolder() {
-  const [folderPath, setFolderPath] = useState<string | null>(() =>
-    isDesktopApp ? getStoredProjectFolder() : null
-  );
+  const [folderPath, setFolderPath] = useState<string | null>(() => (isDesktopApp ? getStoredProjectFolder() : null));
   const [gitStatus, setGitStatus] = useState<GitStatus | null>(null);
   const [gitAvailable, setGitAvailable] = useState(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);

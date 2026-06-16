@@ -74,12 +74,7 @@ export function BoardStrokesLayer({
   onStrokePointerDown
 }: BoardStrokesLayerProps) {
   return (
-    <svg
-      className="board-strokes-layer"
-      width={canvasWidth}
-      height={canvasHeight}
-      aria-hidden
-    >
+    <svg className="board-strokes-layer" width={canvasWidth} height={canvasHeight} aria-hidden>
       {strokes.map((stroke) => (
         <StrokePath
           key={stroke.id}

@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 
-import {
-  clampTransformPatch,
-  MIN_SCALE
-} from "@/features/space3d/lib/space3dObject";
+import { clampTransformPatch, MIN_SCALE } from "@/features/space3d/lib/space3dObject";
 import { useLocale } from "@/shared/context/LocaleContext";
 import type { Space3DObject } from "@/shared/types";
 
@@ -12,16 +9,7 @@ interface Space3DObjectInspectorProps {
   onChange: (patch: Partial<Space3DObject>) => void;
 }
 
-type NumericField =
-  | "x"
-  | "y"
-  | "z"
-  | "rotationX"
-  | "rotationY"
-  | "rotationZ"
-  | "scaleX"
-  | "scaleY"
-  | "scaleZ";
+type NumericField = "x" | "y" | "z" | "rotationX" | "rotationY" | "rotationZ" | "scaleX" | "scaleY" | "scaleZ";
 
 function NumRow({
   label,
@@ -74,18 +62,13 @@ function NumRow({
   );
 }
 
-export function Space3DObjectInspector({
-  object,
-  onChange
-}: Space3DObjectInspectorProps) {
+export function Space3DObjectInspector({ object, onChange }: Space3DObjectInspectorProps) {
   const { t } = useLocale();
 
   if (!object) {
     return (
       <aside className="space3d-inspector">
-        <h3 className="space3d-inspector-title">
-          {t("space3d.inspectorTitle")}
-        </h3>
+        <h3 className="space3d-inspector-title">{t("space3d.inspectorTitle")}</h3>
         <p className="space3d-inspector-empty">{t("space3d.inspectorEmpty")}</p>
       </aside>
     );
@@ -108,46 +91,16 @@ export function Space3DObjectInspector({
 
       <div className="space3d-inspector-section">
         <h4>{t("space3d.position")}</h4>
-        <NumRow
-          label="X"
-          value={object.x}
-          step={0.1}
-          onCommit={(v) => commitField("x", v)}
-        />
-        <NumRow
-          label="Y"
-          value={object.y}
-          step={0.1}
-          onCommit={(v) => commitField("y", v)}
-        />
-        <NumRow
-          label="Z"
-          value={object.z}
-          step={0.1}
-          onCommit={(v) => commitField("z", v)}
-        />
+        <NumRow label="X" value={object.x} step={0.1} onCommit={(v) => commitField("x", v)} />
+        <NumRow label="Y" value={object.y} step={0.1} onCommit={(v) => commitField("y", v)} />
+        <NumRow label="Z" value={object.z} step={0.1} onCommit={(v) => commitField("z", v)} />
       </div>
 
       <div className="space3d-inspector-section">
         <h4>{t("space3d.rotation")}</h4>
-        <NumRow
-          label="X"
-          value={object.rotationX ?? 0}
-          step={1}
-          onCommit={(v) => commitField("rotationX", v)}
-        />
-        <NumRow
-          label="Y"
-          value={object.rotationY ?? 0}
-          step={1}
-          onCommit={(v) => commitField("rotationY", v)}
-        />
-        <NumRow
-          label="Z"
-          value={object.rotationZ ?? 0}
-          step={1}
-          onCommit={(v) => commitField("rotationZ", v)}
-        />
+        <NumRow label="X" value={object.rotationX ?? 0} step={1} onCommit={(v) => commitField("rotationX", v)} />
+        <NumRow label="Y" value={object.rotationY ?? 0} step={1} onCommit={(v) => commitField("rotationY", v)} />
+        <NumRow label="Z" value={object.rotationZ ?? 0} step={1} onCommit={(v) => commitField("rotationZ", v)} />
       </div>
 
       <div className="space3d-inspector-section">

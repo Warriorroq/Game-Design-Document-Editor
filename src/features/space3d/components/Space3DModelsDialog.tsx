@@ -1,10 +1,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 
-import {
-  countSpace3DModelUsage,
-  displaySpace3DModelName
-} from "@/domain/space3d/modelRegistry";
+import { countSpace3DModelUsage, displaySpace3DModelName } from "@/domain/space3d/modelRegistry";
 import { useLocale } from "@/shared/context/LocaleContext";
 import type { GddDocument } from "@/shared/types";
 
@@ -17,14 +14,7 @@ interface Space3DModelsDialogProps {
   onDelete: (assetId: string) => void;
 }
 
-export function Space3DModelsDialog({
-  open,
-  doc,
-  onClose,
-  onImport,
-  onPlace,
-  onDelete
-}: Space3DModelsDialogProps) {
+export function Space3DModelsDialog({ open, doc, onClose, onImport, onPlace, onDelete }: Space3DModelsDialogProps) {
   const { t } = useLocale();
   const fileRef = useRef<HTMLInputElement>(null);
   const assets = useMemo(
@@ -57,20 +47,12 @@ export function Space3DModelsDialog({
       >
         <header className="space3d-models-header">
           <h3>{t("space3d.modelsTitle")}</h3>
-          <button
-            type="button"
-            className="space3d-models-close"
-            onClick={onClose}
-          >
+          <button type="button" className="space3d-models-close" onClick={onClose}>
             ×
           </button>
         </header>
         <div className="space3d-models-body">
-          <button
-            type="button"
-            className="space3d-tool-btn"
-            onClick={() => fileRef.current?.click()}
-          >
+          <button type="button" className="space3d-tool-btn" onClick={() => fileRef.current?.click()}>
             {t("space3d.importModel")}
           </button>
           <input
@@ -93,19 +75,11 @@ export function Space3DModelsDialog({
                 return (
                   <li key={asset.id} className="space3d-models-item">
                     <div className="space3d-models-item-info">
-                      <span className="space3d-models-item-name">
-                        {displaySpace3DModelName(asset)}
-                      </span>
-                      <span className="space3d-models-item-usage">
-                        {t("space3d.modelUsage", { count: usage })}
-                      </span>
+                      <span className="space3d-models-item-name">{displaySpace3DModelName(asset)}</span>
+                      <span className="space3d-models-item-usage">{t("space3d.modelUsage", { count: usage })}</span>
                     </div>
                     <div className="space3d-models-item-actions">
-                      <button
-                        type="button"
-                        className="space3d-tool-btn"
-                        onClick={() => onPlace(asset.id)}
-                      >
+                      <button type="button" className="space3d-tool-btn" onClick={() => onPlace(asset.id)}>
                         {t("space3d.placeModel")}
                       </button>
                       <button

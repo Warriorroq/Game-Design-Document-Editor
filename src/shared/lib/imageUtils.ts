@@ -10,11 +10,7 @@ function readBlobAsDataUrl(blob: Blob): Promise<string> {
   });
 }
 
-function imageHasAlpha(
-  ctx: CanvasRenderingContext2D,
-  width: number,
-  height: number
-): boolean {
+function imageHasAlpha(ctx: CanvasRenderingContext2D, width: number, height: number): boolean {
   const { data } = ctx.getImageData(0, 0, width, height);
   for (let i = 3; i < data.length; i += 4) {
     if (data[i] < 255) return true;
@@ -28,10 +24,7 @@ function mimeSupportsAlpha(mime: string): boolean {
 
 export async function blobToDataUrl(blob: Blob): Promise<string> {
   const bitmap = await createImageBitmap(blob);
-  const scale = Math.min(
-    1,
-    MAX_DIMENSION / Math.max(bitmap.width, bitmap.height)
-  );
+  const scale = Math.min(1, MAX_DIMENSION / Math.max(bitmap.width, bitmap.height));
   const width = Math.max(1, Math.round(bitmap.width * scale));
   const height = Math.max(1, Math.round(bitmap.height * scale));
 
@@ -48,11 +41,8 @@ export async function blobToDataUrl(blob: Blob): Promise<string> {
   ctx.drawImage(bitmap, 0, 0, width, height);
   bitmap.close();
 
-  const usePng =
-    mimeSupportsAlpha(blob.type) || imageHasAlpha(ctx, width, height);
-  return usePng
-    ? canvas.toDataURL("image/png")
-    : canvas.toDataURL("image/jpeg", JPEG_QUALITY);
+  const usePng = mimeSupportsAlpha(blob.type) || imageHasAlpha(ctx, width, height);
+  return usePng ? canvas.toDataURL("image/png") : canvas.toDataURL("image/jpeg", JPEG_QUALITY);
 }
 
 export function getImageFromClipboard(clipboard: DataTransfer): Blob | null {
@@ -147,13 +137,10 @@ export function copyImageSrcToClipboard(src: string): Promise<void> {
   ]);
 }
 
-export function loadImageDimensions(
-  src: string
-): Promise<{ width: number; height: number }> {
+export function loadImageDimensions(src: string): Promise<{ width: number; height: number }> {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    img.onload = () =>
-      resolve({ width: img.naturalWidth, height: img.naturalHeight });
+    img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
     img.onerror = () => reject(new Error("Failed to load image"));
     img.src = src;
   });

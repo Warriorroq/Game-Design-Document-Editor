@@ -48,9 +48,7 @@ export function BoardSettingsPanel() {
   return (
     <div className="settings-board">
       <p className="settings-hint">{t("settings.boardHint")}</p>
-      <p className="settings-board-current">
-        {t("settings.boardCurrent", { width, height })}
-      </p>
+      <p className="settings-board-current">{t("settings.boardCurrent", { width, height })}</p>
 
       <div className="board-preset-grid">
         {BOARD_SIZE_PRESET_IDS.map((id) => {
@@ -64,24 +62,18 @@ export function BoardSettingsPanel() {
               aria-pressed={active}
               onClick={() => applyPreset(id)}
             >
-              <span className="board-preset-label">
-                {t(boardPresetNameKey(id))}
-              </span>
+              <span className="board-preset-label">{t(boardPresetNameKey(id))}</span>
               <span className="board-preset-size">
                 {preset.width} × {preset.height}
               </span>
-              <span className="board-preset-desc">
-                {t(boardPresetDescKey(id))}
-              </span>
+              <span className="board-preset-desc">{t(boardPresetDescKey(id))}</span>
             </button>
           );
         })}
       </div>
 
       <div className="settings-board-custom">
-        <h3 className="settings-git-block-title">
-          {t("settings.boardCustom")}
-        </h3>
+        <h3 className="settings-git-block-title">{t("settings.boardCustom")}</h3>
         <div className="settings-board-custom-fields">
           <label className="settings-field">
             <span>{t("settings.boardWidth")}</span>

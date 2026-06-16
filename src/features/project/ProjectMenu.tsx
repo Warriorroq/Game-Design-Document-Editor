@@ -6,10 +6,7 @@ import { GitPromptDialog } from "@/features/git/components/GitPromptDialog";
 import { GitPullConfirmDialog } from "@/features/git/components/GitPullConfirmDialog";
 import { useGitActions } from "@/features/git/hooks/useGitActions";
 import type { GitStatus } from "@/features/git/lib/git";
-import {
-  downloadGdeArchive,
-  parseGdeArchive
-} from "@/features/project/lib/gdeArchive";
+import { downloadGdeArchive, parseGdeArchive } from "@/features/project/lib/gdeArchive";
 import { useLocale } from "@/shared/context/LocaleContext";
 import { isDesktopApp } from "@/shared/lib/desktop";
 import type { GddDocument } from "@/shared/types";
@@ -120,8 +117,7 @@ export function ProjectMenu({
       if (!ok) return;
       onImport(imported);
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : t("project.readError");
+      const message = err instanceof Error ? err.message : t("project.readError");
       window.alert(message);
     }
   };
@@ -138,37 +134,21 @@ export function ProjectMenu({
         >
           {t("project.menu")}
           {showGitIndicators && (
-            <GitIndicators
-              branch={git.branch}
-              dirty={git.dirty}
-              uncommittedLabel={t("git.uncommitted")}
-            />
+            <GitIndicators branch={git.branch} dirty={git.dirty} uncommittedLabel={t("git.uncommitted")} />
           )}
           <span className="project-menu-chevron" aria-hidden />
         </button>
         {open && (
           <div className="project-menu-dropdown" role="menu">
             {onNewProject && (
-              <button
-                type="button"
-                className="project-menu-item"
-                role="menuitem"
-                onClick={handleNewProject}
-              >
+              <button type="button" className="project-menu-item" role="menuitem" onClick={handleNewProject}>
                 {t("project.new")}
               </button>
             )}
-            {onNewProject && (
-              <div className="project-menu-separator" role="separator" />
-            )}
+            {onNewProject && <div className="project-menu-separator" role="separator" />}
             {isDesktopApp && onOpenFolder && (
               <>
-                <button
-                  type="button"
-                  className="project-menu-item"
-                  role="menuitem"
-                  onClick={handleOpenFolder}
-                >
+                <button type="button" className="project-menu-item" role="menuitem" onClick={handleOpenFolder}>
                   {t("project.folder")}
                 </button>
                 {folderName && (
@@ -179,29 +159,14 @@ export function ProjectMenu({
                 <div className="project-menu-separator" role="separator" />
               </>
             )}
-            <button
-              type="button"
-              className="project-menu-item"
-              role="menuitem"
-              onClick={handleExport}
-            >
+            <button type="button" className="project-menu-item" role="menuitem" onClick={handleExport}>
               {t("project.export")}
             </button>
-            <button
-              type="button"
-              className="project-menu-item"
-              role="menuitem"
-              onClick={handleImportClick}
-            >
+            <button type="button" className="project-menu-item" role="menuitem" onClick={handleImportClick}>
               {t("project.import")}
             </button>
             {onOpenImageAssets && (
-              <button
-                type="button"
-                className="project-menu-item"
-                role="menuitem"
-                onClick={handleOpenImageAssets}
-              >
+              <button type="button" className="project-menu-item" role="menuitem" onClick={handleOpenImageAssets}>
                 {t("project.imageAssets")}
               </button>
             )}
@@ -212,12 +177,8 @@ export function ProjectMenu({
                 <div className="project-menu-section" role="presentation">
                   {t("git.menuTitle")}
                 </div>
-                {!folderPath && (
-                  <p className="project-menu-hint">{t("git.needFolder")}</p>
-                )}
-                {folderPath && !git.gitAvailable && (
-                  <p className="project-menu-hint">{t("git.notAvailable")}</p>
-                )}
+                {!folderPath && <p className="project-menu-hint">{t("git.needFolder")}</p>}
+                {folderPath && !git.gitAvailable && <p className="project-menu-hint">{t("git.notAvailable")}</p>}
                 {folderPath && git.gitAvailable && !git.isRepo && (
                   <button
                     type="button"
@@ -235,9 +196,7 @@ export function ProjectMenu({
                       type="button"
                       className="project-menu-item project-menu-item--nested"
                       role="menuitem"
-                      disabled={
-                        git.busy || git.syncProgress?.status === "running"
-                      }
+                      disabled={git.busy || git.syncProgress?.status === "running"}
                       onClick={git.handleCommitClick}
                     >
                       {t("git.commit")}
@@ -246,9 +205,7 @@ export function ProjectMenu({
                       type="button"
                       className="project-menu-item project-menu-item--nested"
                       role="menuitem"
-                      disabled={
-                        git.busy || git.syncProgress?.status === "running"
-                      }
+                      disabled={git.busy || git.syncProgress?.status === "running"}
                       onClick={() => void git.handleSetRemoteClick()}
                     >
                       {t("git.setRemote")}
@@ -257,9 +214,7 @@ export function ProjectMenu({
                       type="button"
                       className="project-menu-item project-menu-item--nested"
                       role="menuitem"
-                      disabled={
-                        git.busy || git.syncProgress?.status === "running"
-                      }
+                      disabled={git.busy || git.syncProgress?.status === "running"}
                       onClick={git.handlePush}
                     >
                       {t("git.push")}
@@ -268,32 +223,24 @@ export function ProjectMenu({
                       type="button"
                       className="project-menu-item project-menu-item--nested"
                       role="menuitem"
-                      disabled={
-                        git.busy || git.syncProgress?.status === "running"
-                      }
+                      disabled={git.busy || git.syncProgress?.status === "running"}
                       onClick={git.handlePull}
                     >
                       {t("git.pull")}
                     </button>
-                    {git.dirty &&
-                      gitStatus?.files &&
-                      gitStatus.files.length > 0 && (
-                        <div className="git-menu-changes">
-                          <span className="git-menu-changes-label">
-                            {t("git.changes")}
-                          </span>
-                          <ul>
-                            {gitStatus.files.slice(0, 6).map((file) => (
-                              <li key={`${file.status}-${file.path}`}>
-                                <span className="git-file-status">
-                                  {file.status}
-                                </span>
-                                {file.path}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
+                    {git.dirty && gitStatus?.files && gitStatus.files.length > 0 && (
+                      <div className="git-menu-changes">
+                        <span className="git-menu-changes-label">{t("git.changes")}</span>
+                        <ul>
+                          {gitStatus.files.slice(0, 6).map((file) => (
+                            <li key={`${file.status}-${file.path}`}>
+                              <span className="git-file-status">{file.status}</span>
+                              {file.path}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </>
                 )}
               </>
@@ -322,10 +269,7 @@ export function ProjectMenu({
         onClose={git.handlePullConfirmClose}
         onConfirm={git.handlePullConfirm}
       />
-      <GitProgressDialog
-        state={git.syncProgress}
-        onClose={() => git.setSyncProgress(null)}
-      />
+      <GitProgressDialog state={git.syncProgress} onClose={() => git.setSyncProgress(null)} />
     </>
   );
 }

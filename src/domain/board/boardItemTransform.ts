@@ -16,12 +16,7 @@ export function snapRotationAngle(deg: number): number {
 }
 
 /** Radians from center to pointer (screen coords). */
-export function pointerAngleRad(
-  centerX: number,
-  centerY: number,
-  pointerX: number,
-  pointerY: number
-): number {
+export function pointerAngleRad(centerX: number, centerY: number, pointerX: number, pointerY: number): number {
   return Math.atan2(pointerY - centerY, pointerX - centerX);
 }
 

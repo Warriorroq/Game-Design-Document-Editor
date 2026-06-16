@@ -46,44 +46,18 @@ export function Space3DContextMenu({
   }, [onClose]);
 
   return createPortal(
-    <div
-      ref={menuRef}
-      className="link-context-menu space3d-context-menu"
-      style={{ left: x, top: y }}
-      role="menu"
-    >
-      <button
-        type="button"
-        className="link-menu-item"
-        role="menuitem"
-        onClick={onAddBox}
-      >
+    <div ref={menuRef} className="link-context-menu space3d-context-menu" style={{ left: x, top: y }} role="menu">
+      <button type="button" className="link-menu-item" role="menuitem" onClick={onAddBox}>
         {t("space3d.addBox")}
       </button>
-      <button
-        type="button"
-        className="link-menu-item"
-        role="menuitem"
-        onClick={onAddSphere}
-      >
+      <button type="button" className="link-menu-item" role="menuitem" onClick={onAddSphere}>
         {t("space3d.addSphere")}
       </button>
-      <button
-        type="button"
-        className="link-menu-item"
-        role="menuitem"
-        onClick={onOpenModels}
-      >
+      <button type="button" className="link-menu-item" role="menuitem" onClick={onOpenModels}>
         {t("space3d.models")}
       </button>
       <div className="board-menu-sep" role="separator" />
-      <button
-        type="button"
-        className="link-menu-item"
-        role="menuitem"
-        disabled={!canRemove}
-        onClick={onRemove}
-      >
+      <button type="button" className="link-menu-item" role="menuitem" disabled={!canRemove} onClick={onRemove}>
         {t("space3d.remove")}
       </button>
     </div>,

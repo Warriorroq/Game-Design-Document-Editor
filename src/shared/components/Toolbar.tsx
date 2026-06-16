@@ -77,11 +77,7 @@ export function Toolbar({
     <header className="toolbar">
       <div className="toolbar-brand">
         {settingsOpen ? (
-          <button
-            type="button"
-            className="btn btn-ghost"
-            onClick={onBackFromSettings}
-          >
+          <button type="button" className="btn btn-ghost" onClick={onBackFromSettings}>
             {t("toolbar.back")}
           </button>
         ) : (
@@ -90,16 +86,8 @@ export function Toolbar({
             className={`btn btn-ghost sections-toggle ${sidebarVisible ? "active" : ""}`}
             onClick={onToggleSidebar}
             aria-pressed={sidebarVisible}
-            aria-label={
-              sidebarVisible
-                ? t("toolbar.hideSections")
-                : t("toolbar.showSections")
-            }
-            title={
-              sidebarVisible
-                ? t("toolbar.hideSections")
-                : t("toolbar.showSections")
-            }
+            aria-label={sidebarVisible ? t("toolbar.hideSections") : t("toolbar.showSections")}
+            title={sidebarVisible ? t("toolbar.hideSections") : t("toolbar.showSections")}
           >
             {t("toolbar.sections")}
           </button>
@@ -164,10 +152,7 @@ export function Toolbar({
               aria-label={isMaximized ? "Restore" : "Maximize"}
               title={isMaximized ? "Restore" : "Maximize"}
             >
-              <span
-                aria-hidden
-                className={`win-glyph ${isMaximized ? "win-glyph-restore" : "win-glyph-max"}`}
-              />
+              <span aria-hidden className={`win-glyph ${isMaximized ? "win-glyph-restore" : "win-glyph-max"}`} />
             </button>
             <button
               type="button"

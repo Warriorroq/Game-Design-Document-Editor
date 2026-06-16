@@ -18,10 +18,7 @@ import {
 import { parseGitProgressPercent } from "@/features/git/lib/gitProgress";
 import { useLocale } from "@/shared/context/LocaleContext";
 
-import {
-  type GitSyncOperation,
-  type GitSyncProgressState
-} from "../components/GitProgressDialog";
+import { type GitSyncOperation, type GitSyncProgressState } from "../components/GitProgressDialog";
 import type { GitPromptKind } from "../components/GitPromptDialog";
 import type { GitPullConfirmAction } from "../components/GitPullConfirmDialog";
 
@@ -48,12 +45,8 @@ export function useGitActions({
   const [busy, setBusy] = useState(false);
   const [promptKind, setPromptKind] = useState<GitPromptKind | null>(null);
   const [promptInitial, setPromptInitial] = useState("");
-  const [syncProgress, setSyncProgress] = useState<GitSyncProgressState | null>(
-    null
-  );
-  const [pullConfirmFiles, setPullConfirmFiles] = useState<
-    GitFileStatus[] | null
-  >(null);
+  const [syncProgress, setSyncProgress] = useState<GitSyncProgressState | null>(null);
+  const [pullConfirmFiles, setPullConfirmFiles] = useState<GitFileStatus[] | null>(null);
 
   const isRepo = Boolean(gitStatus?.isRepo);
   const dirty = Boolean(gitStatus?.dirty);
@@ -102,9 +95,7 @@ export function useGitActions({
         : await pullGitChanges(folderPath, onProgress);
 
     if (result.ok) {
-      setSyncProgress((prev) =>
-        prev ? { ...prev, status: "success", percent: 100 } : prev
-      );
+      setSyncProgress((prev) => (prev ? { ...prev, status: "success", percent: 100 } : prev));
       onRefreshStatus();
       if (operation === "pull") {
         onAfterPull?.();
@@ -212,10 +203,7 @@ export function useGitActions({
     setPullConfirmFiles(null);
 
     void (async () => {
-      const prep =
-        action === "stash"
-          ? await stashGitChanges(folderPath)
-          : await discardGitProjectChanges(folderPath);
+      const prep = action === "stash" ? await stashGitChanges(folderPath) : await discardGitProjectChanges(folderPath);
 
       if (!prep.ok) {
         window.alert(formatGitError(prep.error, t));

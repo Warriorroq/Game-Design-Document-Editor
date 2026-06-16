@@ -47,9 +47,7 @@ function removeNegativeAxisHandles(group: THREE.Object3D): void {
   }
 }
 
-export function configureTransformControlsGizmo(
-  transformControls: TransformControls
-): void {
+export function configureTransformControlsGizmo(transformControls: TransformControls): void {
   const gizmo = (transformControls as unknown as { _gizmo: GizmoHost })._gizmo;
   if (!gizmo?.gizmo || !gizmo?.picker) return;
 

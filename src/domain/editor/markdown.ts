@@ -5,9 +5,7 @@ export const DEFAULT_TABLE_MARKDOWN = `| Column 1 | Column 2 |
 
 export function previewMissingTableControls(root: HTMLElement): boolean {
   for (const table of root.querySelectorAll("table")) {
-    if (
-      !table.closest(".gdd-table-wrap")?.querySelector(".gdd-table-control")
-    ) {
+    if (!table.closest(".gdd-table-wrap")?.querySelector(".gdd-table-control")) {
       return true;
     }
   }
@@ -15,19 +13,13 @@ export function previewMissingTableControls(root: HTMLElement): boolean {
 }
 
 function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
 function renderInline(text: string): string {
   const escaped = escapeHtml(text);
   // Deliberately simple inline rules; avoids cross-block regex hacks.
-  return escaped
-    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-    .replace(/\*(.+?)\*/g, "<em>$1</em>");
+  return escaped.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/\*(.+?)\*/g, "<em>$1</em>");
 }
 
 type Block =
@@ -79,11 +71,7 @@ function parseMarkdown(md: string): Block[] {
     }
 
     // Table block
-    if (
-      trimmed.startsWith("|") &&
-      i + 1 < lines.length &&
-      /^\s*\|?[\s:-]+\|\s*[\s|:-]*\s*$/.test(lines[i + 1])
-    ) {
+    if (trimmed.startsWith("|") && i + 1 < lines.length && /^\s*\|?[\s:-]+\|\s*[\s|:-]*\s*$/.test(lines[i + 1])) {
       const headerLine = lines[i];
       i += 2;
       const body: string[] = [];
@@ -160,11 +148,7 @@ function parseMarkdown(md: string): Block[] {
       if (isHrLine(t)) break;
       if (/^[-*]\s+/.test(t)) break;
       if (/^\d+\.\s+/.test(t)) break;
-      if (
-        t.startsWith("|") &&
-        i + 1 < lines.length &&
-        /^\s*\|?[\s:-]+\|\s*[\s|:-]*\s*$/.test(lines[i + 1])
-      ) {
+      if (t.startsWith("|") && i + 1 < lines.length && /^\s*\|?[\s:-]+\|\s*[\s|:-]*\s*$/.test(lines[i + 1])) {
         break;
       }
       paragraph.push(l);
@@ -201,12 +185,7 @@ export function renderMarkdown(md: string): string {
       out.push("<hr>");
     } else if (b.type === "table") {
       const th = b.headers.map((h) => `<th>${renderInline(h)}</th>`).join("");
-      const trs = b.rows
-        .map(
-          (row) =>
-            `<tr>${row.map((c) => `<td>${renderInline(c)}</td>`).join("")}</tr>`
-        )
-        .join("");
+      const trs = b.rows.map((row) => `<tr>${row.map((c) => `<td>${renderInline(c)}</td>`).join("")}</tr>`).join("");
       out.push(
         `<div class='gdd-table-wrap'>` +
           `<table class='gdd-table'>` +

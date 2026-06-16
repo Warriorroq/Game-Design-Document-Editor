@@ -7,17 +7,9 @@ export const MAX_BOARD_DIMENSION = 8000;
 
 export type BoardSizePresetId = "default" | "hd" | "wide" | "large";
 
-export const BOARD_SIZE_PRESET_IDS: BoardSizePresetId[] = [
-  "default",
-  "hd",
-  "wide",
-  "large"
-];
+export const BOARD_SIZE_PRESET_IDS: BoardSizePresetId[] = ["default", "hd", "wide", "large"];
 
-export const BOARD_SIZE_PRESETS: Record<
-  BoardSizePresetId,
-  { width: number; height: number }
-> = {
+export const BOARD_SIZE_PRESETS: Record<BoardSizePresetId, { width: number; height: number }> = {
   default: { width: 3200, height: 2400 },
   hd: { width: 1920, height: 1080 },
   wide: { width: 3840, height: 2160 },
@@ -71,10 +63,7 @@ export function saveBoardSize(size: BoardSize): BoardSize {
   return normalized;
 }
 
-export function boardSizeMatchesPreset(
-  size: BoardSize,
-  presetId: BoardSizePresetId
-): boolean {
+export function boardSizeMatchesPreset(size: BoardSize, presetId: BoardSizePresetId): boolean {
   const preset = BOARD_SIZE_PRESETS[presetId];
   return size.width === preset.width && size.height === preset.height;
 }

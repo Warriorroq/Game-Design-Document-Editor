@@ -21,9 +21,7 @@ interface Window {
       close: () => Promise<void>;
       isMaximized: () => Promise<boolean>;
       focus: () => Promise<void>;
-      onMaximizedChanged: (
-        listener: (maximized: boolean) => void
-      ) => () => void;
+      onMaximizedChanged: (listener: (maximized: boolean) => void) => () => void;
     };
     project?: {
       pickFolder: () => Promise<{
@@ -78,36 +76,16 @@ interface Window {
         email?: string;
         error?: string;
       }>;
-      setIdentity: (
-        folderPath: string,
-        name: string,
-        email: string
-      ) => Promise<{ ok: boolean; error?: string }>;
+      setIdentity: (folderPath: string, name: string, email: string) => Promise<{ ok: boolean; error?: string }>;
       push: (folderPath: string) => Promise<{ ok: boolean; error?: string }>;
       pull: (folderPath: string) => Promise<{ ok: boolean; error?: string }>;
-      stash: (
-        folderPath: string
-      ) => Promise<{ ok: boolean; stashed?: boolean; error?: string }>;
-      discardProject: (
-        folderPath: string
-      ) => Promise<{ ok: boolean; error?: string }>;
-      onProgress: (
-        listener: (payload: { phase: string; line: string }) => void
-      ) => () => void;
-      getRemote: (
-        folderPath: string
-      ) => Promise<{ ok: boolean; url?: string | null }>;
-      setRemote: (
-        folderPath: string,
-        url: string
-      ) => Promise<{ ok: boolean; error?: string }>;
-      authenticate: (
-        folderPath: string
-      ) => Promise<{ ok: boolean; error?: string }>;
-      storeToken: (
-        folderPath: string,
-        token: string
-      ) => Promise<{ ok: boolean; error?: string }>;
+      stash: (folderPath: string) => Promise<{ ok: boolean; stashed?: boolean; error?: string }>;
+      discardProject: (folderPath: string) => Promise<{ ok: boolean; error?: string }>;
+      onProgress: (listener: (payload: { phase: string; line: string }) => void) => () => void;
+      getRemote: (folderPath: string) => Promise<{ ok: boolean; url?: string | null }>;
+      setRemote: (folderPath: string, url: string) => Promise<{ ok: boolean; error?: string }>;
+      authenticate: (folderPath: string) => Promise<{ ok: boolean; error?: string }>;
+      storeToken: (folderPath: string, token: string) => Promise<{ ok: boolean; error?: string }>;
     };
   };
 }

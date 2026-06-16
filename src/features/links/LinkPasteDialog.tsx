@@ -67,11 +67,7 @@ export function LinkPasteDialog() {
           />
         </label>
         <div className="link-paste-actions">
-          <button
-            type="button"
-            className="btn btn-ghost"
-            onClick={closePasteDialog}
-          >
+          <button type="button" className="btn btn-ghost" onClick={closePasteDialog}>
             {t("link.cancel")}
           </button>
           <button type="button" className="btn" onClick={submit}>

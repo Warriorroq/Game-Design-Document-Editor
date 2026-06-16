@@ -1,11 +1,4 @@
-import {
-  createContext,
-  type ReactNode,
-  useCallback,
-  useContext,
-  useMemo,
-  useState
-} from "react";
+import { createContext, type ReactNode, useCallback, useContext, useMemo, useState } from "react";
 
 import {
   type AppLanguage,
@@ -25,29 +18,18 @@ interface LocaleContextValue {
 const LocaleContext = createContext<LocaleContextValue | null>(null);
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<AppLanguage>(() =>
-    loadStoredLanguage()
-  );
+  const [language, setLanguageState] = useState<AppLanguage>(() => loadStoredLanguage());
 
   const setLanguage = useCallback((lang: AppLanguage) => {
     saveLanguage(lang);
     setLanguageState(lang);
   }, []);
 
-  const t = useCallback(
-    (key: MessageKey, params?: TranslateParams) =>
-      translate(language, key, params),
-    [language]
-  );
+  const t = useCallback((key: MessageKey, params?: TranslateParams) => translate(language, key, params), [language]);
 
-  const value = useMemo(
-    () => ({ language, setLanguage, t }),
-    [language, setLanguage, t]
-  );
+  const value = useMemo(() => ({ language, setLanguage, t }), [language, setLanguage, t]);
 
-  return (
-    <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>
-  );
+  return <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>;
 }
 
 export function useLocale() {

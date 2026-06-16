@@ -8,26 +8,14 @@ import { useShortcuts } from "@/shared/context/ShortcutsContext";
 import { useAppTheme } from "@/shared/hooks/useAppTheme";
 import { APP_LANGUAGES } from "@/shared/i18n";
 import { themeDescKey, themeNameKey } from "@/shared/i18n";
-import {
-  shortcutDescKey,
-  shortcutLabelKey
-} from "@/shared/i18n/shortcutMessages";
+import { shortcutDescKey, shortcutLabelKey } from "@/shared/i18n/shortcutMessages";
 import { APP_THEME_IDS, themePreview } from "@/shared/lib/appTheme";
 import { isDesktopApp } from "@/shared/lib/desktop";
-import {
-  SHORTCUT_DEFINITIONS,
-  type ShortcutGroup
-} from "@/shared/lib/shortcuts";
+import { SHORTCUT_DEFINITIONS, type ShortcutGroup } from "@/shared/lib/shortcuts";
 
 import { ShortcutBindingInput } from "./ShortcutBindingInput";
 
-type SettingsTab =
-  | "general"
-  | "styles"
-  | "board"
-  | "languages"
-  | "shortcuts"
-  | "git";
+type SettingsTab = "general" | "styles" | "board" | "languages" | "shortcuts" | "git";
 
 interface SettingsPageProps {
   projectFolderPath?: string | null;
@@ -64,9 +52,7 @@ export function SettingsPage({
 
   const shortcutGroups: ShortcutGroup[] = ["editor", "desk"];
   const groupTitleKey = (group: ShortcutGroup) =>
-    group === "editor"
-      ? "settings.shortcutsGroupEditor"
-      : "settings.shortcutsGroupDesk";
+    group === "editor" ? "settings.shortcutsGroupEditor" : "settings.shortcutsGroupDesk";
 
   return (
     <div className="settings-page">
@@ -75,11 +61,7 @@ export function SettingsPage({
           <h1 className="settings-title">{t("settings.title")}</h1>
         </header>
 
-        <div
-          className="settings-tabs"
-          role="tablist"
-          aria-label={t("settings.tabsAria")}
-        >
+        <div className="settings-tabs" role="tablist" aria-label={t("settings.tabsAria")}>
           {tabs.map((item) => (
             <button
               key={item.id}
@@ -97,17 +79,13 @@ export function SettingsPage({
         <div className="settings-panel" role="tabpanel">
           {tab === "general" && (
             <section className="settings-section">
-              <h2 className="settings-section-title">
-                {t("settings.generalTitle")}
-              </h2>
+              <h2 className="settings-section-title">{t("settings.generalTitle")}</h2>
             </section>
           )}
 
           {tab === "styles" && (
             <section className="settings-section">
-              <h2 className="settings-section-title">
-                {t("settings.stylesTitle")}
-              </h2>
+              <h2 className="settings-section-title">{t("settings.stylesTitle")}</h2>
               <div className="theme-grid">
                 {APP_THEME_IDS.map((id) => {
                   const active = themeId === id;
@@ -121,25 +99,12 @@ export function SettingsPage({
                       onClick={() => setTheme(id)}
                     >
                       <div className="theme-card-preview">
-                        <span
-                          className="theme-swatch theme-swatch--bg"
-                          style={{ background: preview[0] }}
-                        />
-                        <span
-                          className="theme-swatch theme-swatch--accent"
-                          style={{ background: preview[1] }}
-                        />
-                        <span
-                          className="theme-swatch theme-swatch--text"
-                          style={{ background: preview[2] }}
-                        />
+                        <span className="theme-swatch theme-swatch--bg" style={{ background: preview[0] }} />
+                        <span className="theme-swatch theme-swatch--accent" style={{ background: preview[1] }} />
+                        <span className="theme-swatch theme-swatch--text" style={{ background: preview[2] }} />
                       </div>
-                      <span className="theme-card-label">
-                        {t(themeNameKey(id))}
-                      </span>
-                      <span className="theme-card-desc">
-                        {t(themeDescKey(id))}
-                      </span>
+                      <span className="theme-card-label">{t(themeNameKey(id))}</span>
+                      <span className="theme-card-desc">{t(themeDescKey(id))}</span>
                     </button>
                   );
                 })}
@@ -149,18 +114,14 @@ export function SettingsPage({
 
           {tab === "board" && (
             <section className="settings-section">
-              <h2 className="settings-section-title">
-                {t("settings.boardTitle")}
-              </h2>
+              <h2 className="settings-section-title">{t("settings.boardTitle")}</h2>
               <BoardSettingsPanel />
             </section>
           )}
 
           {tab === "languages" && (
             <section className="settings-section">
-              <h2 className="settings-section-title">
-                {t("settings.languagesTitle")}
-              </h2>
+              <h2 className="settings-section-title">{t("settings.languagesTitle")}</h2>
               <div className="language-grid">
                 {APP_LANGUAGES.map((lang) => {
                   const active = language === lang;
@@ -172,9 +133,7 @@ export function SettingsPage({
                       aria-pressed={active}
                       onClick={() => setLanguage(lang)}
                     >
-                      <span className="language-card-label">
-                        {t(`language.${lang}` as "language.en")}
-                      </span>
+                      <span className="language-card-label">{t(`language.${lang}` as "language.en")}</span>
                     </button>
                   );
                 })}
@@ -184,9 +143,7 @@ export function SettingsPage({
 
           {tab === "git" && (
             <section className="settings-section">
-              <h2 className="settings-section-title">
-                {t("settings.gitTitle")}
-              </h2>
+              <h2 className="settings-section-title">{t("settings.gitTitle")}</h2>
               <GitSettingsPanel
                 folderPath={projectFolderPath}
                 gitAvailable={gitAvailable}
@@ -198,41 +155,25 @@ export function SettingsPage({
 
           {tab === "shortcuts" && (
             <section className="settings-section settings-section--shortcuts">
-              <h2 className="settings-section-title">
-                {t("settings.shortcutsTitle")}
-              </h2>
-              <p className="settings-shortcuts-hint">
-                {t("settings.shortcutsHint")}
-              </p>
+              <h2 className="settings-section-title">{t("settings.shortcutsTitle")}</h2>
+              <p className="settings-shortcuts-hint">{t("settings.shortcutsHint")}</p>
               {shortcutGroups.map((group) => (
                 <div key={group} className="shortcut-group">
-                  <h3 className="shortcut-group-title">
-                    {t(groupTitleKey(group))}
-                  </h3>
+                  <h3 className="shortcut-group-title">{t(groupTitleKey(group))}</h3>
                   <ul className="shortcut-list">
-                    {SHORTCUT_DEFINITIONS.filter((d) => d.group === group).map(
-                      (def) => (
-                        <li key={def.id} className="shortcut-row">
-                          <div className="shortcut-row-text">
-                            <span className="shortcut-row-label">
-                              {t(shortcutLabelKey(def.id))}
-                            </span>
-                            <span className="shortcut-row-desc">
-                              {t(shortcutDescKey(def.id))}
-                            </span>
-                          </div>
-                          <ShortcutBindingInput actionId={def.id} />
-                        </li>
-                      )
-                    )}
+                    {SHORTCUT_DEFINITIONS.filter((d) => d.group === group).map((def) => (
+                      <li key={def.id} className="shortcut-row">
+                        <div className="shortcut-row-text">
+                          <span className="shortcut-row-label">{t(shortcutLabelKey(def.id))}</span>
+                          <span className="shortcut-row-desc">{t(shortcutDescKey(def.id))}</span>
+                        </div>
+                        <ShortcutBindingInput actionId={def.id} />
+                      </li>
+                    ))}
                   </ul>
                 </div>
               ))}
-              <button
-                type="button"
-                className="btn btn-ghost settings-shortcuts-reset"
-                onClick={resetAll}
-              >
+              <button type="button" className="btn btn-ghost settings-shortcuts-reset" onClick={resetAll}>
                 {t("settings.shortcutsResetAll")}
               </button>
             </section>

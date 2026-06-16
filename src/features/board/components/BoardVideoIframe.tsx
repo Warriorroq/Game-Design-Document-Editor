@@ -6,11 +6,7 @@ interface BoardVideoIframeProps {
   className?: string;
 }
 
-export function BoardVideoIframe({
-  src,
-  title,
-  className
-}: BoardVideoIframeProps) {
+export function BoardVideoIframe({ src, title, className }: BoardVideoIframeProps) {
   return (
     <iframe
       className={className}

@@ -2,15 +2,8 @@ import "./Board.css";
 
 import { useState } from "react";
 
-import {
-  type ImageBoardProps,
-  useImageBoard
-} from "@/application/board/useImageBoard";
-import {
-  boardVideoEmbedSrc,
-  boardVideoRenderMode,
-  isBoardVideoItem
-} from "@/domain/board/boardItem";
+import { type ImageBoardProps, useImageBoard } from "@/application/board/useImageBoard";
+import { boardVideoEmbedSrc, boardVideoRenderMode, isBoardVideoItem } from "@/domain/board/boardItem";
 import { boardItemTransform } from "@/domain/board/boardItemTransform";
 import { selectionCount } from "@/domain/board/deskGroups";
 import { buildMediaHref, buildTextHref } from "@/features/links/lib/links";
@@ -126,35 +119,21 @@ export function ImageBoard(props: ImageBoardProps) {
               count: items.filter((i) => !isBoardVideoItem(i)).length
             })}
           </span>
-          <span>
-            {t("desk.videos", { count: items.filter(isBoardVideoItem).length })}
-          </span>
+          <span>{t("desk.videos", { count: items.filter(isBoardVideoItem).length })}</span>
           <span>{t("desk.shapes", { count: shapes.length })}</span>
           <span>{t("desk.labels", { count: texts.length })}</span>
           {canGroup && (
-            <button
-              type="button"
-              className="btn btn-ghost board-group-action"
-              onClick={groupSelection}
-            >
+            <button type="button" className="btn btn-ghost board-group-action" onClick={groupSelection}>
               {t("desk.group")}
             </button>
           )}
           {canUngroup && (
-            <button
-              type="button"
-              className="btn btn-ghost board-group-action"
-              onClick={ungroupSelection}
-            >
+            <button type="button" className="btn btn-ghost board-group-action" onClick={ungroupSelection}>
               {t("desk.ungroup")}
             </button>
           )}
           {selectionSize > 0 && (
-            <button
-              type="button"
-              className="btn btn-ghost board-delete"
-              onClick={deleteSelection}
-            >
+            <button type="button" className="btn btn-ghost board-delete" onClick={deleteSelection}>
               {t("desk.removeSelected")}
             </button>
           )}
@@ -231,8 +210,7 @@ export function ImageBoard(props: ImageBoardProps) {
                     e.preventDefault();
                     e.stopPropagation();
                     const next =
-                      selection.itemIds.includes(item.id) &&
-                      selectionCount(selection) > 0
+                      selection.itemIds.includes(item.id) && selectionCount(selection) > 0
                         ? selection
                         : {
                             itemIds: [item.id],
@@ -240,24 +218,11 @@ export function ImageBoard(props: ImageBoardProps) {
                             textIds: [],
                             strokeIds: []
                           };
-                    openDeskObjectMenu(
-                      e.clientX,
-                      e.clientY,
-                      next,
-                      buildMediaHref(sectionId, item.id)
-                    );
+                    openDeskObjectMenu(e.clientX, e.clientY, next, buildMediaHref(sectionId, item.id));
                   }}
                 >
-                  <div
-                    className="board-item-drag"
-                    onPointerDown={(e) =>
-                      handleItemPointerDown(e, item, "move")
-                    }
-                  />
-                  <div
-                    className="board-item-body"
-                    style={{ transform: boardItemTransform(item) }}
-                  >
+                  <div className="board-item-drag" onPointerDown={(e) => handleItemPointerDown(e, item, "move")} />
+                  <div className="board-item-body" style={{ transform: boardItemTransform(item) }}>
                     <div className="board-item-frame" aria-hidden />
                     <div className="board-item-visual">
                       {isVideo && videoEmbedSrc ? (
@@ -278,11 +243,7 @@ export function ImageBoard(props: ImageBoardProps) {
                           />
                         )
                       ) : (
-                        <img
-                          src={resolveItemSrc(item)}
-                          alt=""
-                          draggable={false}
-                        />
+                        <img src={resolveItemSrc(item)} alt="" draggable={false} />
                       )}
                     </div>
                     <div className="board-item-handles">
@@ -295,38 +256,28 @@ export function ImageBoard(props: ImageBoardProps) {
                           if (item.locked) return;
                           onRemove(item.id);
                           setSelection((prev) => ({
-                            itemIds: prev.itemIds.filter(
-                              (id) => id !== item.id
-                            ),
+                            itemIds: prev.itemIds.filter((id) => id !== item.id),
                             shapeIds: prev.shapeIds,
                             textIds: prev.textIds,
                             strokeIds: prev.strokeIds
                           }));
                         }}
-                        aria-label={
-                          isVideo
-                            ? t("desk.removeVideo")
-                            : t("desk.removeImage")
-                        }
+                        aria-label={isVideo ? t("desk.removeVideo") : t("desk.removeImage")}
                       >
                         ×
                       </button>
                       <div
                         className="board-item-resize"
-                        onPointerDown={(e) =>
-                          handleItemPointerDown(e, item, "resize")
-                        }
+                        onPointerDown={(e) => handleItemPointerDown(e, item, "resize")}
                       />
-                      {!isVideo &&
-                        singleImageSelection === item.id &&
-                        !item.locked && (
-                          <div
-                            className="board-item-rotate"
-                            title={t("desk.rotate")}
-                            aria-label={t("desk.rotate")}
-                            onPointerDown={(e) => startItemRotate(e, item)}
-                          />
-                        )}
+                      {!isVideo && singleImageSelection === item.id && !item.locked && (
+                        <div
+                          className="board-item-rotate"
+                          title={t("desk.rotate")}
+                          aria-label={t("desk.rotate")}
+                          onPointerDown={(e) => startItemRotate(e, item)}
+                        />
+                      )}
                     </div>
                   </div>
                 </div>
@@ -350,8 +301,7 @@ export function ImageBoard(props: ImageBoardProps) {
               onTextPointerDown={handleTextPointerDown}
               onTextContextMenu={(e, text) => {
                 const next =
-                  selection.textIds.includes(text.id) &&
-                  selectionCount(selection) > 0
+                  selection.textIds.includes(text.id) && selectionCount(selection) > 0
                     ? selection
                     : {
                         itemIds: [],
@@ -359,12 +309,7 @@ export function ImageBoard(props: ImageBoardProps) {
                         textIds: [text.id],
                         strokeIds: []
                       };
-                openDeskObjectMenu(
-                  e.clientX,
-                  e.clientY,
-                  next,
-                  buildTextHref(sectionId, text.id)
-                );
+                openDeskObjectMenu(e.clientX, e.clientY, next, buildTextHref(sectionId, text.id));
               }}
               onTextDoubleClick={(textId) => {
                 const text = texts.find((t) => t.id === textId);
@@ -394,12 +339,8 @@ export function ImageBoard(props: ImageBoardProps) {
                 style={{
                   left: Math.min(marqueePreview.start.x, marqueePreview.end.x),
                   top: Math.min(marqueePreview.start.y, marqueePreview.end.y),
-                  width: Math.abs(
-                    marqueePreview.end.x - marqueePreview.start.x
-                  ),
-                  height: Math.abs(
-                    marqueePreview.end.y - marqueePreview.start.y
-                  )
+                  width: Math.abs(marqueePreview.end.x - marqueePreview.start.x),
+                  height: Math.abs(marqueePreview.end.y - marqueePreview.start.y)
                 }}
               />
             )}

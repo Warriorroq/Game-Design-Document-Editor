@@ -4,9 +4,7 @@ import type { Space3DObject } from "@/domain/types";
 
 export const MIN_SCALE = 0.001;
 
-export function clampTransformPatch(
-  patch: Partial<Space3DObject>
-): Partial<Space3DObject> {
+export function clampTransformPatch(patch: Partial<Space3DObject>): Partial<Space3DObject> {
   const next = { ...patch };
   for (const key of ["scaleX", "scaleY", "scaleZ"] as const) {
     if (next[key] !== undefined) {
@@ -18,18 +16,7 @@ export function clampTransformPatch(
 
 export function patchFromObject3D(
   obj: THREE.Object3D
-): Pick<
-  Space3DObject,
-  | "x"
-  | "y"
-  | "z"
-  | "scaleX"
-  | "scaleY"
-  | "scaleZ"
-  | "rotationX"
-  | "rotationY"
-  | "rotationZ"
-> {
+): Pick<Space3DObject, "x" | "y" | "z" | "scaleX" | "scaleY" | "scaleZ" | "rotationX" | "rotationY" | "rotationZ"> {
   return clampTransformPatch({
     x: obj.position.x,
     y: obj.position.y,
@@ -40,24 +27,10 @@ export function patchFromObject3D(
     rotationX: THREE.MathUtils.radToDeg(obj.rotation.x),
     rotationY: THREE.MathUtils.radToDeg(obj.rotation.y),
     rotationZ: THREE.MathUtils.radToDeg(obj.rotation.z)
-  }) as Pick<
-    Space3DObject,
-    | "x"
-    | "y"
-    | "z"
-    | "scaleX"
-    | "scaleY"
-    | "scaleZ"
-    | "rotationX"
-    | "rotationY"
-    | "rotationZ"
-  >;
+  }) as Pick<Space3DObject, "x" | "y" | "z" | "scaleX" | "scaleY" | "scaleZ" | "rotationX" | "rotationY" | "rotationZ">;
 }
 
-export function applyObjectTransform(
-  obj3d: THREE.Object3D,
-  obj: Space3DObject
-): void {
+export function applyObjectTransform(obj3d: THREE.Object3D, obj: Space3DObject): void {
   obj3d.position.set(obj.x, obj.y, obj.z);
   const sx = Math.max(MIN_SCALE, Math.abs(obj.scaleX ?? 1));
   const sy = Math.max(MIN_SCALE, Math.abs(obj.scaleY ?? 1));
@@ -74,10 +47,7 @@ export function primitiveMesh(obj: Space3DObject): THREE.Mesh {
   const sx = obj.scaleX ?? 1;
   const sy = obj.scaleY ?? 1;
   const sz = obj.scaleZ ?? 1;
-  const geometry =
-    obj.type === "sphere"
-      ? new THREE.SphereGeometry(0.5, 24, 16)
-      : new THREE.BoxGeometry(1, 1, 1);
+  const geometry = obj.type === "sphere" ? new THREE.SphereGeometry(0.5, 24, 16) : new THREE.BoxGeometry(1, 1, 1);
   const material = new THREE.MeshStandardMaterial({
     color: obj.color ?? "#6366f1"
   });

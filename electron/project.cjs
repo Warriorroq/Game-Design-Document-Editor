@@ -11,10 +11,7 @@ function manifestPath(dir) {
 }
 
 function hasProjectFile(dir) {
-  return (
-    fs.existsSync(manifestPath(dir)) ||
-    fs.existsSync(path.join(dir, LEGACY_FILE))
-  );
+  return fs.existsSync(manifestPath(dir)) || fs.existsSync(path.join(dir, LEGACY_FILE));
 }
 
 function readBinaryFile(filePath) {
@@ -139,11 +136,7 @@ function writeProjectFolder(dir, payload) {
       const rel = section.path.replace(/\\/g, "/");
       const name = path.basename(rel);
       sectionNames.push(name);
-      fs.writeFileSync(
-        path.join(dir, SECTIONS_DIR, name),
-        section.content,
-        "utf8"
-      );
+      fs.writeFileSync(path.join(dir, SECTIONS_DIR, name), section.content, "utf8");
     }
 
     const assetNames = [];

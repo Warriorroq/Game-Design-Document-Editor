@@ -62,11 +62,7 @@ function persist(state: PanelState) {
   }
 }
 
-function fitPanels(
-  editorW: number,
-  boardW: number,
-  panelW: number
-): { editorWidth: number; boardWidth: number } {
+function fitPanels(editorW: number, boardW: number, panelW: number): { editorWidth: number; boardWidth: number } {
   const available = panelW - SPLITTER_SIZE * 2;
   let e = Math.max(0, editorW);
   let b = Math.max(0, boardW);
@@ -89,20 +85,14 @@ function reflowToPanelWidth(state: PanelState, panelW: number): PanelState {
   if (state.editorHidden) {
     return {
       ...state,
-      boardWidth: Math.max(
-        MIN_BOARD,
-        panelW - COLLAPSED_SPLITTER - SPLITTER_SIZE
-      )
+      boardWidth: Math.max(MIN_BOARD, panelW - COLLAPSED_SPLITTER - SPLITTER_SIZE)
     };
   }
 
   if (state.boardHidden) {
     return {
       ...state,
-      editorWidth: Math.max(
-        MIN_EDITOR,
-        panelW - COLLAPSED_SPLITTER - SPLITTER_SIZE
-      )
+      editorWidth: Math.max(MIN_EDITOR, panelW - COLLAPSED_SPLITTER - SPLITTER_SIZE)
     };
   }
 
@@ -210,9 +200,7 @@ export function useResizablePanels(sidebarVisible: boolean) {
   const [editorWidth, setEditorWidth] = useState(MIN_EDITOR);
   const [boardWidth, setBoardWidth] = useState(MIN_BOARD);
   const [editorHidden, setEditorHidden] = useState(false);
-  const [boardHidden, setBoardHidden] = useState(() =>
-    loadBool(STORAGE_BOARD_HIDDEN)
-  );
+  const [boardHidden, setBoardHidden] = useState(() => loadBool(STORAGE_BOARD_HIDDEN));
   const [dragTarget, setDragTarget] = useState<DragTarget | null>(null);
   const dragTargetRef = useRef<DragTarget | null>(null);
   const dragRef = useRef<{
@@ -399,10 +387,7 @@ export function useResizablePanels(sidebarVisible: boolean) {
       setDragTarget(null);
       document.body.classList.remove("panel-resizing");
       const panelW = mainRef.current?.clientWidth ?? 0;
-      const next =
-        panelW > 0
-          ? finalizeAfterDrag(stateRef.current, panelW)
-          : stateRef.current;
+      const next = panelW > 0 ? finalizeAfterDrag(stateRef.current, panelW) : stateRef.current;
       applyState(next);
       persist(next);
     };
@@ -428,14 +413,8 @@ export function useResizablePanels(sidebarVisible: boolean) {
         const rect = panel.getBoundingClientRect();
 
         if (target === "editor" && s.editorHidden) {
-          startEditor = Math.max(
-            COLLAPSE_AT,
-            e.clientX - rect.left - SPLITTER_SIZE
-          );
-          startBoard = Math.max(
-            COLLAPSE_AT,
-            panelW - startEditor - SPLITTER_SIZE * 2
-          );
+          startEditor = Math.max(COLLAPSE_AT, e.clientX - rect.left - SPLITTER_SIZE);
+          startBoard = Math.max(COLLAPSE_AT, panelW - startEditor - SPLITTER_SIZE * 2);
           applyState({
             editorWidth: startEditor,
             boardWidth: startBoard,
@@ -443,14 +422,8 @@ export function useResizablePanels(sidebarVisible: boolean) {
             boardHidden: false
           });
         } else if (target === "board" && s.boardHidden) {
-          startBoard = Math.max(
-            COLLAPSE_AT,
-            rect.right - e.clientX - SPLITTER_SIZE
-          );
-          startEditor = Math.max(
-            COLLAPSE_AT,
-            panelW - startBoard - SPLITTER_SIZE * 2
-          );
+          startBoard = Math.max(COLLAPSE_AT, rect.right - e.clientX - SPLITTER_SIZE);
+          startEditor = Math.max(COLLAPSE_AT, panelW - startBoard - SPLITTER_SIZE * 2);
           applyState({
             editorWidth: startEditor,
             boardWidth: startBoard,
@@ -461,10 +434,7 @@ export function useResizablePanels(sidebarVisible: boolean) {
           const actual = readPanelWidths(panel);
           startEditor = actual.editor;
           startBoard = actual.board;
-          if (
-            Math.abs(actual.editor - s.editorWidth) > 1 ||
-            Math.abs(actual.board - s.boardWidth) > 1
-          ) {
+          if (Math.abs(actual.editor - s.editorWidth) > 1 || Math.abs(actual.board - s.boardWidth) > 1) {
             applyState({
               ...s,
               editorWidth: actual.editor,
@@ -541,9 +511,7 @@ export function useResizablePanels(sidebarVisible: boolean) {
         {
           ...s,
           boardHidden: hidden,
-          boardWidth: hidden
-            ? 0
-            : s.boardWidth || loadBoardPanelWidth() || MIN_BOARD
+          boardWidth: hidden ? 0 : s.boardWidth || loadBoardPanelWidth() || MIN_BOARD
         },
         panelW
       );

@@ -1,11 +1,4 @@
-import {
-  createContext,
-  type ReactNode,
-  useCallback,
-  useContext,
-  useMemo,
-  useState
-} from "react";
+import { createContext, type ReactNode, useCallback, useContext, useMemo, useState } from "react";
 
 import {
   bindingFromKeyboardEvent,
@@ -22,17 +15,11 @@ import {
 interface ShortcutsContextValue {
   bindings: Record<ShortcutActionId, ShortcutBinding>;
   matches: (actionId: ShortcutActionId, e: KeyboardEvent) => boolean;
-  setBinding: (
-    actionId: ShortcutActionId,
-    binding: ShortcutBinding
-  ) => ShortcutActionId | null;
+  setBinding: (actionId: ShortcutActionId, binding: ShortcutBinding) => ShortcutActionId | null;
   resetBinding: (actionId: ShortcutActionId) => void;
   resetAll: () => void;
   bindingFromEvent: (e: KeyboardEvent) => ShortcutBinding | null;
-  findConflict: (
-    actionId: ShortcutActionId,
-    candidate: ShortcutBinding
-  ) => ShortcutActionId | null;
+  findConflict: (actionId: ShortcutActionId, candidate: ShortcutBinding) => ShortcutActionId | null;
 }
 
 const ShortcutsContext = createContext<ShortcutsContextValue | null>(null);
@@ -40,17 +27,13 @@ const ShortcutsContext = createContext<ShortcutsContextValue | null>(null);
 export function ShortcutsProvider({ children }: { children: ReactNode }) {
   const [bindings, setBindings] = useState(loadShortcutBindings);
 
-  const persist = useCallback(
-    (next: Record<ShortcutActionId, ShortcutBinding>) => {
-      setBindings(next);
-      saveShortcutBindings(next);
-    },
-    []
-  );
+  const persist = useCallback((next: Record<ShortcutActionId, ShortcutBinding>) => {
+    setBindings(next);
+    saveShortcutBindings(next);
+  }, []);
 
   const matches = useCallback(
-    (actionId: ShortcutActionId, e: KeyboardEvent) =>
-      eventMatchesBinding(e, bindings[actionId]),
+    (actionId: ShortcutActionId, e: KeyboardEvent) => eventMatchesBinding(e, bindings[actionId]),
     [bindings]
   );
 
@@ -79,8 +62,7 @@ export function ShortcutsProvider({ children }: { children: ReactNode }) {
   }, [persist]);
 
   const findConflict = useCallback(
-    (actionId: ShortcutActionId, candidate: ShortcutBinding) =>
-      findBindingConflict(bindings, actionId, candidate),
+    (actionId: ShortcutActionId, candidate: ShortcutBinding) => findBindingConflict(bindings, actionId, candidate),
     [bindings]
   );
 
@@ -97,11 +79,7 @@ export function ShortcutsProvider({ children }: { children: ReactNode }) {
     [bindings, matches, setBinding, resetBinding, resetAll, findConflict]
   );
 
-  return (
-    <ShortcutsContext.Provider value={value}>
-      {children}
-    </ShortcutsContext.Provider>
-  );
+  return <ShortcutsContext.Provider value={value}>{children}</ShortcutsContext.Provider>;
 }
 
 export function useShortcuts() {

@@ -1,13 +1,5 @@
-import {
-  displayBoardImageAssetName,
-  listBoardImageAssetDesks
-} from "@/features/board/lib/boardImageRegistry";
-import {
-  buildAnchorHref,
-  buildMediaHref,
-  buildSectionHref,
-  buildTextHref
-} from "@/features/links/lib/links";
+import { displayBoardImageAssetName, listBoardImageAssetDesks } from "@/features/board/lib/boardImageRegistry";
+import { buildAnchorHref, buildMediaHref, buildSectionHref, buildTextHref } from "@/features/links/lib/links";
 import type { MessageKey } from "@/shared/i18n";
 import { type AppLanguage, translate } from "@/shared/i18n";
 import type { GddDocument, GddSection } from "@/shared/types";
@@ -66,11 +58,7 @@ export function countMatches(haystack: string, needle: string): number {
   return count;
 }
 
-export function snippetAround(
-  text: string,
-  query: string,
-  radius = 36
-): string {
+export function snippetAround(text: string, query: string, radius = 36): string {
   const normalized = normalizeWhitespace(text);
   if (!normalized) return "";
   const idx = normalized.toLowerCase().indexOf(query.toLowerCase());
@@ -80,10 +68,7 @@ export function snippetAround(
   return normalized.slice(start, end);
 }
 
-function pushResult(
-  results: GlobalSearchResult[],
-  item: Omit<GlobalSearchResult, "key"> & { key?: string }
-) {
+function pushResult(results: GlobalSearchResult[], item: Omit<GlobalSearchResult, "key"> & { key?: string }) {
   results.push({
     ...item,
     key: item.key ?? `${item.href}:${results.length}`
@@ -100,12 +85,7 @@ const SEARCH_WHERE_KEYS: Record<GlobalSearchMatchKind, MessageKey> = {
   "board-image": "search.where.boardImage"
 };
 
-function searchSection(
-  section: GddSection,
-  query: string,
-  results: GlobalSearchResult[],
-  lang: AppLanguage
-) {
+function searchSection(section: GddSection, query: string, results: GlobalSearchResult[], lang: AppLanguage) {
   const sectionTitle = section.title || "Untitled";
 
   if (section.title && matches(section.title, query)) {
@@ -146,10 +126,7 @@ function searchSection(
   }
 
   if (section.content.trim()) {
-    const parsed = new DOMParser().parseFromString(
-      section.content,
-      "text/html"
-    );
+    const parsed = new DOMParser().parseFromString(section.content, "text/html");
     parsed.querySelectorAll("[id]").forEach((el) => {
       const anchorId = el.id;
       if (!anchorId) return;
@@ -186,12 +163,7 @@ function searchSection(
   }
 }
 
-function searchBoardImages(
-  doc: GddDocument,
-  query: string,
-  results: GlobalSearchResult[],
-  lang: AppLanguage
-) {
+function searchBoardImages(doc: GddDocument, query: string, results: GlobalSearchResult[], lang: AppLanguage) {
   for (const asset of Object.values(doc.boardImages ?? {})) {
     const displayName = displayBoardImageAssetName(asset);
     if (!matches(displayName, query)) continue;
@@ -227,12 +199,7 @@ function searchBoardImages(
   }
 }
 
-function searchFolders(
-  doc: GddDocument,
-  query: string,
-  results: GlobalSearchResult[],
-  lang: AppLanguage
-) {
+function searchFolders(doc: GddDocument, query: string, results: GlobalSearchResult[], lang: AppLanguage) {
   for (const folder of doc.folders ?? []) {
     if (!folder.title || !matches(folder.title, query)) continue;
     const firstSection = doc.sections
@@ -261,11 +228,7 @@ export interface SearchFocusTarget {
   anchorId?: string;
 }
 
-export function searchDocument(
-  doc: GddDocument,
-  query: string,
-  lang: AppLanguage = "en"
-): GlobalSearchResult[] {
+export function searchDocument(doc: GddDocument, query: string, lang: AppLanguage = "en"): GlobalSearchResult[] {
   const q = query.trim();
   if (!q) return [];
 

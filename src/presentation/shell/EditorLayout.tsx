@@ -157,21 +157,13 @@ export function EditorLayout({
   const showCompactSwitch = compactLayout && !isSpace3D;
   const compactEditorFull = showCompactSwitch && compactPane === "editor";
   const compactBoardFull = showCompactSwitch && compactPane === "board";
-  const hideEditorPane = showCompactSwitch
-    ? compactPane !== "editor"
-    : editorHidden;
-  const hideBoardPane = isSpace3D
-    ? false
-    : showCompactSwitch
-      ? compactPane !== "board"
-      : boardHidden;
+  const hideEditorPane = showCompactSwitch ? compactPane !== "editor" : editorHidden;
+  const hideBoardPane = isSpace3D ? false : showCompactSwitch ? compactPane !== "board" : boardHidden;
 
   const mainPanelClass = [
     "main-panel",
     isSpace3D ? "main-panel--space3d" : "",
-    showCompactSwitch
-      ? `main-panel--compact main-panel--compact-${compactPane}`
-      : ""
+    showCompactSwitch ? `main-panel--compact main-panel--compact-${compactPane}` : ""
   ]
     .filter(Boolean)
     .join(" ");
@@ -191,12 +183,7 @@ export function EditorLayout({
     },
     [onUpdateSectionViewState]
   );
-  useSectionEditorScroll(
-    editorScrollRef,
-    activeSectionId,
-    activeSection?.editorScrollTop,
-    saveEditorScrollTop
-  );
+  useSectionEditorScroll(editorScrollRef, activeSectionId, activeSection?.editorScrollTop, saveEditorScrollTop);
 
   return (
     <div className="app-body">
@@ -216,9 +203,7 @@ export function EditorLayout({
         onReorder={onReorderSidebar}
       />
       <div ref={mainRef} className={mainPanelClass}>
-        {showCompactSwitch && (
-          <CompactPaneToggle value={compactPane} onChange={setCompactPane} />
-        )}
+        {showCompactSwitch && <CompactPaneToggle value={compactPane} onChange={setCompactPane} />}
         {!isSpace3D && !compactLayout && (
           <PanelSplitter
             edge="start"
@@ -232,34 +217,21 @@ export function EditorLayout({
         {!isSpace3D && (
           <div
             className={`content-column ${hideEditorPane ? "content-column--hidden" : ""}`}
-            style={
-              compactEditorFull
-                ? compactFlex
-                : panelFlexStyle(editorHidden, editorWidth, 280, resizingPanels)
-            }
+            style={compactEditorFull ? compactFlex : panelFlexStyle(editorHidden, editorWidth, 280, resizingPanels)}
           >
             {!hideEditorPane && (
               <div className="content-column-scroll" ref={editorScrollRef}>
                 <DocumentMeta doc={doc} onChange={onUpdateDoc} />
-                <div
-                  className="editor-pane"
-                  key={activeSection?.id ?? "no-section"}
-                >
+                <div className="editor-pane" key={activeSection?.id ?? "no-section"}>
                   {activeSection ? (
                     <SectionEditor
                       key={activeSection.id}
                       section={activeSection}
                       scrollToAnchorId={scrollAnchorId}
                       onScrollAnchorDone={onScrollAnchorDone}
-                      searchFocus={
-                        searchFocus?.sectionId === activeSection.id
-                          ? searchFocus
-                          : null
-                      }
+                      searchFocus={searchFocus?.sectionId === activeSection.id ? searchFocus : null}
                       onSearchFocusDone={onSearchFocusDone}
-                      onChange={(patch) =>
-                        onUpdateSection(activeSection.id, patch)
-                      }
+                      onChange={(patch) => onUpdateSection(activeSection.id, patch)}
                     />
                   ) : (
                     <div className="editor-empty">
@@ -336,57 +308,23 @@ export function EditorLayout({
                   highlightTextId={highlightTextId}
                   onHighlightDone={onHighlightDone}
                   onAdd={(item) => onAddBoardItem(activeSection.id, item)}
-                  onUpdate={(itemId, patch) =>
-                    onUpdateBoardItem(activeSection.id, itemId, patch)
-                  }
-                  onRemove={(itemId) =>
-                    onRemoveBoardItem(activeSection.id, itemId)
-                  }
-                  onAddShape={(shape) =>
-                    onAddBoardShape(activeSection.id, shape)
-                  }
-                  onUpdateShape={(shapeId, patch) =>
-                    onUpdateBoardShape(activeSection.id, shapeId, patch)
-                  }
-                  onRemoveShape={(shapeId) =>
-                    onRemoveBoardShape(activeSection.id, shapeId)
-                  }
+                  onUpdate={(itemId, patch) => onUpdateBoardItem(activeSection.id, itemId, patch)}
+                  onRemove={(itemId) => onRemoveBoardItem(activeSection.id, itemId)}
+                  onAddShape={(shape) => onAddBoardShape(activeSection.id, shape)}
+                  onUpdateShape={(shapeId, patch) => onUpdateBoardShape(activeSection.id, shapeId, patch)}
+                  onRemoveShape={(shapeId) => onRemoveBoardShape(activeSection.id, shapeId)}
                   onAddText={(text) => onAddBoardText(activeSection.id, text)}
-                  onUpdateText={(textId, patch, options) =>
-                    onUpdateBoardText(activeSection.id, textId, patch, options)
-                  }
-                  onRemoveText={(textId) =>
-                    onRemoveBoardText(activeSection.id, textId)
-                  }
-                  onAddStroke={(stroke) =>
-                    onAddBoardStroke(activeSection.id, stroke)
-                  }
-                  onUpdateStroke={(strokeId, patch) =>
-                    onUpdateBoardStroke(activeSection.id, strokeId, patch)
-                  }
-                  onRemoveStroke={(strokeId) =>
-                    onRemoveBoardStroke(activeSection.id, strokeId)
-                  }
-                  onAddGroup={(group) =>
-                    onAddBoardGroup(activeSection.id, group)
-                  }
-                  onRemoveGroup={(groupId) =>
-                    onRemoveBoardGroup(activeSection.id, groupId)
-                  }
-                  onPasteDesk={(payload) =>
-                    onPasteDesk(activeSection.id, payload)
-                  }
-                  onReorderLayer={(selection, direction) =>
-                    onReorderLayer(activeSection.id, selection, direction)
-                  }
+                  onUpdateText={(textId, patch, options) => onUpdateBoardText(activeSection.id, textId, patch, options)}
+                  onRemoveText={(textId) => onRemoveBoardText(activeSection.id, textId)}
+                  onAddStroke={(stroke) => onAddBoardStroke(activeSection.id, stroke)}
+                  onUpdateStroke={(strokeId, patch) => onUpdateBoardStroke(activeSection.id, strokeId, patch)}
+                  onRemoveStroke={(strokeId) => onRemoveBoardStroke(activeSection.id, strokeId)}
+                  onAddGroup={(group) => onAddBoardGroup(activeSection.id, group)}
+                  onRemoveGroup={(groupId) => onRemoveBoardGroup(activeSection.id, groupId)}
+                  onPasteDesk={(payload) => onPasteDesk(activeSection.id, payload)}
+                  onReorderLayer={(selection, direction) => onReorderLayer(activeSection.id, selection, direction)}
                   onRemoveSelection={(itemIds, shapeIds, textIds, strokeIds) =>
-                    onRemoveSelection(
-                      activeSection.id,
-                      itemIds,
-                      shapeIds,
-                      textIds,
-                      strokeIds
-                    )
+                    onRemoveSelection(activeSection.id, itemIds, shapeIds, textIds, strokeIds)
                   }
                   resolveItemSrc={(item) => resolveBoardItemSrc(doc, item)}
                   deskClipboard={deskClipboard}

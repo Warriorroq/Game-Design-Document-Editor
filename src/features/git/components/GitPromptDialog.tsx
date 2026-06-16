@@ -20,12 +20,7 @@ function focusGitPromptInput(input: HTMLInputElement | null) {
   input.select();
 }
 
-export function GitPromptDialog({
-  kind,
-  initialValue = "",
-  onClose,
-  onSubmit
-}: GitPromptDialogProps) {
+export function GitPromptDialog({ kind, initialValue = "", onClose, onSubmit }: GitPromptDialogProps) {
   const { t } = useLocale();
   const [value, setValue] = useState(initialValue);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -71,10 +66,8 @@ export function GitPromptDialog({
 
   if (!kind) return null;
 
-  const title =
-    kind === "commit" ? t("git.dialogCommitTitle") : t("git.dialogRemoteTitle");
-  const label =
-    kind === "commit" ? t("git.commitPrompt") : t("git.remotePrompt");
+  const title = kind === "commit" ? t("git.dialogCommitTitle") : t("git.dialogRemoteTitle");
+  const label = kind === "commit" ? t("git.commitPrompt") : t("git.remotePrompt");
 
   const submit = () => {
     const trimmed = value.trim();
@@ -115,9 +108,7 @@ export function GitPromptDialog({
                 submit();
               }
             }}
-            placeholder={
-              kind === "remote" ? "https://github.com/user/repo.git" : ""
-            }
+            placeholder={kind === "remote" ? "https://github.com/user/repo.git" : ""}
           />
         </label>
         <div className="link-paste-actions">

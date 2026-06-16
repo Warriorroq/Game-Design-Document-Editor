@@ -1,9 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import type {
-  DeskClipboard,
-  DeskSelection
-} from "@/domain/board/deskClipboard";
+import type { DeskClipboard, DeskSelection } from "@/domain/board/deskClipboard";
 import { createDocument, normalizeDocument } from "@/domain/document/document";
 import * as mutations from "@/domain/document/mutations";
 import type { SidebarDropTarget } from "@/domain/sidebar/sidebarOrder";
@@ -18,10 +15,7 @@ import type {
   GddSection,
   GddSectionFolder
 } from "@/domain/types";
-import {
-  loadDocument,
-  saveDocument
-} from "@/infrastructure/persistence/webDocumentStorage";
+import { loadDocument, saveDocument } from "@/infrastructure/persistence/webDocumentStorage";
 
 const MAX_UNDO = 50;
 const CONTENT_UNDO_GAP_MS = 1000;
@@ -38,12 +32,8 @@ export function useDocumentStore() {
     saveDocument(fresh);
     return fresh;
   });
-  const [activeSectionId, setActiveSectionId] = useState<string>(
-    () => doc.sections[0]?.id ?? ""
-  );
-  const [deskClipboard, setDeskClipboard] = useState<DeskClipboard | null>(
-    null
-  );
+  const [activeSectionId, setActiveSectionId] = useState<string>(() => doc.sections[0]?.id ?? "");
+  const [deskClipboard, setDeskClipboard] = useState<DeskClipboard | null>(null);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const docRef = useRef(doc);
   const undoStack = useRef<GddDocument[]>([]);
@@ -75,10 +65,7 @@ export function useDocumentStore() {
   }, []);
 
   const mutateDoc = useCallback(
-    (
-      updater: (prev: GddDocument) => GddDocument,
-      options?: { recordHistory?: boolean }
-    ) => {
+    (updater: (prev: GddDocument) => GddDocument, options?: { recordHistory?: boolean }) => {
       setDoc((prev) => {
         const next = updater(prev);
         if (next === prev) return prev;
@@ -153,10 +140,7 @@ export function useDocumentStore() {
   );
 
   const updateSectionViewState = useCallback(
-    (
-      id: string,
-      patch: Partial<Pick<GddSection, "editorScrollTop" | "boardViewport">>
-    ) => {
+    (id: string, patch: Partial<Pick<GddSection, "editorScrollTop" | "boardViewport">>) => {
       mutateDoc((prev) => mutations.patchSection(prev, id, patch), {
         recordHistory: false
       });
@@ -166,10 +150,7 @@ export function useDocumentStore() {
 
   const addSection = useCallback(
     (folderId?: string) => {
-      const { doc: next, sectionId } = mutations.addSection(
-        docRef.current,
-        folderId
-      );
+      const { doc: next, sectionId } = mutations.addSection(docRef.current, folderId);
       mutateDoc(() => next);
       setActiveSectionId(sectionId);
     },
@@ -178,11 +159,7 @@ export function useDocumentStore() {
 
   const addSpace3DSection = useCallback(
     (folderId?: string) => {
-      const { doc: next, sectionId } = mutations.addSection(
-        docRef.current,
-        folderId,
-        "space3d"
-      );
+      const { doc: next, sectionId } = mutations.addSection(docRef.current, folderId, "space3d");
       mutateDoc(() => next);
       setActiveSectionId(sectionId);
     },
@@ -218,10 +195,7 @@ export function useDocumentStore() {
   );
 
   const reorderSidebar = useCallback(
-    (
-      drag: { kind: "section" | "folder"; id: string },
-      target: SidebarDropTarget
-    ) => {
+    (drag: { kind: "section" | "folder"; id: string }, target: SidebarDropTarget) => {
       mutateDoc((prev) => mutations.reorderSidebar(prev, drag, target));
     },
     [mutateDoc]
@@ -242,10 +216,7 @@ export function useDocumentStore() {
 
   const updateBoardItem = useCallback(
     (sectionId: string, itemId: string, patch: Partial<BoardItem>) => {
-      mutateDoc(
-        (prev) => mutations.patchBoardItem(prev, sectionId, itemId, patch),
-        { recordHistory: false }
-      );
+      mutateDoc((prev) => mutations.patchBoardItem(prev, sectionId, itemId, patch), { recordHistory: false });
     },
     [mutateDoc]
   );
@@ -273,10 +244,7 @@ export function useDocumentStore() {
 
   const updateBoardShape = useCallback(
     (sectionId: string, shapeId: string, patch: Partial<BoardShape>) => {
-      mutateDoc(
-        (prev) => mutations.patchBoardShape(prev, sectionId, shapeId, patch),
-        { recordHistory: false }
-      );
+      mutateDoc((prev) => mutations.patchBoardShape(prev, sectionId, shapeId, patch), { recordHistory: false });
     },
     [mutateDoc]
   );
@@ -310,16 +278,10 @@ export function useDocumentStore() {
   );
 
   const updateBoardText = useCallback(
-    (
-      sectionId: string,
-      textId: string,
-      patch: Partial<BoardText>,
-      options?: { recordHistory?: boolean }
-    ) => {
-      mutateDoc(
-        (prev) => mutations.patchBoardText(prev, sectionId, textId, patch),
-        { recordHistory: options?.recordHistory === true }
-      );
+    (sectionId: string, textId: string, patch: Partial<BoardText>, options?: { recordHistory?: boolean }) => {
+      mutateDoc((prev) => mutations.patchBoardText(prev, sectionId, textId, patch), {
+        recordHistory: options?.recordHistory === true
+      });
     },
     [mutateDoc]
   );
@@ -340,19 +302,14 @@ export function useDocumentStore() {
 
   const updateBoardStroke = useCallback(
     (sectionId: string, strokeId: string, patch: Partial<BoardStroke>) => {
-      mutateDoc(
-        (prev) => mutations.patchBoardStroke(prev, sectionId, strokeId, patch),
-        { recordHistory: false }
-      );
+      mutateDoc((prev) => mutations.patchBoardStroke(prev, sectionId, strokeId, patch), { recordHistory: false });
     },
     [mutateDoc]
   );
 
   const removeBoardStroke = useCallback(
     (sectionId: string, strokeId: string) => {
-      mutateDoc((prev) =>
-        mutations.removeBoardStroke(prev, sectionId, strokeId)
-      );
+      mutateDoc((prev) => mutations.removeBoardStroke(prev, sectionId, strokeId));
     },
     [mutateDoc]
   );
@@ -374,36 +331,15 @@ export function useDocumentStore() {
   );
 
   const reorderDeskLayerOrder = useCallback(
-    (
-      sectionId: string,
-      selection: DeskSelection,
-      direction: "forward" | "backward"
-    ) => {
-      mutateDoc((prev) =>
-        mutations.reorderDeskLayerOrder(prev, sectionId, selection, direction)
-      );
+    (sectionId: string, selection: DeskSelection, direction: "forward" | "backward") => {
+      mutateDoc((prev) => mutations.reorderDeskLayerOrder(prev, sectionId, selection, direction));
     },
     [mutateDoc]
   );
 
   const removeDeskSelection = useCallback(
-    (
-      sectionId: string,
-      itemIds: string[],
-      shapeIds: string[],
-      textIds: string[],
-      strokeIds: string[]
-    ) => {
-      mutateDoc((prev) =>
-        mutations.removeDeskSelection(
-          prev,
-          sectionId,
-          itemIds,
-          shapeIds,
-          textIds,
-          strokeIds
-        )
-      );
+    (sectionId: string, itemIds: string[], shapeIds: string[], textIds: string[], strokeIds: string[]) => {
+      mutateDoc((prev) => mutations.removeDeskSelection(prev, sectionId, itemIds, shapeIds, textIds, strokeIds));
     },
     [mutateDoc]
   );
@@ -444,9 +380,7 @@ export function useDocumentStore() {
 
   const updateSpace3DModelAssetName = useCallback(
     (assetId: string, name: string) => {
-      mutateDoc((prev) =>
-        mutations.renameSpace3DModelAsset(prev, assetId, name)
-      );
+      mutateDoc((prev) => mutations.renameSpace3DModelAsset(prev, assetId, name));
     },
     [mutateDoc]
   );
@@ -493,8 +427,7 @@ export function useDocumentStore() {
     syncActiveSection(doc);
   }, [sectionIdsKey, doc, syncActiveSection]);
 
-  const activeSection =
-    doc.sections.find((s) => s.id === activeSectionId) ?? doc.sections[0];
+  const activeSection = doc.sections.find((s) => s.id === activeSectionId) ?? doc.sections[0];
 
   return {
     doc,

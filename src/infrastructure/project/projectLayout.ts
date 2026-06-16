@@ -127,9 +127,7 @@ function extensionForMime(mime: string): string {
   return MIME_EXT[mime] ?? "bin";
 }
 
-function parseDataUrl(
-  src: string
-): { mime: string; dataBase64: string } | null {
+function parseDataUrl(src: string): { mime: string; dataBase64: string } | null {
   const match = /^data:([^;]+);base64,(.+)$/s.exec(src);
   if (!match) return null;
   return { mime: match[1], dataBase64: match[2] };
@@ -147,10 +145,7 @@ function assetFilePath(assetId: string, mime: string): string {
   return `${ASSETS_DIR}/${assetId}.${extensionForMime(mime)}`;
 }
 
-function registryAssetToFolder(
-  asset: { id: string; src: string },
-  assets: Map<string, FolderAsset>
-): void {
+function registryAssetToFolder(asset: { id: string; src: string }, assets: Map<string, FolderAsset>): void {
   const parsed = parseDataUrl(asset.src);
   if (!parsed) return;
 
@@ -164,29 +159,19 @@ function registryAssetToFolder(
   });
 }
 
-function collectBoardImageRegistryAssets(
-  doc: GddDocument,
-  assets: Map<string, FolderAsset>
-): void {
+function collectBoardImageRegistryAssets(doc: GddDocument, assets: Map<string, FolderAsset>): void {
   for (const asset of Object.values(doc.boardImages ?? {})) {
     registryAssetToFolder(asset, assets);
   }
 }
 
-function collectSpace3DModelRegistryAssetsToFolder(
-  doc: GddDocument,
-  assets: Map<string, FolderAsset>
-): void {
+function collectSpace3DModelRegistryAssetsToFolder(doc: GddDocument, assets: Map<string, FolderAsset>): void {
   for (const asset of collectSpace3DModelRegistryAssets(doc)) {
     registryAssetToFolder(asset, assets);
   }
 }
 
-function boardItemToFile(
-  doc: GddDocument,
-  item: BoardItem,
-  assets: Map<string, FolderAsset>
-): SectionFileBoardItem {
+function boardItemToFile(doc: GddDocument, item: BoardItem, assets: Map<string, FolderAsset>): SectionFileBoardItem {
   if (isBoardVideoItem(item)) {
     const embedUrl = item.src;
     if (!embedUrl) {
@@ -207,11 +192,7 @@ function boardItemToFile(
   }
 
   const src = resolveBoardItemSrc(doc, item);
-  const assetId =
-    item.assetId ??
-    Object.entries(doc.boardImages ?? {}).find(
-      ([, asset]) => asset.src === src
-    )?.[0];
+  const assetId = item.assetId ?? Object.entries(doc.boardImages ?? {}).find(([, asset]) => asset.src === src)?.[0];
   if (!assetId) {
     throw new Error(`Board item ${item.id} has no asset id`);
   }
@@ -301,9 +282,7 @@ function boardItemFromFile(
   };
 }
 
-export function documentToFolderPayload(
-  doc: GddDocument
-): FolderProjectPayload {
+export function documentToFolderPayload(doc: GddDocument): FolderProjectPayload {
   const updated = migrateBoardImages({
     ...doc,
     lastModified: new Date().toISOString()
@@ -322,15 +301,9 @@ export function documentToFolderPayload(
       folderId: section.folderId,
       kind: section.kind,
       space3d: section.space3d,
-      ...(section.editorScrollTop != null
-        ? { editorScrollTop: section.editorScrollTop }
-        : {}),
-      ...(section.boardViewport
-        ? { boardViewport: section.boardViewport }
-        : {}),
-      board: section.board.map((item) =>
-        boardItemToFile(updated, item, assets)
-      ),
+      ...(section.editorScrollTop != null ? { editorScrollTop: section.editorScrollTop } : {}),
+      ...(section.boardViewport ? { boardViewport: section.boardViewport } : {}),
+      board: section.board.map((item) => boardItemToFile(updated, item, assets)),
       shapes: section.shapes,
       strokes: section.strokes,
       texts: section.texts,
@@ -390,9 +363,7 @@ export function documentToFolderPayload(
   };
 }
 
-export function folderPayloadToDocument(
-  payload: FolderProjectPayload
-): GddDocument {
+export function folderPayloadToDocument(payload: FolderProjectPayload): GddDocument {
   let manifest: ManifestFile;
   try {
     manifest = JSON.parse(payload.manifest) as ManifestFile;
@@ -407,12 +378,8 @@ export function folderPayloadToDocument(
   const assetMap = new Map(payload.assets.map((asset) => [asset.path, asset]));
   const boardImages: Record<string, BoardImageAsset> = {};
   const space3DModels: Record<string, Space3DModelAsset> = {};
-  const modelMetaIds = new Set(
-    (manifest.space3DModels ?? []).map((meta) => meta.id)
-  );
-  const sectionById = new Map(
-    payload.sections.map((entry) => [entry.id, entry.content])
-  );
+  const modelMetaIds = new Set((manifest.space3DModels ?? []).map((meta) => meta.id));
+  const sectionById = new Map(payload.sections.map((entry) => [entry.id, entry.content]));
 
   const sections: GddSection[] = manifest.sections
     .slice()
@@ -481,8 +448,7 @@ export function folderPayloadToDocument(
     subtitle: manifest.subtitle,
     lastModified: manifest.lastModified,
     boardImages,
-    space3DModels:
-      Object.keys(space3DModels).length > 0 ? space3DModels : undefined,
+    space3DModels: Object.keys(space3DModels).length > 0 ? space3DModels : undefined,
     folders: (manifest.folders ?? []).map(
       (folder): GddSectionFolder => ({
         id: folder.id,
@@ -496,9 +462,7 @@ export function folderPayloadToDocument(
   });
 }
 
-export function documentToFolderFiles(
-  doc: GddDocument
-): Map<string, string | Uint8Array> {
+export function documentToFolderFiles(doc: GddDocument): Map<string, string | Uint8Array> {
   const payload = documentToFolderPayload(doc);
   const files = new Map<string, string | Uint8Array>();
   files.set(MANIFEST_FILE, payload.manifest);
@@ -506,17 +470,13 @@ export function documentToFolderFiles(
     files.set(section.path, section.content);
   }
   for (const asset of payload.assets) {
-    const binary = Uint8Array.from(atob(asset.dataBase64), (c) =>
-      c.charCodeAt(0)
-    );
+    const binary = Uint8Array.from(atob(asset.dataBase64), (c) => c.charCodeAt(0));
     files.set(asset.path, binary);
   }
   return files;
 }
 
-export function folderFilesToDocument(
-  files: Map<string, string | Uint8Array>
-): GddDocument {
+export function folderFilesToDocument(files: Map<string, string | Uint8Array>): GddDocument {
   const manifest = files.get(MANIFEST_FILE);
   if (typeof manifest !== "string") {
     throw new Error("Missing gdd.json in project folder.");
@@ -537,9 +497,7 @@ export function folderFilesToDocument(
     }
     if (path.startsWith(`${ASSETS_DIR}/`) && content instanceof Uint8Array) {
       const ext = path.split(".").pop() ?? "bin";
-      const mime =
-        Object.entries(MIME_EXT).find(([, value]) => value === ext)?.[0] ??
-        "application/octet-stream";
+      const mime = Object.entries(MIME_EXT).find(([, value]) => value === ext)?.[0] ?? "application/octet-stream";
       let binary = "";
       for (const byte of content) {
         binary += String.fromCharCode(byte);

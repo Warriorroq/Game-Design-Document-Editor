@@ -62,25 +62,17 @@ function hexToColor(hex: string, fallback: number): THREE.Color {
   return color;
 }
 
-function applyGridMaterialUniforms(
-  material: THREE.ShaderMaterial,
-  grid: Space3DGrid
-) {
+function applyGridMaterialUniforms(material: THREE.ShaderMaterial, grid: Space3DGrid) {
   const step = grid.step ?? 1;
   material.uniforms.uStep.value = step;
-  material.uniforms.uCenterColor.value.copy(
-    hexToColor(grid.centerColor ?? "#3f3f46", 0x3f3f46)
-  );
-  material.uniforms.uLineColor.value.copy(
-    hexToColor(grid.lineColor ?? "#27272a", 0x27272a)
-  );
+  material.uniforms.uCenterColor.value.copy(hexToColor(grid.centerColor ?? "#3f3f46", 0x3f3f46));
+  material.uniforms.uLineColor.value.copy(hexToColor(grid.lineColor ?? "#27272a", 0x27272a));
 }
 
 export function snapToGrid(value: number, step: number): number {
   if (!(step > 0)) return value;
   const snapped = Math.round(value / step) * step;
-  const precision =
-    step < 1 ? Math.min(6, Math.ceil(-Math.log10(step)) + 2) : 4;
+  const precision = step < 1 ? Math.min(6, Math.ceil(-Math.log10(step)) + 2) : 4;
   return Number(snapped.toFixed(precision));
 }
 
@@ -119,10 +111,7 @@ export function createInfiniteGrid(grid: Space3DGrid): THREE.Mesh {
     fragmentShader: infiniteGridFragmentShader
   });
 
-  const mesh = new THREE.Mesh(
-    new THREE.PlaneGeometry(GRID_PLANE_SIZE, GRID_PLANE_SIZE),
-    material
-  );
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(GRID_PLANE_SIZE, GRID_PLANE_SIZE), material);
   mesh.rotation.x = -Math.PI / 2;
   mesh.frustumCulled = false;
   mesh.renderOrder = -1;
@@ -130,12 +119,7 @@ export function createInfiniteGrid(grid: Space3DGrid): THREE.Mesh {
   return mesh;
 }
 
-export function updateInfiniteGrid(
-  mesh: THREE.Mesh,
-  camera: THREE.Camera,
-  target: THREE.Vector3,
-  grid: Space3DGrid
-) {
+export function updateInfiniteGrid(mesh: THREE.Mesh, camera: THREE.Camera, target: THREE.Vector3, grid: Space3DGrid) {
   const step = grid.step ?? 1;
   if (!(step > 0)) return;
 

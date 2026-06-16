@@ -17,9 +17,7 @@ export function useSectionEditorScroll(
 ) {
   const prevSectionIdRef = useRef<string | null>(null);
   const scrollBySectionRef = useRef(new Map<string, number>());
-  const pendingTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
-    undefined
-  );
+  const pendingTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const onSaveScrollTopRef = useRef(onSaveScrollTop);
   onSaveScrollTopRef.current = onSaveScrollTop;
 
@@ -44,8 +42,7 @@ export function useSectionEditorScroll(
     }
 
     if (prevId !== sectionId) {
-      const top =
-        scrollBySectionRef.current.get(sectionId) ?? savedScrollTop ?? 0;
+      const top = scrollBySectionRef.current.get(sectionId) ?? savedScrollTop ?? 0;
       scrollBySectionRef.current.set(sectionId, top);
       applyScrollTop(el, top);
       prevSectionIdRef.current = sectionId;

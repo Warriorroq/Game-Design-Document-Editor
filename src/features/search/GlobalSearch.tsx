@@ -10,13 +10,7 @@ interface GlobalSearchProps {
   onSelectResult: (result: GlobalSearchResult) => void;
 }
 
-function SnippetHighlight({
-  snippet,
-  query
-}: {
-  snippet: string;
-  query: string;
-}) {
+function SnippetHighlight({ snippet, query }: { snippet: string; query: string }) {
   const q = query.trim();
   if (!q) return <>{snippet}</>;
 
@@ -27,20 +21,13 @@ function SnippetHighlight({
   return (
     <>
       {snippet.slice(0, idx)}
-      <mark className="global-search-mark">
-        {snippet.slice(idx, idx + q.length)}
-      </mark>
+      <mark className="global-search-mark">{snippet.slice(idx, idx + q.length)}</mark>
       {snippet.slice(idx + q.length)}
     </>
   );
 }
 
-export function GlobalSearch({
-  query,
-  onChange,
-  results,
-  onSelectResult
-}: GlobalSearchProps) {
+export function GlobalSearch({ query, onChange, results, onSelectResult }: GlobalSearchProps) {
   const { t } = useLocale();
   const rootRef = useRef<HTMLDivElement>(null);
   const searchActive = query.trim().length > 0;
@@ -118,9 +105,7 @@ export function GlobalSearch({
                   )}
                 </span>
                 <span className="global-search-item-section">
-                  {result.folderTitle &&
-                  result.kind !== "folder-title" &&
-                  result.sectionTitle
+                  {result.folderTitle && result.kind !== "folder-title" && result.sectionTitle
                     ? `${result.folderTitle} / ${result.sectionTitle}`
                     : result.folderTitle && result.kind === "folder-title"
                       ? result.folderTitle

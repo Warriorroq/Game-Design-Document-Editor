@@ -1,17 +1,6 @@
-import {
-  createContext,
-  type ReactNode,
-  useCallback,
-  useContext,
-  useMemo,
-  useState
-} from "react";
+import { createContext, type ReactNode, useCallback, useContext, useMemo, useState } from "react";
 
-import {
-  type LinkTarget,
-  linkTargetFromGddLink,
-  parseGddHref
-} from "@/features/links/lib/links";
+import { type LinkTarget, linkTargetFromGddLink, parseGddHref } from "@/features/links/lib/links";
 import type { GddDocument } from "@/shared/types";
 
 export interface PasteLinkRequest {
@@ -62,9 +51,7 @@ export function LinkProvider({
   children: ReactNode;
 }) {
   const [linkTarget, setLinkTarget] = useState<LinkTarget | null>(null);
-  const [contextMenu, setContextMenu] = useState<ContextMenuRequest | null>(
-    null
-  );
+  const [contextMenu, setContextMenu] = useState<ContextMenuRequest | null>(null);
   const [pasteDialog, setPasteDialog] = useState<PasteLinkRequest | null>(null);
 
   const clearLinkTarget = useCallback(() => setLinkTarget(null), []);
