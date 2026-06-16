@@ -14,11 +14,7 @@ interface BoardShapesLayerProps {
   selectedShapeIds: ReadonlySet<string>;
   className?: string;
   onShapePointerDown: (e: React.PointerEvent, shapeId: string) => void;
-  onEndpointPointerDown: (
-    e: React.PointerEvent,
-    shapeId: string,
-    endpoint: "start" | "end"
-  ) => void;
+  onEndpointPointerDown: (e: React.PointerEvent, shapeId: string, endpoint: "start" | "end") => void;
 }
 
 function ShapeView({
@@ -26,16 +22,13 @@ function ShapeView({
   items,
   selected,
   onShapePointerDown,
-  onEndpointPointerDown,
+  onEndpointPointerDown
 }: {
   shape: BoardShape;
   items: BoardItem[];
   selected: boolean;
   onShapePointerDown: (e: React.PointerEvent) => void;
-  onEndpointPointerDown: (
-    e: React.PointerEvent,
-    endpoint: "start" | "end"
-  ) => void;
+  onEndpointPointerDown: (e: React.PointerEvent, endpoint: "start" | "end") => void;
 }) {
   const a = resolveBoardPoint(shape.start, items);
   const b = resolveBoardPoint(shape.end, items);
@@ -90,8 +83,7 @@ function ShapeView({
     );
   }
 
-  const markerEnd =
-    shape.type === "arrow" ? "url(#board-arrowhead)" : undefined;
+  const markerEnd = shape.type === "arrow" ? "url(#board-arrowhead)" : undefined;
 
   return (
     <g
@@ -132,15 +124,7 @@ function ShapeView({
   );
 }
 
-function Handle({
-  cx,
-  cy,
-  onPointerDown,
-}: {
-  cx: number;
-  cy: number;
-  onPointerDown: (e: React.PointerEvent) => void;
-}) {
+function Handle({ cx, cy, onPointerDown }: { cx: number; cy: number; onPointerDown: (e: React.PointerEvent) => void }) {
   return (
     <circle
       className="board-shape-handle"
@@ -164,15 +148,10 @@ export function BoardShapesLayer({
   selectedShapeIds,
   className = "board-shapes-layer",
   onShapePointerDown,
-  onEndpointPointerDown,
+  onEndpointPointerDown
 }: BoardShapesLayerProps) {
   return (
-    <svg
-      className={className}
-      width={canvasWidth}
-      height={canvasHeight}
-      aria-hidden
-    >
+    <svg className={className} width={canvasWidth} height={canvasHeight} aria-hidden>
       <defs>
         <marker
           id="board-arrowhead"
@@ -194,9 +173,7 @@ export function BoardShapesLayer({
           items={items}
           selected={selectedShapeIds.has(shape.id)}
           onShapePointerDown={(e) => onShapePointerDown(e, shape.id)}
-          onEndpointPointerDown={(e, endpoint) =>
-            onEndpointPointerDown(e, shape.id, endpoint)
-          }
+          onEndpointPointerDown={(e, endpoint) => onEndpointPointerDown(e, shape.id, endpoint)}
         />
       ))}
 
@@ -206,7 +183,7 @@ export function BoardShapesLayer({
             id: "__preview",
             type: preview.type,
             start: preview.start,
-            end: preview.end,
+            end: preview.end
           }}
           items={items}
           selected={false}

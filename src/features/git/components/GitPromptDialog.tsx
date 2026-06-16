@@ -1,7 +1,9 @@
+import "@/shared/styles/LinkMenus.css";
+
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+
 import { useLocale } from "@/shared/context/LocaleContext";
-import "@/shared/styles/LinkMenus.css";
 
 export type GitPromptKind = "commit" | "remote";
 
@@ -18,12 +20,7 @@ function focusGitPromptInput(input: HTMLInputElement | null) {
   input.select();
 }
 
-export function GitPromptDialog({
-  kind,
-  initialValue = "",
-  onClose,
-  onSubmit,
-}: GitPromptDialogProps) {
+export function GitPromptDialog({ kind, initialValue = "", onClose, onSubmit }: GitPromptDialogProps) {
   const { t } = useLocale();
   const [value, setValue] = useState(initialValue);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -69,10 +66,8 @@ export function GitPromptDialog({
 
   if (!kind) return null;
 
-  const title =
-    kind === "commit" ? t("git.dialogCommitTitle") : t("git.dialogRemoteTitle");
-  const label =
-    kind === "commit" ? t("git.commitPrompt") : t("git.remotePrompt");
+  const title = kind === "commit" ? t("git.dialogCommitTitle") : t("git.dialogRemoteTitle");
+  const label = kind === "commit" ? t("git.commitPrompt") : t("git.remotePrompt");
 
   const submit = () => {
     const trimmed = value.trim();
@@ -85,10 +80,7 @@ export function GitPromptDialog({
   };
 
   const dialog = (
-    <div
-      className="link-dialog-backdrop"
-      onMouseDown={closeIfBackdrop}
-    >
+    <div className="link-dialog-backdrop" onMouseDown={closeIfBackdrop}>
       <div
         ref={dialogRef}
         className="link-paste-dialog"

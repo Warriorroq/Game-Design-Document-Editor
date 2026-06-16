@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocale } from "@/shared/context/LocaleContext";
+
 import {
   applyGitIdentity,
   commitGitChanges,
@@ -7,21 +7,20 @@ import {
   formatGitError,
   getGitRemote,
   getGitStatus,
+  type GitFileStatus,
+  type GitStatus,
   initGitRepo,
   pullGitChanges,
   pushGitChanges,
   setGitRemote,
-  stashGitChanges,
-  type GitFileStatus,
-  type GitStatus,
+  stashGitChanges
 } from "@/features/git/lib/git";
+import { parseGitProgressPercent } from "@/features/git/lib/gitProgress";
+import { useLocale } from "@/shared/context/LocaleContext";
+
+import { type GitSyncOperation, type GitSyncProgressState } from "../components/GitProgressDialog";
 import type { GitPromptKind } from "../components/GitPromptDialog";
 import type { GitPullConfirmAction } from "../components/GitPullConfirmDialog";
-import {
-  parseGitProgressPercent,
-  type GitSyncOperation,
-  type GitSyncProgressState,
-} from "../components/GitProgressDialog";
 
 interface UseGitActionsOptions {
   folderPath: string | null;
@@ -40,17 +39,14 @@ export function useGitActions({
   onRefreshStatus,
   onAfterPull,
   onFlushProject,
-  onCloseMenu,
+  onCloseMenu
 }: UseGitActionsOptions) {
   const { t } = useLocale();
   const [busy, setBusy] = useState(false);
   const [promptKind, setPromptKind] = useState<GitPromptKind | null>(null);
   const [promptInitial, setPromptInitial] = useState("");
-  const [syncProgress, setSyncProgress] =
-    useState<GitSyncProgressState | null>(null);
-  const [pullConfirmFiles, setPullConfirmFiles] = useState<
-    GitFileStatus[] | null
-  >(null);
+  const [syncProgress, setSyncProgress] = useState<GitSyncProgressState | null>(null);
+  const [pullConfirmFiles, setPullConfirmFiles] = useState<GitFileStatus[] | null>(null);
 
   const isRepo = Boolean(gitStatus?.isRepo);
   const dirty = Boolean(gitStatus?.dirty);
@@ -74,7 +70,7 @@ export function useGitActions({
       return {
         ...prev,
         lines: [...prev.lines.slice(-80), line],
-        percent,
+        percent
       };
     });
   };
@@ -86,7 +82,7 @@ export function useGitActions({
       operation,
       lines: [],
       percent: null,
-      status: "running",
+      status: "running"
     });
 
     const onProgress = (event: { line: string }) => {
@@ -99,9 +95,7 @@ export function useGitActions({
         : await pullGitChanges(folderPath, onProgress);
 
     if (result.ok) {
-      setSyncProgress((prev) =>
-        prev ? { ...prev, status: "success", percent: 100 } : prev
-      );
+      setSyncProgress((prev) => (prev ? { ...prev, status: "success", percent: 100 } : prev));
       onRefreshStatus();
       if (operation === "pull") {
         onAfterPull?.();
@@ -114,7 +108,7 @@ export function useGitActions({
         ? {
             ...prev,
             status: "error",
-            error: formatGitError(result.error, t),
+            error: formatGitError(result.error, t)
           }
         : prev
     );
@@ -209,10 +203,7 @@ export function useGitActions({
     setPullConfirmFiles(null);
 
     void (async () => {
-      const prep =
-        action === "stash"
-          ? await stashGitChanges(folderPath)
-          : await discardGitProjectChanges(folderPath);
+      const prep = action === "stash" ? await stashGitChanges(folderPath) : await discardGitProjectChanges(folderPath);
 
       if (!prep.ok) {
         window.alert(formatGitError(prep.error, t));
@@ -249,6 +240,6 @@ export function useGitActions({
     handlePull,
     pullConfirmFiles,
     handlePullConfirm,
-    handlePullConfirmClose,
+    handlePullConfirmClose
   };
 }

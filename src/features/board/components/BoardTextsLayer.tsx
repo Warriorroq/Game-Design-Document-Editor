@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+
 import { boardTextStyleProps } from "@/features/board/lib/boardTextStyle";
 import { resolveBoardTextColor } from "@/shared/lib/textColorUtils";
 import type { BoardText } from "@/shared/types";
@@ -28,7 +29,7 @@ export function BoardTextsLayer({
   onTextContextMenu,
   onTextDoubleClick,
   onTextCommit,
-  onEditEnd,
+  onEditEnd
 }: BoardTextsLayerProps) {
   const editRef = useRef<HTMLDivElement | null>(null);
 
@@ -61,7 +62,7 @@ export function BoardTextsLayer({
               width: text.width,
               fontSize: text.fontSize ?? 14,
               color: resolveBoardTextColor(text.color),
-              ...styleProps,
+              ...styleProps
             }}
             onPointerDown={(e) => {
               if (editing) return;

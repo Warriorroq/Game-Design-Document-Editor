@@ -18,7 +18,7 @@ export function serializeGdeProject(doc: GddDocument): string {
     format: GDE_FORMAT,
     version: GDE_VERSION,
     exportedAt: new Date().toISOString(),
-    document: { ...doc, lastModified: new Date().toISOString() },
+    document: { ...doc, lastModified: new Date().toISOString() }
   };
   return JSON.stringify(payload, null, 2);
 }

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
-import { parseGdeArchive } from "@/infrastructure/project/gdeArchive";
+
 import type { GddDocument } from "@/domain/types";
+import { parseGdeArchive } from "@/infrastructure/project/gdeArchive";
 
 function base64ToArrayBuffer(base64: string): ArrayBuffer {
   const binary = atob(base64);
@@ -11,10 +12,7 @@ function base64ToArrayBuffer(base64: string): ArrayBuffer {
   return bytes.buffer;
 }
 
-export function useDesktopArchiveOpen(
-  onImport: (doc: GddDocument) => void,
-  onError: (message: string) => void
-) {
+export function useDesktopArchiveOpen(onImport: (doc: GddDocument) => void, onError: (message: string) => void) {
   useEffect(() => {
     const projectApi = window.gddDesktop?.project;
     if (!projectApi?.onOpenArchive || !projectApi.readArchive) return;

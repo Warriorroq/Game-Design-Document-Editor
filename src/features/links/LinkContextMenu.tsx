@@ -1,19 +1,15 @@
+import "@/shared/styles/LinkMenus.css";
+
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { useLocale } from "@/shared/context/LocaleContext";
-import { useLinkContext } from "@/features/links/LinkContext";
+
 import { isNavigableHref, suggestLinkText } from "@/features/links/lib/links";
-import "@/shared/styles/LinkMenus.css";
+import { useLinkContext } from "@/features/links/LinkContext";
+import { useLocale } from "@/shared/context/LocaleContext";
 
 export function LinkContextMenu() {
   const { t } = useLocale();
-  const {
-    contextMenu,
-    closeContextMenu,
-    copyHref,
-    openPasteDialog,
-    doc,
-  } = useLinkContext();
+  const { contextMenu, closeContextMenu, copyHref, openPasteDialog, doc } = useLinkContext();
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -54,7 +50,7 @@ export function LinkContextMenu() {
       openPasteDialog({
         ...paste,
         href: clip,
-        suggestedText: suggestLinkText(doc, clip),
+        suggestedText: suggestLinkText(doc, clip)
       });
     } catch {
       /* clipboard denied */
@@ -67,12 +63,7 @@ export function LinkContextMenu() {
   const canActions = actions.length > 0;
 
   const menu = (
-    <div
-      ref={menuRef}
-      className="link-context-menu"
-      style={{ left: contextMenu.x, top: contextMenu.y }}
-      role="menu"
-    >
+    <div ref={menuRef} className="link-context-menu" style={{ left: contextMenu.x, top: contextMenu.y }} role="menu">
       {canCopy && (
         <button type="button" className="link-menu-item" role="menuitem" onClick={handleCopy}>
           {t("menu.copyLink")}

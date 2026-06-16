@@ -1,10 +1,7 @@
 import type { BoardText, BoardTextAlign } from "@/domain/types";
 
 /** `true` / `false` when uniform; `null` when mixed across selection. */
-export function uniformFlag(
-  texts: BoardText[],
-  key: "bold" | "italic" | "strikethrough"
-): boolean | null {
+export function uniformFlag(texts: BoardText[], key: "bold" | "italic" | "strikethrough"): boolean | null {
   if (texts.length === 0) return null;
   const values = texts.map((t) => Boolean(t[key]));
   if (values.every((v) => v)) return true;
@@ -35,6 +32,6 @@ export function boardTextStyleProps(text: BoardText): {
     fontWeight: text.bold ? 700 : undefined,
     fontStyle: text.italic ? "italic" : undefined,
     textDecoration: text.strikethrough ? "line-through" : undefined,
-    textAlign: textAlign === "left" ? undefined : textAlign,
+    textAlign: textAlign === "left" ? undefined : textAlign
   };
 }

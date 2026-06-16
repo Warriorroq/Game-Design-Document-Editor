@@ -13,6 +13,39 @@ Local-first editor for game design documents.
 npm install
 ```
 
+## Pre-commit
+
+Git hooks run formatting, linting, and type-checking before each commit.
+
+**One-time setup** (requires [Python](https://www.python.org/) with `pip`):
+
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+On commit, hooks run in order:
+
+1. **Prettier** — format staged files
+2. **ESLint** — lint and auto-fix staged JS/TS
+3. **TypeScript** — `tsc -b` (full project)
+
+Run hooks manually without committing:
+
+```bash
+pre-commit run --all-files
+```
+
+You can also run checks directly:
+
+```bash
+npm run format:check   # Prettier (check only)
+npm run format         # Prettier (write)
+npm run lint           # ESLint
+npm run lint:fix       # ESLint with auto-fix
+npm run typecheck      # TypeScript
+```
+
 ## Run
 
 ### Web (browser)

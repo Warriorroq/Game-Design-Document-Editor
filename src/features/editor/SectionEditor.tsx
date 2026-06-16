@@ -1,35 +1,34 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "react";
-import { useLocale } from "@/shared/context/LocaleContext";
-import { useShortcuts } from "@/shared/context/ShortcutsContext";
-import { useLinkContext } from "@/features/links/LinkContext";
-import { applyEditorFormat } from "@/features/editor/lib/editorFormat";
-import { EDITOR_FORMAT_SHORTCUT_ACTIONS } from "@/features/editor/lib/editorFormatShortcuts";
+
 import { ensureBlockAnchor, findBlockElement } from "@/features/editor/lib/editorAnchors";
 import {
   deleteSelectionInRoot,
   getSelectionRichContent,
   pasteRichContent,
-  setClipboardRichContent,
+  setClipboardRichContent
 } from "@/features/editor/lib/editorClipboard";
 import {
   contentForEditor,
   normalizeEditorDom,
   previewMissingTableControls,
-  serializeEditorHtml,
+  serializeEditorHtml
 } from "@/features/editor/lib/editorContent";
+import { applyEditorFormat } from "@/features/editor/lib/editorFormat";
+import { EDITOR_FORMAT_SHORTCUT_ACTIONS } from "@/features/editor/lib/editorFormatShortcuts";
 import { insertLinkInEditor, saveEditorSelection } from "@/features/editor/lib/insertLink";
+import { buildAnchorHref, isNavigableHref } from "@/features/links/lib/links";
+import { useLinkContext } from "@/features/links/LinkContext";
 import type { SearchFocusTarget } from "@/features/search/lib/globalSearch";
+import { useLocale } from "@/shared/context/LocaleContext";
+import { useShortcuts } from "@/shared/context/ShortcutsContext";
 import {
-  buildAnchorHref,
-  isNavigableHref,
-} from "@/features/links/lib/links";
-import {
-  HIGHLIGHT_FLASH_MS,
   flashElement,
+  HIGHLIGHT_FLASH_MS,
   highlightQueryInElement,
-  stripEphemeralEditorMarkup,
+  stripEphemeralEditorMarkup
 } from "@/shared/lib/searchHighlight";
 import type { GddSection } from "@/shared/types";
+
 import { FormatToolbar } from "./FormatToolbar";
 
 interface SectionEditorProps {
@@ -52,7 +51,7 @@ export function SectionEditor({
   scrollToAnchorId,
   onScrollAnchorDone,
   searchFocus,
-  onSearchFocusDone,
+  onSearchFocusDone
 }: SectionEditorProps) {
   const { t } = useLocale();
   const { matches: shortcutMatches } = useShortcuts();
@@ -71,8 +70,7 @@ export function SectionEditor({
       return;
     }
     const html = contentForEditor(section.content);
-    const domMatchesContent =
-      serializeEditorHtml(el).trim() === section.content.trim();
+    const domMatchesContent = serializeEditorHtml(el).trim() === section.content.trim();
     const missingControls = previewMissingTableControls(el);
     const focused = document.activeElement === el;
 
@@ -90,16 +88,11 @@ export function SectionEditor({
     if (!el) return;
 
     requestAnimationFrame(() => {
-      const target = el.querySelector(
-        `#${CSS.escape(scrollToAnchorId)}`
-      ) as HTMLElement | null;
+      const target = el.querySelector(`#${CSS.escape(scrollToAnchorId)}`) as HTMLElement | null;
       if (target) {
         target.scrollIntoView({ behavior: "smooth", block: "center" });
         target.classList.add("gdd-anchor-flash");
-        window.setTimeout(
-          () => target.classList.remove("gdd-anchor-flash"),
-          HIGHLIGHT_FLASH_MS
-        );
+        window.setTimeout(() => target.classList.remove("gdd-anchor-flash"), HIGHLIGHT_FLASH_MS);
       }
       onScrollAnchorDone?.();
     });
@@ -121,15 +114,9 @@ export function SectionEditor({
       } else if (kind === "section-description") {
         flashElement(descRef.current);
       } else if (kind === "section-content" && editorRef.current) {
-        cleanupHighlights = highlightQueryInElement(
-          editorRef.current,
-          query,
-          matchIndex
-        );
+        cleanupHighlights = highlightQueryInElement(editorRef.current, query, matchIndex);
       } else if (kind === "anchor" && searchFocus.anchorId && editorRef.current) {
-        const target = editorRef.current.querySelector(
-          `#${CSS.escape(searchFocus.anchorId)}`
-        );
+        const target = editorRef.current.querySelector(`#${CSS.escape(searchFocus.anchorId)}`);
         if (target instanceof HTMLElement) {
           cleanupHighlights = highlightQueryInElement(target, query, matchIndex);
           flashElement(target, "gdd-anchor-flash");
@@ -199,11 +186,7 @@ export function SectionEditor({
   }, [shortcutMatches, syncContent]);
 
   const addRowToDomTable = useCallback((table: HTMLTableElement) => {
-    const firstRow =
-      table.tHead?.rows[0] ??
-      table.tBodies?.[0]?.rows?.[0] ??
-      table.rows?.[0] ??
-      null;
+    const firstRow = table.tHead?.rows[0] ?? table.tBodies?.[0]?.rows?.[0] ?? table.rows?.[0] ?? null;
     const colCount = firstRow?.cells.length ?? 2;
 
     const tbody =
@@ -241,11 +224,7 @@ export function SectionEditor({
   }, []);
 
   const deleteColFromDomTable = useCallback((table: HTMLTableElement) => {
-    const sampleRow =
-      table.tHead?.rows?.[0] ??
-      table.tBodies?.[0]?.rows?.[0] ??
-      table.rows?.[0] ??
-      null;
+    const sampleRow = table.tHead?.rows?.[0] ?? table.tBodies?.[0]?.rows?.[0] ?? table.rows?.[0] ?? null;
 
     const colCount = sampleRow?.cells.length ?? 0;
     if (colCount <= 1) return;
@@ -263,26 +242,16 @@ export function SectionEditor({
       const target = e.target as HTMLElement | null;
       if (!target) return;
 
-      const addRowBtn = target.closest(
-        ".gdd-table-add-row"
-      ) as HTMLElement | null;
-      const addColBtn = target.closest(
-        ".gdd-table-add-col"
-      ) as HTMLElement | null;
+      const addRowBtn = target.closest(".gdd-table-add-row") as HTMLElement | null;
+      const addColBtn = target.closest(".gdd-table-add-col") as HTMLElement | null;
 
-      const delRowBtn = target.closest(
-        ".gdd-table-del-row"
-      ) as HTMLElement | null;
-      const delColBtn = target.closest(
-        ".gdd-table-del-col"
-      ) as HTMLElement | null;
+      const delRowBtn = target.closest(".gdd-table-del-row") as HTMLElement | null;
+      const delColBtn = target.closest(".gdd-table-del-col") as HTMLElement | null;
 
       if (!addRowBtn && !addColBtn && !delRowBtn && !delColBtn) return;
 
       const wrap = target.closest(".gdd-table-wrap") as HTMLElement | null;
-      const table = wrap?.querySelector("table.gdd-table") as
-        | HTMLTableElement
-        | null;
+      const table = wrap?.querySelector("table.gdd-table") as HTMLTableElement | null;
       if (!table) return;
 
       e.preventDefault();
@@ -296,13 +265,7 @@ export function SectionEditor({
       skipInnerHTMLReplaceOnceRef.current = true;
       syncContent();
     },
-    [
-      addColToDomTable,
-      addRowToDomTable,
-      deleteColFromDomTable,
-      deleteRowFromDomTable,
-      syncContent,
-    ]
+    [addColToDomTable, addRowToDomTable, deleteColFromDomTable, deleteRowFromDomTable, syncContent]
   );
 
   const handleTableControlMouseDown = useCallback((e: MouseEvent) => {
@@ -392,16 +355,11 @@ export function SectionEditor({
         suggestedText: "",
         insert: (href, text) => {
           if (!editorRef.current) return;
-          insertLinkInEditor(
-            editorRef.current,
-            href,
-            text,
-            savedSelectionRef.current
-          );
+          insertLinkInEditor(editorRef.current, href, text, savedSelectionRef.current);
           savedSelectionRef.current = null;
           syncContent();
-        },
-      },
+        }
+      }
     });
   };
 
@@ -436,9 +394,7 @@ export function SectionEditor({
           aria-label={t("editor.sectionDescAria")}
         />
         <div className="editor-toolbar">
-          <span className="word-count">
-            {t("editor.words", { count: wordCount })}
-          </span>
+          <span className="word-count">{t("editor.words", { count: wordCount })}</span>
         </div>
       </div>
 

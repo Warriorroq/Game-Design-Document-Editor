@@ -17,7 +17,7 @@ const YOUTUBE_HOSTS = new Set([
   "youtube-nocookie.com",
   "www.youtube-nocookie.com",
   "m.youtube.com",
-  "music.youtube.com",
+  "music.youtube.com"
 ]);
 
 /** Embed origin sent to YouTube when the app has no http(s) origin (e.g. Electron file://). */
@@ -52,9 +52,7 @@ export function normalizeEmbedSrc(src: string): string {
   }
 
   const host = url.hostname.replace(/^www\./, "");
-  const bareHost = url.hostname.startsWith("www.")
-    ? url.hostname.slice(4)
-    : url.hostname;
+  const bareHost = url.hostname.startsWith("www.") ? url.hostname.slice(4) : url.hostname;
 
   if (YOUTUBE_HOSTS.has(url.hostname) || YOUTUBE_HOSTS.has(bareHost) || host === "youtu.be") {
     const id =
@@ -80,11 +78,7 @@ function parseYouTubeId(url: URL): string | null {
     const id = url.pathname.slice(1).split("/")[0];
     return id || null;
   }
-  if (
-    host === "youtube.com" ||
-    host === "m.youtube.com" ||
-    host === "music.youtube.com"
-  ) {
+  if (host === "youtube.com" || host === "m.youtube.com" || host === "music.youtube.com") {
     if (url.pathname === "/watch") {
       return url.searchParams.get("v");
     }
@@ -127,7 +121,7 @@ export function parseVideoEmbed(input: string): VideoEmbed | null {
       render: "iframe",
       src: buildYouTubeEmbedSrc(youtubeId),
       originalUrl: normalized,
-      provider: "youtube",
+      provider: "youtube"
     };
   }
 
@@ -138,7 +132,7 @@ export function parseVideoEmbed(input: string): VideoEmbed | null {
       render: "iframe",
       src: `https://player.vimeo.com/video/${vimeoId}`,
       originalUrl: normalized,
-      provider: "vimeo",
+      provider: "vimeo"
     };
   }
 
@@ -148,7 +142,7 @@ export function parseVideoEmbed(input: string): VideoEmbed | null {
       render: "video",
       src: normalized,
       originalUrl: normalized,
-      provider: "direct",
+      provider: "direct"
     };
   }
 

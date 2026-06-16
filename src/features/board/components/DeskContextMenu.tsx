@@ -1,8 +1,10 @@
-import { useEffect, useRef } from "react";
-import { useLocale } from "@/shared/context/LocaleContext";
-import { createPortal } from "react-dom";
-import type { BoardDrawTool } from "@/shared/types";
 import "@/shared/styles/LinkMenus.css";
+
+import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
+
+import { useLocale } from "@/shared/context/LocaleContext";
+import type { BoardDrawTool } from "@/shared/types";
 
 interface DeskContextMenuProps {
   x: number;
@@ -59,7 +61,7 @@ export function DeskContextMenu({
   onSendBackward,
   onFlipHorizontal,
   onFlipVertical,
-  onClose,
+  onClose
 }: DeskContextMenuProps) {
   const { t } = useLocale();
   const menuRef = useRef<HTMLDivElement>(null);
@@ -81,50 +83,20 @@ export function DeskContextMenu({
   }, [onClose]);
 
   const menu = (
-    <div
-      ref={menuRef}
-      className="link-context-menu desk-context-menu"
-      style={{ left: x, top: y }}
-      role="menu"
-    >
-      <button
-        type="button"
-        className="link-menu-item"
-        role="menuitem"
-        onClick={() => onPick("arrow")}
-      >
+    <div ref={menuRef} className="link-context-menu desk-context-menu" style={{ left: x, top: y }} role="menu">
+      <button type="button" className="link-menu-item" role="menuitem" onClick={() => onPick("arrow")}>
         {t("menu.addArrow")}
       </button>
-      <button
-        type="button"
-        className="link-menu-item"
-        role="menuitem"
-        onClick={() => onPick("line")}
-      >
+      <button type="button" className="link-menu-item" role="menuitem" onClick={() => onPick("line")}>
         {t("menu.addLine")}
       </button>
-      <button
-        type="button"
-        className="link-menu-item"
-        role="menuitem"
-        onClick={() => onPick("box")}
-      >
+      <button type="button" className="link-menu-item" role="menuitem" onClick={() => onPick("box")}>
         {t("menu.addBox")}
       </button>
-      <button
-        type="button"
-        className="link-menu-item"
-        role="menuitem"
-        onClick={onAddText}
-      >
+      <button type="button" className="link-menu-item" role="menuitem" onClick={onAddText}>
         {t("menu.addText")}
       </button>
-      <button
-        type="button"
-        className="link-menu-item"
-        role="menuitem"
-        onClick={onInsertVideo}
-      >
+      <button type="button" className="link-menu-item" role="menuitem" onClick={onInsertVideo}>
         {t("menu.insertVideo")}
       </button>
       <div className="board-menu-sep" role="separator" />
@@ -152,42 +124,22 @@ export function DeskContextMenu({
         <div className="board-menu-sep" role="separator" />
       )}
       {canBringForward && (
-        <button
-          type="button"
-          className="link-menu-item"
-          role="menuitem"
-          onClick={onBringForward}
-        >
+        <button type="button" className="link-menu-item" role="menuitem" onClick={onBringForward}>
           {t("desk.bringForward")}
         </button>
       )}
       {canSendBackward && (
-        <button
-          type="button"
-          className="link-menu-item"
-          role="menuitem"
-          onClick={onSendBackward}
-        >
+        <button type="button" className="link-menu-item" role="menuitem" onClick={onSendBackward}>
           {t("desk.sendBackward")}
         </button>
       )}
       {canFlipHorizontal && (
-        <button
-          type="button"
-          className="link-menu-item"
-          role="menuitem"
-          onClick={onFlipHorizontal}
-        >
+        <button type="button" className="link-menu-item" role="menuitem" onClick={onFlipHorizontal}>
           {t("desk.flipHorizontal")}
         </button>
       )}
       {canFlipVertical && (
-        <button
-          type="button"
-          className="link-menu-item"
-          role="menuitem"
-          onClick={onFlipVertical}
-        >
+        <button type="button" className="link-menu-item" role="menuitem" onClick={onFlipVertical}>
           {t("desk.flipVertical")}
         </button>
       )}

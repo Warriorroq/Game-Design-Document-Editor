@@ -1,4 +1,5 @@
 import * as THREE from "three";
+
 import type { Space3DGrid, Space3DObject } from "@/domain/types";
 import { clampTransformPatch } from "@/features/space3d/lib/space3dObject";
 
@@ -64,9 +65,7 @@ function hexToColor(hex: string, fallback: number): THREE.Color {
 function applyGridMaterialUniforms(material: THREE.ShaderMaterial, grid: Space3DGrid) {
   const step = grid.step ?? 1;
   material.uniforms.uStep.value = step;
-  material.uniforms.uCenterColor.value.copy(
-    hexToColor(grid.centerColor ?? "#3f3f46", 0x3f3f46)
-  );
+  material.uniforms.uCenterColor.value.copy(hexToColor(grid.centerColor ?? "#3f3f46", 0x3f3f46));
   material.uniforms.uLineColor.value.copy(hexToColor(grid.lineColor ?? "#27272a", 0x27272a));
 }
 
@@ -100,14 +99,16 @@ export function createInfiniteGrid(grid: Space3DGrid): THREE.Mesh {
     depthWrite: false,
     uniforms: {
       uStep: { value: step },
-      uCenterColor: { value: hexToColor(grid.centerColor ?? "#3f3f46", 0x3f3f46) },
+      uCenterColor: {
+        value: hexToColor(grid.centerColor ?? "#3f3f46", 0x3f3f46)
+      },
       uLineColor: { value: hexToColor(grid.lineColor ?? "#27272a", 0x27272a) },
       uCameraPosition: { value: new THREE.Vector3() },
       uFadeNear: { value: 8 },
-      uFadeFar: { value: 140 },
+      uFadeFar: { value: 140 }
     },
     vertexShader: infiniteGridVertexShader,
-    fragmentShader: infiniteGridFragmentShader,
+    fragmentShader: infiniteGridFragmentShader
   });
 
   const mesh = new THREE.Mesh(new THREE.PlaneGeometry(GRID_PLANE_SIZE, GRID_PLANE_SIZE), material);
@@ -118,12 +119,7 @@ export function createInfiniteGrid(grid: Space3DGrid): THREE.Mesh {
   return mesh;
 }
 
-export function updateInfiniteGrid(
-  mesh: THREE.Mesh,
-  camera: THREE.Camera,
-  target: THREE.Vector3,
-  grid: Space3DGrid
-) {
+export function updateInfiniteGrid(mesh: THREE.Mesh, camera: THREE.Camera, target: THREE.Vector3, grid: Space3DGrid) {
   const step = grid.step ?? 1;
   if (!(step > 0)) return;
 
@@ -131,11 +127,7 @@ export function updateInfiniteGrid(
   applyGridMaterialUniforms(material, grid);
   material.uniforms.uCameraPosition.value.copy(camera.position);
 
-  mesh.position.set(
-    snapToGrid(target.x, step),
-    0,
-    snapToGrid(target.z, step)
-  );
+  mesh.position.set(snapToGrid(target.x, step), 0, snapToGrid(target.z, step));
 }
 
 export function disposeInfiniteGrid(mesh: THREE.Mesh) {

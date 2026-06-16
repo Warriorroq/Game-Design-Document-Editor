@@ -34,8 +34,7 @@ const en = {
   "settings.tab.git": "Git",
   "settings.gitTitle": "Git",
   "settings.shortcutsTitle": "Keyboard shortcuts",
-  "settings.shortcutsHint":
-    "Click a shortcut, then press the new key combination. Esc cancels.",
+  "settings.shortcutsHint": "Click a shortcut, then press the new key combination. Esc cancels.",
   "settings.shortcutsGroupEditor": "Editor",
   "settings.shortcutsGroupDesk": "Desk",
   "settings.shortcutsResetAll": "Reset all to defaults",
@@ -91,8 +90,7 @@ const en = {
   "project.folderActive": "Folder: {name}",
   "project.confirmLoadFolder":
     "This folder contains a GDD project. Load it into the editor? (Folder files will not be modified.)",
-  "project.confirmSaveToEmptyFolder":
-    "This folder is empty. Save the current project into it?",
+  "project.confirmSaveToEmptyFolder": "This folder is empty. Save the current project into it?",
   "project.imageAssets": "Image assets",
 
   "git.menuTitle": "Git",
@@ -116,12 +114,10 @@ const en = {
   "git.missingToken": "Enter a Personal Access Token.",
   "git.tokenHttpsOnly": "Tokens work only with HTTPS remote URLs, not SSH.",
   "git.networkFailed": "Network error. Check your connection and remote URL.",
-  "git.ffOnlyFailed":
-    "Fast-forward pull is not possible. Resolve conflicts in Git, then try again.",
+  "git.ffOnlyFailed": "Fast-forward pull is not possible. Resolve conflicts in Git, then try again.",
   "git.notARepo": "Initialize a Git repository in the project folder first.",
   "git.remoteBranchNotFound": "Remote branch not found. Push to the remote first.",
-  "git.noInitialCommit":
-    "No commits in this repository yet. Commit your project first, then push or pull.",
+  "git.noInitialCommit": "No commits in this repository yet. Commit your project first, then push or pull.",
   "git.progressPush": "Pushing to remote",
   "git.progressPull": "Pulling from remote",
   "git.progressRunning": "In progress",
@@ -137,10 +133,8 @@ const en = {
   "git.pullConfirmStash": "Stash & pull",
   "git.pullConfirmDiscard": "Discard & pull",
   "git.pullConfirmMore": "+{count} more files",
-  "git.pushRejectedPullFirst":
-    "Remote has new commits. Pull first, then push again.",
-  "git.missingIdentity":
-    "Set your Git name and email in Settings → Git before committing.",
+  "git.pushRejectedPullFirst": "Remote has new commits. Pull first, then push again.",
+  "git.missingIdentity": "Set your Git name and email in Settings → Git before committing.",
   "git.settingsDesktopOnly": "Git settings are available in the desktop app.",
   "git.settingsAccount": "Commit author",
   "git.settingsAccountHint":
@@ -200,8 +194,7 @@ const en = {
   "sidebar.renameFolder": "Rename folder",
   "sidebar.renameFolderHint": "Double-click to rename",
   "sidebar.confirmRemove": 'Remove section "{title}"?',
-  "sidebar.confirmRemoveFolder":
-    'Remove folder "{title}"? Nested folders and sections will move up one level.',
+  "sidebar.confirmRemoveFolder": 'Remove folder "{title}"? Nested folders and sections will move up one level.',
 
   "doc.titlePlaceholder": "Game title",
   "doc.subtitlePlaceholder": "Subtitle",
@@ -236,8 +229,7 @@ const en = {
   "desk.videoUrl": "Video URL",
   "desk.videoUrlPlaceholder": "https://www.youtube.com/watch?v=…",
   "desk.videoUrlRequired": "Enter a video URL.",
-  "desk.videoUrlInvalid":
-    "Unsupported URL. Use YouTube, Vimeo, or a direct .mp4 / .webm / .ogg link.",
+  "desk.videoUrlInvalid": "Unsupported URL. Use YouTube, Vimeo, or a direct .mp4 / .webm / .ogg link.",
   "desk.videoInsert": "Insert",
   "desk.videoEmbedTitle": "Embedded video",
   "desk.removeImage": "Remove image",
@@ -370,7 +362,7 @@ const en = {
   "theme.solarized-light.name": "Solarized Light",
   "theme.solarized-light.desc": "Solarized light",
   "theme.neon.name": "Neon",
-  "theme.neon.desc": "Cyber high contrast",
+  "theme.neon.desc": "Cyber high contrast"
 } as const;
 
 const ru: Record<keyof typeof en, string> = {
@@ -407,8 +399,7 @@ const ru: Record<keyof typeof en, string> = {
   "settings.tab.git": "Git",
   "settings.gitTitle": "Git",
   "settings.shortcutsTitle": "Горячие клавиши",
-  "settings.shortcutsHint":
-    "Нажмите на комбинацию и введите новую. Esc — отмена.",
+  "settings.shortcutsHint": "Нажмите на комбинацию и введите новую. Esc — отмена.",
   "settings.shortcutsGroupEditor": "Редактор",
   "settings.shortcutsGroupDesk": "Доска",
   "settings.shortcutsResetAll": "Сбросить все",
@@ -462,10 +453,8 @@ const ru: Record<keyof typeof en, string> = {
   "project.readError": "Не удалось прочитать файл проекта.",
   "project.folder": "Папка проекта",
   "project.folderActive": "Папка: {name}",
-  "project.confirmLoadFolder":
-    "В папке есть проект GDD. Загрузить в редактор? (Файлы в папке не будут изменены.)",
-  "project.confirmSaveToEmptyFolder":
-    "Папка пуста. Сохранить текущий проект в неё?",
+  "project.confirmLoadFolder": "В папке есть проект GDD. Загрузить в редактор? (Файлы в папке не будут изменены.)",
+  "project.confirmSaveToEmptyFolder": "Папка пуста. Сохранить текущий проект в неё?",
   "project.imageAssets": "Библиотека изображений",
 
   "git.menuTitle": "Git",
@@ -489,12 +478,10 @@ const ru: Record<keyof typeof en, string> = {
   "git.missingToken": "Введите Personal Access Token.",
   "git.tokenHttpsOnly": "Токен работает только с HTTPS URL, не с SSH.",
   "git.networkFailed": "Сетевая ошибка. Проверьте интернет и URL remote.",
-  "git.ffOnlyFailed":
-    "Fast-forward pull невозможен. Разрешите конфликты в Git и повторите.",
+  "git.ffOnlyFailed": "Fast-forward pull невозможен. Разрешите конфликты в Git и повторите.",
   "git.notARepo": "Сначала инициализируйте Git-репозиторий в папке проекта.",
   "git.remoteBranchNotFound": "Ветка на remote не найдена. Сначала сделайте push.",
-  "git.noInitialCommit":
-    "В репозитории ещё нет коммитов. Сначала закоммитьте проект, затем push или pull.",
+  "git.noInitialCommit": "В репозитории ещё нет коммитов. Сначала закоммитьте проект, затем push или pull.",
   "git.progressPush": "Отправка на remote",
   "git.progressPull": "Получение с remote",
   "git.progressRunning": "Выполняется",
@@ -510,10 +497,8 @@ const ru: Record<keyof typeof en, string> = {
   "git.pullConfirmStash": "Stash и pull",
   "git.pullConfirmDiscard": "Отменить и pull",
   "git.pullConfirmMore": "ещё {count} файлов",
-  "git.pushRejectedPullFirst":
-    "На remote есть новые коммиты. Сначала сделайте pull, затем push.",
-  "git.missingIdentity":
-    "Укажите имя и email в Настройки → Git перед коммитом.",
+  "git.pushRejectedPullFirst": "На remote есть новые коммиты. Сначала сделайте pull, затем push.",
+  "git.missingIdentity": "Укажите имя и email в Настройки → Git перед коммитом.",
   "git.settingsDesktopOnly": "Настройки Git доступны в десктопном приложении.",
   "git.settingsAccount": "Автор коммитов",
   "git.settingsAccountHint":
@@ -572,9 +557,8 @@ const ru: Record<keyof typeof en, string> = {
   "sidebar.toggleFolder": "Развернуть или свернуть папку",
   "sidebar.renameFolder": "Переименовать папку",
   "sidebar.renameFolderHint": "Двойной щелчок — переименовать",
-  "sidebar.confirmRemove": 'Удалить секцию «{title}»?',
-  "sidebar.confirmRemoveFolder":
-    'Удалить папку «{title}»? Вложенные папки и секции поднимутся на уровень выше.',
+  "sidebar.confirmRemove": "Удалить секцию «{title}»?",
+  "sidebar.confirmRemoveFolder": "Удалить папку «{title}»? Вложенные папки и секции поднимутся на уровень выше.",
 
   "doc.titlePlaceholder": "Название игры",
   "doc.subtitlePlaceholder": "Подзаголовок",
@@ -609,8 +593,7 @@ const ru: Record<keyof typeof en, string> = {
   "desk.videoUrl": "Ссылка на видео",
   "desk.videoUrlPlaceholder": "https://www.youtube.com/watch?v=…",
   "desk.videoUrlRequired": "Введите ссылку на видео.",
-  "desk.videoUrlInvalid":
-    "Ссылка не поддерживается. YouTube, Vimeo или прямой .mp4 / .webm / .ogg.",
+  "desk.videoUrlInvalid": "Ссылка не поддерживается. YouTube, Vimeo или прямой .mp4 / .webm / .ogg.",
   "desk.videoInsert": "Вставить",
   "desk.videoEmbedTitle": "Встроенное видео",
   "desk.removeImage": "Удалить изображение",
@@ -695,8 +678,7 @@ const ru: Record<keyof typeof en, string> = {
   "link.insert": "Вставить",
   "link.cancel": "Отмена",
   "dialog.confirm": "Подтвердить",
-  "link.previewBlocked":
-    "Некоторые сайты блокируют встроенный предпросмотр.",
+  "link.previewBlocked": "Некоторые сайты блокируют встроенный предпросмотр.",
   "link.blockNotFound": "Блок не найден",
   "link.imageNotFound": "Изображение не найдено",
   "link.videoNotFound": "Видео не найдено",
@@ -744,14 +726,14 @@ const ru: Record<keyof typeof en, string> = {
   "theme.solarized-light.name": "Solarized Light",
   "theme.solarized-light.desc": "Светлая Solarized",
   "theme.neon.name": "Neon",
-  "theme.neon.desc": "Неоновый контраст",
+  "theme.neon.desc": "Неоновый контраст"
 };
 
 export type MessageKey = keyof typeof en;
 
 export const MESSAGES: Record<AppLanguage, Record<MessageKey, string>> = {
   en,
-  ru,
+  ru
 };
 
 export const APP_LANGUAGES: AppLanguage[] = ["en", "ru"];

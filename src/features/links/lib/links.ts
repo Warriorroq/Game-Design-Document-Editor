@@ -14,8 +14,7 @@ export interface LinkTarget {
   textId?: string;
 }
 
-const UUID =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export function buildSectionHref(sectionId: string): string {
   return `gdd:section/${sectionId}`;
@@ -72,26 +71,15 @@ export function parseGddHref(href: string): GddLink | null {
   return null;
 }
 
-export function findSection(
-  doc: GddDocument,
-  sectionId: string
-): GddSection | undefined {
+export function findSection(doc: GddDocument, sectionId: string): GddSection | undefined {
   return doc.sections.find((s) => s.id === sectionId);
 }
 
-export function findBoardItem(
-  doc: GddDocument,
-  sectionId: string,
-  itemId: string
-): BoardItem | undefined {
+export function findBoardItem(doc: GddDocument, sectionId: string, itemId: string): BoardItem | undefined {
   return findSection(doc, sectionId)?.board.find((b) => b.id === itemId);
 }
 
-export function findBoardText(
-  doc: GddDocument,
-  sectionId: string,
-  textId: string
-): BoardText | undefined {
+export function findBoardText(doc: GddDocument, sectionId: string, textId: string): BoardText | undefined {
   return findSection(doc, sectionId)?.texts.find((t) => t.id === textId);
 }
 
@@ -154,6 +142,6 @@ export function linkTargetFromGddLink(link: GddLink): LinkTarget | null {
     sectionId: link.sectionId,
     anchorId: link.type === "anchor" ? link.anchorId : undefined,
     mediaId: link.type === "media" ? link.itemId : undefined,
-    textId: link.type === "text" ? link.textId : undefined,
+    textId: link.type === "text" ? link.textId : undefined
   };
 }

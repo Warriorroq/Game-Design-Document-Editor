@@ -15,10 +15,7 @@ export function space3DModelContentKey(src: string): string {
   return src;
 }
 
-export function resolveSpace3DModelSrc(
-  doc: GddDocument,
-  assetId: string | undefined
-): string | null {
+export function resolveSpace3DModelSrc(doc: GddDocument, assetId: string | undefined): string | null {
   if (!assetId) return null;
   return doc.space3DModels?.[assetId]?.src ?? null;
 }
@@ -50,17 +47,13 @@ export function registerSpace3DModel(
   models[assetId] = {
     id: assetId,
     src,
-    name: trimmed && trimmed !== assetId ? trimmed : undefined,
+    name: trimmed && trimmed !== assetId ? trimmed : undefined
   };
 
   return { doc: { ...doc, space3DModels: models }, assetId };
 }
 
-export function updateSpace3DModelAssetName(
-  doc: GddDocument,
-  assetId: string,
-  name: string
-): GddDocument {
+export function updateSpace3DModelAssetName(doc: GddDocument, assetId: string, name: string): GddDocument {
   const trimmed = name.trim();
   if (trimmed.length > 200) {
     throw new Error("INVALID_ASSET_NAME");
@@ -76,15 +69,12 @@ export function updateSpace3DModelAssetName(
     ...doc,
     space3DModels: {
       ...models,
-      [assetId]: { ...asset, name: nextName },
-    },
+      [assetId]: { ...asset, name: nextName }
+    }
   };
 }
 
-export function deleteSpace3DModelAsset(
-  doc: GddDocument,
-  assetId: string
-): GddDocument {
+export function deleteSpace3DModelAsset(doc: GddDocument, assetId: string): GddDocument {
   const models = doc.space3DModels;
   if (!models?.[assetId]) return doc;
 
@@ -92,7 +82,7 @@ export function deleteSpace3DModelAsset(
   delete next[assetId];
   return {
     ...doc,
-    space3DModels: Object.keys(next).length > 0 ? next : undefined,
+    space3DModels: Object.keys(next).length > 0 ? next : undefined
   };
 }
 
@@ -108,7 +98,7 @@ export function listSpace3DModelReferences(
         refs.push({
           sectionId: section.id,
           sectionTitle: section.title.trim() || section.id,
-          objectId: obj.id,
+          objectId: obj.id
         });
       }
     }
@@ -135,8 +125,6 @@ export function prepareSpace3DObjectForDoc(
   throw new Error(`Space3D model object ${obj.id} has no registered asset`);
 }
 
-export function collectSpace3DModelRegistryAssets(
-  doc: GddDocument
-): Space3DModelAsset[] {
+export function collectSpace3DModelRegistryAssets(doc: GddDocument): Space3DModelAsset[] {
   return Object.values(doc.space3DModels ?? {});
 }

@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, type RefObject } from "react";
+import { type RefObject, useEffect, useLayoutEffect, useRef } from "react";
 
 const SAVE_DEBOUNCE_MS = 300;
 
@@ -42,8 +42,7 @@ export function useSectionEditorScroll(
     }
 
     if (prevId !== sectionId) {
-      const top =
-        scrollBySectionRef.current.get(sectionId) ?? savedScrollTop ?? 0;
+      const top = scrollBySectionRef.current.get(sectionId) ?? savedScrollTop ?? 0;
       scrollBySectionRef.current.set(sectionId, top);
       applyScrollTop(el, top);
       prevSectionIdRef.current = sectionId;

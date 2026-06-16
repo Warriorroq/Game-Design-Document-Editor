@@ -1,13 +1,9 @@
 import { useEffect, useRef, useState } from "react";
+
 import { useLocale } from "@/shared/context/LocaleContext";
-import { shortcutLabelKey } from "@/shared/i18n/shortcutMessages";
 import { useShortcuts } from "@/shared/context/ShortcutsContext";
-import {
-  bindingsEqual,
-  formatShortcut,
-  SHORTCUT_DEFINITIONS,
-  type ShortcutActionId,
-} from "@/shared/lib/shortcuts";
+import { shortcutLabelKey } from "@/shared/i18n/shortcutMessages";
+import { bindingsEqual, formatShortcut, SHORTCUT_DEFINITIONS, type ShortcutActionId } from "@/shared/lib/shortcuts";
 
 interface ShortcutBindingInputProps {
   actionId: ShortcutActionId;
@@ -15,15 +11,13 @@ interface ShortcutBindingInputProps {
 
 export function ShortcutBindingInput({ actionId }: ShortcutBindingInputProps) {
   const { t } = useLocale();
-  const { bindings, setBinding, resetBinding, bindingFromEvent, findConflict } =
-    useShortcuts();
+  const { bindings, setBinding, resetBinding, bindingFromEvent, findConflict } = useShortcuts();
   const [recording, setRecording] = useState(false);
   const [conflictId, setConflictId] = useState<ShortcutActionId | null>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const binding = bindings[actionId];
-  const defaultBinding = SHORTCUT_DEFINITIONS.find((d) => d.id === actionId)!
-    .defaultBinding;
+  const defaultBinding = SHORTCUT_DEFINITIONS.find((d) => d.id === actionId)!.defaultBinding;
   const isDefault = bindingsEqual(binding, defaultBinding);
 
   useEffect(() => {
@@ -91,7 +85,7 @@ export function ShortcutBindingInput({ actionId }: ShortcutBindingInputProps) {
       {conflictId && (
         <span className="shortcut-conflict" role="alert">
           {t("settings.shortcutsConflict", {
-            action: t(shortcutLabelKey(conflictId)),
+            action: t(shortcutLabelKey(conflictId))
           })}
         </span>
       )}

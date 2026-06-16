@@ -1,20 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+
+import type { GddDocument } from "@/domain/types";
+import { isDesktopApp } from "@/infrastructure/desktop/desktop";
+import { getGitStatus, type GitStatus } from "@/infrastructure/git";
 import {
   folderLabel,
   getStoredProjectFolder,
   loadProjectFromFolder,
   pickProjectFolder,
   saveProjectToFolder,
-  setStoredProjectFolder,
+  setStoredProjectFolder
 } from "@/infrastructure/project/projectFolder";
-import { getGitStatus, type GitStatus } from "@/infrastructure/git";
-import { isDesktopApp } from "@/infrastructure/desktop/desktop";
-import type { GddDocument } from "@/domain/types";
 
 export function useProjectFolder() {
-  const [folderPath, setFolderPath] = useState<string | null>(() =>
-    isDesktopApp ? getStoredProjectFolder() : null
-  );
+  const [folderPath, setFolderPath] = useState<string | null>(() => (isDesktopApp ? getStoredProjectFolder() : null));
   const [gitStatus, setGitStatus] = useState<GitStatus | null>(null);
   const [gitAvailable, setGitAvailable] = useState(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -114,6 +113,6 @@ export function useProjectFolder() {
     saveDocTo,
     scheduleSaveDoc,
     closeFolder,
-    refreshGitStatus,
+    refreshGitStatus
   };
 }

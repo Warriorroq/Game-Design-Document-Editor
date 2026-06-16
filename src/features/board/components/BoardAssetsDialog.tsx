@@ -1,22 +1,21 @@
+import "@/shared/styles/LinkMenus.css";
+import "./BoardAssetsDialog.css";
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+
 import {
   countBoardImageAssetUsage,
   displayBoardImageAssetName,
-  listBoardImageAssetDesks,
+  listBoardImageAssetDesks
 } from "@/features/board/lib/boardImageRegistry";
-import {
-  buildAssetDeskClipboard,
-  type DeskClipboard,
-} from "@/features/board/lib/deskClipboard";
-import { useLinkContext } from "@/features/links/LinkContext";
+import { buildAssetDeskClipboard, type DeskClipboard } from "@/features/board/lib/deskClipboard";
 import { buildMediaHref } from "@/features/links/lib/links";
+import { useLinkContext } from "@/features/links/LinkContext";
 import { useLocale } from "@/shared/context/LocaleContext";
 import { restoreAppFocus } from "@/shared/lib/desktop";
 import { loadImageDimensions } from "@/shared/lib/imageUtils";
 import type { GddDocument } from "@/shared/types";
-import "@/shared/styles/LinkMenus.css";
-import "./BoardAssetsDialog.css";
 
 interface BoardAssetsDialogProps {
   open: boolean;
@@ -33,7 +32,7 @@ export function BoardAssetsDialog({
   onClose,
   onDeleteAsset,
   onUpdateAssetName,
-  onCopyAsset,
+  onCopyAsset
 }: BoardAssetsDialogProps) {
   const { t } = useLocale();
   const { navigateToHref } = useLinkContext();
@@ -48,9 +47,7 @@ export function BoardAssetsDialog({
 
   const assets = useMemo(() => {
     const entries = Object.values(doc.boardImages ?? {});
-    return entries.sort((a, b) =>
-      displayBoardImageAssetName(a).localeCompare(displayBoardImageAssetName(b))
-    );
+    return entries.sort((a, b) => displayBoardImageAssetName(a).localeCompare(displayBoardImageAssetName(b)));
   }, [doc.boardImages]);
 
   useEffect(() => {
@@ -182,12 +179,7 @@ export function BoardAssetsDialog({
                 <li key={asset.id} className="board-assets-item">
                   <div className="board-assets-item-row">
                     <div className="board-assets-thumb-wrap">
-                      <img
-                        className="board-assets-thumb"
-                        src={asset.src}
-                        alt=""
-                        draggable={false}
-                      />
+                      <img className="board-assets-thumb" src={asset.src} alt="" draggable={false} />
                     </div>
                     <div className="board-assets-meta">
                       {isRenaming ? (
@@ -245,27 +237,17 @@ export function BoardAssetsDialog({
                           type="button"
                           className={`board-assets-usage-btn ${refsOpen ? "active" : ""}`}
                           aria-expanded={refsOpen}
-                          onClick={() =>
-                            setExpandedRefsId(refsOpen ? null : asset.id)
-                          }
+                          onClick={() => setExpandedRefsId(refsOpen ? null : asset.id)}
                         >
                           {t("desk.imageAssetsUsage", { count: usage })}
                         </button>
                       ) : (
-                        <span className="board-assets-usage">
-                          {t("desk.imageAssetsUnused")}
-                        </span>
+                        <span className="board-assets-usage">{t("desk.imageAssetsUnused")}</span>
                       )}
                     </div>
                     <div className="board-assets-actions">
-                      <button
-                        type="button"
-                        className="btn btn-ghost"
-                        onClick={() => handleCopy(asset.id, asset.src)}
-                      >
-                        {copiedId === asset.id
-                          ? t("desk.imageAssetCopied")
-                          : t("desk.imageAssetCopy")}
+                      <button type="button" className="btn btn-ghost" onClick={() => handleCopy(asset.id, asset.src)}>
+                        {copiedId === asset.id ? t("desk.imageAssetCopied") : t("desk.imageAssetCopy")}
                       </button>
                       <button
                         type="button"
@@ -285,13 +267,9 @@ export function BoardAssetsDialog({
                           <button
                             type="button"
                             className="board-assets-ref-item"
-                            onClick={() =>
-                              goToReference(desk.sectionId, desk.itemId)
-                            }
+                            onClick={() => goToReference(desk.sectionId, desk.itemId)}
                           >
-                            <span className="board-assets-ref-title">
-                              {desk.sectionTitle}
-                            </span>
+                            <span className="board-assets-ref-title">{desk.sectionTitle}</span>
                           </button>
                         </li>
                       ))}

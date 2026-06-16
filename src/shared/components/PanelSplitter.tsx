@@ -6,13 +6,7 @@ interface PanelSplitterProps {
   onDoubleClick: () => void;
 }
 
-export function PanelSplitter({
-  edge,
-  hidden,
-  dragging,
-  onPointerDown,
-  onDoubleClick,
-}: PanelSplitterProps) {
+export function PanelSplitter({ edge, hidden, dragging, onPointerDown, onDoubleClick }: PanelSplitterProps) {
   const isStart = edge === "start";
   const label = isStart
     ? "Resize document panel. Double-click to hide or show."
@@ -26,11 +20,7 @@ export function PanelSplitter({
       aria-label={label}
       onPointerDown={onPointerDown}
       onDoubleClick={onDoubleClick}
-      title={
-        isStart
-          ? "Drag to resize · double-click to hide document"
-          : "Drag to resize · double-click to hide board"
-      }
+      title={isStart ? "Drag to resize · double-click to hide document" : "Drag to resize · double-click to hide board"}
     />
   );
 }

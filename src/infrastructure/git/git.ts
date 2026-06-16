@@ -1,6 +1,6 @@
 import { isDesktopApp } from "@/infrastructure/desktop/desktop";
+import { type GitSettings, loadGitSettings } from "@/infrastructure/git/gitSettings";
 import type { MessageKey } from "@/shared/i18n/messages";
-import { loadGitSettings, type GitSettings } from "@/infrastructure/git/gitSettings";
 
 export interface GitFileStatus {
   path: string;
@@ -56,14 +56,12 @@ export function gitIdentityForCommit(
   return { name, email };
 }
 
-export async function getGitIdentity(
-  folderPath: string
-): Promise<{ name: string; email: string }> {
+export async function getGitIdentity(folderPath: string): Promise<{ name: string; email: string }> {
   const api = requireGitApi();
   const result = await api.getIdentity(folderPath);
   return {
     name: result.name ?? "",
-    email: result.email ?? "",
+    email: result.email ?? ""
   };
 }
 
@@ -132,47 +130,33 @@ export async function pullGitChanges(
   return withGitProgress(() => api.pull(folderPath), onProgress);
 }
 
-export async function stashGitChanges(
-  folderPath: string
-): Promise<{ ok: boolean; stashed?: boolean; error?: string }> {
+export async function stashGitChanges(folderPath: string): Promise<{ ok: boolean; stashed?: boolean; error?: string }> {
   const api = requireGitApi();
   return api.stash(folderPath);
 }
 
-export async function discardGitProjectChanges(
-  folderPath: string
-): Promise<{ ok: boolean; error?: string }> {
+export async function discardGitProjectChanges(folderPath: string): Promise<{ ok: boolean; error?: string }> {
   const api = requireGitApi();
   return api.discardProject(folderPath);
 }
 
-export async function getGitRemote(
-  folderPath: string
-): Promise<string | null> {
+export async function getGitRemote(folderPath: string): Promise<string | null> {
   const api = requireGitApi();
   const result = await api.getRemote(folderPath);
-  return result.ok ? result.url ?? null : null;
+  return result.ok ? (result.url ?? null) : null;
 }
 
-export async function setGitRemote(
-  folderPath: string,
-  url: string
-): Promise<{ ok: boolean; error?: string }> {
+export async function setGitRemote(folderPath: string, url: string): Promise<{ ok: boolean; error?: string }> {
   const api = requireGitApi();
   return api.setRemote(folderPath, url);
 }
 
-export async function authenticateGitRemote(
-  folderPath: string
-): Promise<{ ok: boolean; error?: string }> {
+export async function authenticateGitRemote(folderPath: string): Promise<{ ok: boolean; error?: string }> {
   const api = requireGitApi();
   return api.authenticate(folderPath);
 }
 
-export async function storeGitAccessToken(
-  folderPath: string,
-  token: string
-): Promise<{ ok: boolean; error?: string }> {
+export async function storeGitAccessToken(folderPath: string, token: string): Promise<{ ok: boolean; error?: string }> {
   const api = requireGitApi();
   return api.storeToken(folderPath, token);
 }
@@ -189,13 +173,10 @@ const GIT_ERROR_KEYS: Record<string, MessageKey> = {
   push_rejected_pull_first: "git.pushRejectedPullFirst",
   no_initial_commit: "git.noInitialCommit",
   not_a_repo: "git.notARepo",
-  remote_branch_not_found: "git.remoteBranchNotFound",
+  remote_branch_not_found: "git.remoteBranchNotFound"
 };
 
-export function formatGitError(
-  code: string | undefined,
-  t: (key: MessageKey) => string
-): string {
+export function formatGitError(code: string | undefined, t: (key: MessageKey) => string): string {
   if (!code) return t("git.errorGeneric");
   const key = GIT_ERROR_KEYS[code];
   if (key) return t(key);

@@ -1,5 +1,5 @@
 import type { DeskSelection } from "@/domain/board/deskClipboard";
-import type { BoardShape, BoardStroke, BoardText, BoardItem } from "@/domain/types";
+import type { BoardItem, BoardShape, BoardStroke, BoardText } from "@/domain/types";
 
 type Direction = "forward" | "backward";
 
@@ -29,9 +29,7 @@ function reorderSelection<T extends { id: string }>(
   direction: Direction
 ): T[] {
   const idSet = new Set(ids);
-  const orderedIds = arr
-    .filter((item) => predicate(item) && idSet.has(item.id))
-    .map((item) => item.id);
+  const orderedIds = arr.filter((item) => predicate(item) && idSet.has(item.id)).map((item) => item.id);
 
   let result = arr;
   if (direction === "forward") {
@@ -54,9 +52,7 @@ function canMoveInSubset<T extends { id: string }>(
 ): boolean {
   const idSet = new Set(ids);
   const subset = arr.filter(predicate);
-  const indices = subset
-    .map((item, i) => (idSet.has(item.id) ? i : -1))
-    .filter((i) => i >= 0);
+  const indices = subset.map((item, i) => (idSet.has(item.id) ? i : -1)).filter((i) => i >= 0);
   if (indices.length === 0) return false;
   const min = Math.min(...indices);
   const max = Math.max(...indices);
@@ -89,12 +85,7 @@ export function reorderDeskLayer(
       shapes = reorderSelection(shapes, boxIds, (sh) => sh.type === "box", direction);
     }
     if (lineIds.length > 0) {
-      shapes = reorderSelection(
-        shapes,
-        lineIds,
-        (sh) => sh.type !== "box",
-        direction
-      );
+      shapes = reorderSelection(shapes, lineIds, (sh) => sh.type !== "box", direction);
     }
   }
 
@@ -109,26 +100,17 @@ export function reorderDeskLayer(
   return { items, shapes, texts, strokes };
 }
 
-export function canReorderDeskLayer(
-  state: DeskLayerState,
-  selection: DeskSelection,
-  direction: Direction
-): boolean {
+export function canReorderDeskLayer(state: DeskLayerState, selection: DeskSelection, direction: Direction): boolean {
   const { items, shapes, texts, strokes } = state;
   const shapeMap = new Map(shapes.map((s) => [s.id, s] as const));
   const boxIds = selection.shapeIds.filter((id) => shapeMap.get(id)?.type === "box");
   const lineIds = selection.shapeIds.filter((id) => shapeMap.get(id)?.type !== "box");
 
   return (
-    (selection.itemIds.length > 0 &&
-      canMoveInSubset(items, selection.itemIds, () => true, direction)) ||
-    (boxIds.length > 0 &&
-      canMoveInSubset(shapes, boxIds, (sh) => sh.type === "box", direction)) ||
-    (lineIds.length > 0 &&
-      canMoveInSubset(shapes, lineIds, (sh) => sh.type !== "box", direction)) ||
-    (selection.textIds.length > 0 &&
-      canMoveInSubset(texts, selection.textIds, () => true, direction)) ||
-    (selection.strokeIds.length > 0 &&
-      canMoveInSubset(strokes, selection.strokeIds, () => true, direction))
+    (selection.itemIds.length > 0 && canMoveInSubset(items, selection.itemIds, () => true, direction)) ||
+    (boxIds.length > 0 && canMoveInSubset(shapes, boxIds, (sh) => sh.type === "box", direction)) ||
+    (lineIds.length > 0 && canMoveInSubset(shapes, lineIds, (sh) => sh.type !== "box", direction)) ||
+    (selection.textIds.length > 0 && canMoveInSubset(texts, selection.textIds, () => true, direction)) ||
+    (selection.strokeIds.length > 0 && canMoveInSubset(strokes, selection.strokeIds, () => true, direction))
   );
 }

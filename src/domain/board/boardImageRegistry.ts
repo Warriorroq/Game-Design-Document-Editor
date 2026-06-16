@@ -23,8 +23,7 @@ export function boardImageContentKey(src: string): string {
   return src;
 }
 
-const MISSING_BOARD_IMAGE_SRC =
-  "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+const MISSING_BOARD_IMAGE_SRC = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
 export function resolveBoardItemSrc(doc: GddDocument, item: BoardItem): string {
   if (isBoardVideoItem(item)) {
@@ -36,10 +35,7 @@ export function resolveBoardItemSrc(doc: GddDocument, item: BoardItem): string {
   return MISSING_BOARD_IMAGE_SRC;
 }
 
-export function registerBoardImage(
-  doc: GddDocument,
-  src: string
-): { doc: GddDocument; assetId: string } {
+export function registerBoardImage(doc: GddDocument, src: string): { doc: GddDocument; assetId: string } {
   const key = boardImageContentKey(src);
   const images = { ...(doc.boardImages ?? {}) };
 
@@ -49,18 +45,13 @@ export function registerBoardImage(
     }
   }
 
-  const assetId = src.startsWith(`${ASSETS_DIR}/`)
-    ? assetIdFromAssetPath(src)
-    : crypto.randomUUID();
+  const assetId = src.startsWith(`${ASSETS_DIR}/`) ? assetIdFromAssetPath(src) : crypto.randomUUID();
 
   images[assetId] = { id: assetId, src };
   return { doc: { ...doc, boardImages: images }, assetId };
 }
 
-export function prepareBoardItemForDoc(
-  doc: GddDocument,
-  item: BoardItem
-): { doc: GddDocument; item: BoardItem } {
+export function prepareBoardItemForDoc(doc: GddDocument, item: BoardItem): { doc: GddDocument; item: BoardItem } {
   if (isBoardVideoItem(item)) {
     if (!item.src) {
       throw new Error(`Board video ${item.id} has no embed source`);
@@ -98,7 +89,9 @@ export function prepareBoardItemsForDoc(
 }
 
 export function migrateBoardImages(doc: GddDocument): GddDocument {
-  const images: Record<string, BoardImageAsset> = { ...(doc.boardImages ?? {}) };
+  const images: Record<string, BoardImageAsset> = {
+    ...(doc.boardImages ?? {})
+  };
   const contentToAssetId = new Map<string, string>();
 
   for (const asset of Object.values(images)) {
@@ -128,9 +121,7 @@ export function migrateBoardImages(doc: GddDocument): GddDocument {
       const key = boardImageContentKey(src);
       let assetId = contentToAssetId.get(key);
       if (!assetId) {
-        assetId = src.startsWith(`${ASSETS_DIR}/`)
-          ? assetIdFromAssetPath(src)
-          : crypto.randomUUID();
+        assetId = src.startsWith(`${ASSETS_DIR}/`) ? assetIdFromAssetPath(src) : crypto.randomUUID();
         images[assetId] = { id: assetId, src };
         contentToAssetId.set(key, assetId);
       }
@@ -138,7 +129,7 @@ export function migrateBoardImages(doc: GddDocument): GddDocument {
       changed = true;
       const { src: _legacy, ...rest } = item;
       return { ...rest, assetId };
-    }),
+    })
   }));
 
   if (!changed) return doc;
@@ -169,10 +160,7 @@ export function normalizeAssetName(input: string): string | null {
   return name;
 }
 
-export function listBoardImageAssetReferences(
-  doc: GddDocument,
-  assetId: string
-): BoardImageAssetReference[] {
+export function listBoardImageAssetReferences(doc: GddDocument, assetId: string): BoardImageAssetReference[] {
   const refs: BoardImageAssetReference[] = [];
   for (const section of doc.sections) {
     for (const item of section.board) {
@@ -180,7 +168,7 @@ export function listBoardImageAssetReferences(
         refs.push({
           sectionId: section.id,
           sectionTitle: section.title.trim() || section.id,
-          itemId: item.id,
+          itemId: item.id
         });
       }
     }
@@ -188,10 +176,7 @@ export function listBoardImageAssetReferences(
   return refs;
 }
 
-export function listBoardImageAssetDesks(
-  doc: GddDocument,
-  assetId: string
-): BoardImageAssetDeskReference[] {
+export function listBoardImageAssetDesks(doc: GddDocument, assetId: string): BoardImageAssetDeskReference[] {
   const bySection = new Map<string, BoardImageAssetDeskReference>();
   for (const section of doc.sections) {
     for (const item of section.board) {
@@ -200,7 +185,7 @@ export function listBoardImageAssetDesks(
         bySection.set(section.id, {
           sectionId: section.id,
           sectionTitle: section.title.trim() || section.id,
-          itemId: item.id,
+          itemId: item.id
         });
       }
     }
@@ -212,11 +197,7 @@ export function countBoardImageAssetUsage(doc: GddDocument, assetId: string): nu
   return listBoardImageAssetReferences(doc, assetId).length;
 }
 
-export function updateBoardImageAssetName(
-  doc: GddDocument,
-  assetId: string,
-  name: string
-): GddDocument {
+export function updateBoardImageAssetName(doc: GddDocument, assetId: string, name: string): GddDocument {
   const trimmed = name.trim();
   if (trimmed.length > 200) {
     throw new Error("INVALID_ASSET_NAME");
@@ -234,9 +215,9 @@ export function updateBoardImageAssetName(
       ...images,
       [assetId]: {
         ...asset,
-        name: nextName,
-      },
-    },
+        name: nextName
+      }
+    }
   };
 }
 
@@ -248,7 +229,7 @@ export function deleteBoardImageAsset(doc: GddDocument, assetId: string): GddDoc
   delete nextImages[assetId];
   return {
     ...doc,
-    boardImages: Object.keys(nextImages).length > 0 ? nextImages : undefined,
+    boardImages: Object.keys(nextImages).length > 0 ? nextImages : undefined
   };
 }
 
@@ -277,11 +258,7 @@ export function pruneUnusedBoardImages(doc: GddDocument): GddDocument {
   return { ...doc, boardImages: nextImages };
 }
 
-export function collectBoardImageAsset(
-  registry: Record<string, BoardImageAsset>,
-  assetId: string,
-  src: string
-): void {
+export function collectBoardImageAsset(registry: Record<string, BoardImageAsset>, assetId: string, src: string): void {
   if (!registry[assetId]) {
     registry[assetId] = { id: assetId, src };
   }

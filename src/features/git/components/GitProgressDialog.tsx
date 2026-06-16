@@ -1,7 +1,9 @@
+import "@/shared/styles/LinkMenus.css";
+
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+
 import { useLocale } from "@/shared/context/LocaleContext";
-import "@/shared/styles/LinkMenus.css";
 
 export type GitSyncOperation = "push" | "pull";
 
@@ -40,8 +42,7 @@ export function GitProgressDialog({ state, onClose }: GitProgressDialogProps) {
 
   if (!state) return null;
 
-  const title =
-    state.operation === "push" ? t("git.progressPush") : t("git.progressPull");
+  const title = state.operation === "push" ? t("git.progressPush") : t("git.progressPull");
 
   const statusLabel =
     state.status === "running"
@@ -51,10 +52,7 @@ export function GitProgressDialog({ state, onClose }: GitProgressDialogProps) {
         : t("git.progressFailed");
 
   const dialog = (
-    <div
-      className="link-dialog-backdrop"
-      onPointerDown={state.status === "running" ? undefined : onClose}
-    >
+    <div className="link-dialog-backdrop" onPointerDown={state.status === "running" ? undefined : onClose}>
       <div
         className="link-paste-dialog git-progress-dialog"
         role="dialog"
@@ -64,17 +62,10 @@ export function GitProgressDialog({ state, onClose }: GitProgressDialogProps) {
         <h3 id="git-progress-title" className="link-paste-title">
           {title}
         </h3>
-        <p
-          className={`git-progress-status git-progress-status--${state.status}`}
-        >
-          {statusLabel}
-        </p>
+        <p className={`git-progress-status git-progress-status--${state.status}`}>{statusLabel}</p>
         {state.percent !== null && state.status === "running" && (
           <div className="git-progress-bar" aria-hidden>
-            <div
-              className="git-progress-bar-fill"
-              style={{ width: `${Math.min(100, Math.max(0, state.percent))}%` }}
-            />
+            <div className="git-progress-bar-fill" style={{ width: `${Math.min(100, Math.max(0, state.percent))}%` }} />
           </div>
         )}
         {state.percent !== null && state.status === "running" && (
@@ -108,18 +99,4 @@ export function GitProgressDialog({ state, onClose }: GitProgressDialogProps) {
   );
 
   return createPortal(dialog, document.body);
-}
-
-export function parseGitProgressPercent(line: string): number | null {
-  const match = line.match(/(\d+)%/);
-  if (match) return Number(match[1]);
-
-  const ratio = line.match(/\((\d+)\/(\d+)\)/);
-  if (ratio) {
-    const current = Number(ratio[1]);
-    const total = Number(ratio[2]);
-    if (total > 0) return Math.round((current / total) * 100);
-  }
-
-  return null;
 }

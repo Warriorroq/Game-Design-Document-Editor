@@ -1,77 +1,63 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useBoardSize } from "@/shared/context/BoardSizeContext";
-import { useLocale } from "@/shared/context/LocaleContext";
-import { useShortcuts } from "@/shared/context/ShortcutsContext";
-import { useLinkContext } from "@/features/links/LinkContext";
+
+import { DEFAULT_VIDEO_HEIGHT, DEFAULT_VIDEO_WIDTH, isBoardVideoItem } from "@/domain/board/boardItem";
+import {
+  clamp,
+  DEFAULT_PLACE,
+  DEFAULT_TEXT_WIDTH,
+  isShapeTool,
+  PASTE_OFFSET,
+  shapeLongEnough,
+  ZOOM_INTENSITY
+} from "@/domain/board/deskDrawing";
+import { parseVideoEmbed } from "@/domain/board/videoEmbed";
+import type {
+  BoardDrawTool,
+  BoardGroup,
+  BoardItem,
+  BoardPoint,
+  BoardShape,
+  BoardShapeType,
+  BoardStroke,
+  BoardText
+} from "@/domain/types";
+import { snapBoardPoint } from "@/features/board/lib/boardGeometry";
+import { pointerAngleRad, rotationDeltaDeg, snapRotationAngle } from "@/features/board/lib/boardItemTransform";
+import {
+  appendPenPoint,
+  DEFAULT_PEN_COLOR,
+  DEFAULT_PEN_WIDTH,
+  penStrokeLongEnough
+} from "@/features/board/lib/boardPen";
+import {
+  BOARD_MAX_SCALE,
+  type BoardViewport,
+  constrainBoardViewport,
+  fitBoardViewport
+} from "@/features/board/lib/boardViewport";
 import {
   buildDeskClipboard,
-  pasteDeskClipboard,
   type DeskClipboard,
   type DeskSelection,
+  pasteDeskClipboard
 } from "@/features/board/lib/deskClipboard";
 import {
   applyDeskSelectClick,
   armDragAfterThreshold,
   groupsTouchingSelection,
   isSingleImageSelection,
-  selectionCount,
+  selectionCount
 } from "@/features/board/lib/deskGroups";
-import {
-  boardRectFromPoints,
-  selectionFromMarqueeRect,
-} from "@/features/board/lib/deskMarquee";
+import { canReorderDeskLayer } from "@/features/board/lib/deskLayerOrder";
+import { boardRectFromPoints, selectionFromMarqueeRect } from "@/features/board/lib/deskMarquee";
 import { translateStroke } from "@/features/board/lib/deskStrokeTransform";
 import { translateShapeForDrag } from "@/features/board/lib/deskTransform";
-import {
-  appendPenPoint,
-  DEFAULT_PEN_COLOR,
-  DEFAULT_PEN_WIDTH,
-  penStrokeLongEnough,
-} from "@/features/board/lib/boardPen";
-import {
-  DEFAULT_VIDEO_HEIGHT,
-  DEFAULT_VIDEO_WIDTH,
-  isBoardVideoItem,
-} from "@/domain/board/boardItem";
-import { parseVideoEmbed } from "@/domain/board/videoEmbed";
-import {
-  blobToDataUrl,
-  getImageFromClipboard,
-  loadImageDimensions,
-} from "@/shared/lib/imageUtils";
-import {
-  pointerAngleRad,
-  rotationDeltaDeg,
-  snapRotationAngle,
-} from "@/features/board/lib/boardItemTransform";
-import { snapBoardPoint } from "@/features/board/lib/boardGeometry";
-import { canReorderDeskLayer } from "@/features/board/lib/deskLayerOrder";
-import {
-  BOARD_MAX_SCALE,
-  constrainBoardViewport,
-  fitBoardViewport,
-  type BoardViewport,
-} from "@/features/board/lib/boardViewport";
+import { useLinkContext } from "@/features/links/LinkContext";
+import { useBoardSize } from "@/shared/context/BoardSizeContext";
+import { useLocale } from "@/shared/context/LocaleContext";
+import { useShortcuts } from "@/shared/context/ShortcutsContext";
+import { blobToDataUrl, getImageFromClipboard, loadImageDimensions } from "@/shared/lib/imageUtils";
 import { HIGHLIGHT_FLASH_MS } from "@/shared/lib/searchHighlight";
-import type {
-  BoardGroup,
-  BoardItem,
-  BoardPoint,
-  BoardDrawTool,
-  BoardShape,
-  BoardShapeType,
-  BoardStroke,
-  BoardText,
-} from "@/domain/types";
-import {
-  DEFAULT_PLACE,
-  DEFAULT_TEXT_WIDTH,
-  PASTE_OFFSET,
-  ZOOM_INTENSITY,
-  clamp,
-  isShapeTool,
-  shapeLongEnough,
-} from "@/domain/board/deskDrawing";
 
 interface ImageBoardProps {
   projectId: string;
@@ -96,11 +82,7 @@ interface ImageBoardProps {
   onUpdateStroke: (id: string, patch: Partial<BoardStroke>) => void;
   onRemoveStroke: (id: string) => void;
   onAddText: (text: BoardText) => void;
-  onUpdateText: (
-    id: string,
-    patch: Partial<BoardText>,
-    options?: { recordHistory?: boolean }
-  ) => void;
+  onUpdateText: (id: string, patch: Partial<BoardText>, options?: { recordHistory?: boolean }) => void;
   onRemoveText: (id: string) => void;
   onAddGroup: (group: BoardGroup) => void;
   onRemoveGroup: (groupId: string) => void;
@@ -111,16 +93,8 @@ interface ImageBoardProps {
     strokes: BoardStroke[];
     groups: BoardGroup[];
   }) => void;
-  onRemoveSelection: (
-    itemIds: string[],
-    shapeIds: string[],
-    textIds: string[],
-    strokeIds: string[]
-  ) => void;
-  onReorderLayer: (
-    selection: DeskSelection,
-    direction: "forward" | "backward"
-  ) => void;
+  onRemoveSelection: (itemIds: string[], shapeIds: string[], textIds: string[], strokeIds: string[]) => void;
+  onReorderLayer: (selection: DeskSelection, direction: "forward" | "backward") => void;
   onBeginTransientEdit?: () => void;
   onEndTransientEdit?: () => void;
   resolveItemSrc: (item: BoardItem) => string;
@@ -128,12 +102,11 @@ interface ImageBoardProps {
   onStoreDeskClipboard: (clip: DeskClipboard | null) => void;
 }
 
-
 const EMPTY_SELECTION: DeskSelection = {
   itemIds: [],
   shapeIds: [],
   textIds: [],
-  strokeIds: [],
+  strokeIds: []
 };
 
 export function useImageBoard({
@@ -170,7 +143,7 @@ export function useImageBoard({
   onEndTransientEdit,
   resolveItemSrc,
   deskClipboard,
-  onStoreDeskClipboard,
+  onStoreDeskClipboard
 }: ImageBoardProps) {
   const { t } = useLocale();
   const { width: canvasWidth, height: canvasHeight } = useBoardSize();
@@ -218,15 +191,13 @@ export function useImageBoard({
     start: BoardPoint;
     end: BoardPoint;
   } | null>(null);
-  const [deskMenu, setDeskMenu] = useState<{ x: number; y: number } | null>(
-    null
-  );
+  const [deskMenu, setDeskMenu] = useState<{ x: number; y: number } | null>(null);
   const [pasteHint, setPasteHint] = useState(false);
   const [editingTextId, setEditingTextId] = useState<string | null>(null);
   const [viewport, setViewport] = useState<BoardViewport>({
     scale: 1,
     panX: 0,
-    panY: 0,
+    panY: 0
   });
   const viewportRef = useRef(viewport);
   viewportRef.current = viewport;
@@ -235,33 +206,14 @@ export function useImageBoard({
   const onBoardViewportChangeRef = useRef(onBoardViewportChange);
   onBoardViewportChangeRef.current = onBoardViewportChange;
 
-  const selectedShapeIds = useMemo(
-    () => new Set(selection.shapeIds),
-    [selection.shapeIds]
-  );
-  const selectedItemSet = useMemo(
-    () => new Set(selection.itemIds),
-    [selection.itemIds]
-  );
-  const selectedTextIds = useMemo(
-    () => new Set(selection.textIds),
-    [selection.textIds]
-  );
-  const selectedStrokeIds = useMemo(
-    () => new Set(selection.strokeIds),
-    [selection.strokeIds]
-  );
-  const boxShapes = useMemo(
-    () => shapes.filter((shape) => shape.type === "box"),
-    [shapes]
-  );
-  const lineShapes = useMemo(
-    () => shapes.filter((shape) => shape.type !== "box"),
-    [shapes]
-  );
+  const selectedShapeIds = useMemo(() => new Set(selection.shapeIds), [selection.shapeIds]);
+  const selectedItemSet = useMemo(() => new Set(selection.itemIds), [selection.itemIds]);
+  const selectedTextIds = useMemo(() => new Set(selection.textIds), [selection.textIds]);
+  const selectedStrokeIds = useMemo(() => new Set(selection.strokeIds), [selection.strokeIds]);
+  const boxShapes = useMemo(() => shapes.filter((shape) => shape.type === "box"), [shapes]);
+  const lineShapes = useMemo(() => shapes.filter((shape) => shape.type !== "box"), [shapes]);
   const boxDrawPreview = drawPreview?.type === "box" ? drawPreview : null;
-  const lineDrawPreview =
-    drawPreview && drawPreview.type !== "box" ? drawPreview : null;
+  const lineDrawPreview = drawPreview && drawPreview.type !== "box" ? drawPreview : null;
   const selectionSize = selectionCount(selection);
   const penMode = activeTool === "pen";
   const isDrawing = activeTool !== null;
@@ -294,7 +246,7 @@ export function useImageBoard({
       item: (id: string) => Boolean(itemMap.get(id)?.locked),
       shape: (id: string) => Boolean(shapeMap.get(id)?.locked),
       text: (id: string) => Boolean(textMap.get(id)?.locked),
-      stroke: (id: string) => Boolean(strokeMap.get(id)?.locked),
+      stroke: (id: string) => Boolean(strokeMap.get(id)?.locked)
     };
   }, [items, shapes, texts, strokes]);
 
@@ -303,7 +255,7 @@ export function useImageBoard({
       ...selection.itemIds.map((id) => ({ kind: "item" as const, id })),
       ...selection.shapeIds.map((id) => ({ kind: "shape" as const, id })),
       ...selection.textIds.map((id) => ({ kind: "text" as const, id })),
-      ...selection.strokeIds.map((id) => ({ kind: "stroke" as const, id })),
+      ...selection.strokeIds.map((id) => ({ kind: "stroke" as const, id }))
     ];
     const total = selectedIds.length;
     const locked = selectedIds.filter(({ kind, id }) => isSelectionLocked[kind](id)).length;
@@ -317,34 +269,18 @@ export function useImageBoard({
   }, []);
 
   const copyDesk = useCallback(() => {
-    const clip = buildDeskClipboard(
-      items,
-      shapes,
-      texts,
-      strokes,
-      groups,
-      selection
-    );
+    const clip = buildDeskClipboard(items, shapes, texts, strokes, groups, selection);
     if (!clip) return;
     onStoreDeskClipboard({
       ...clip,
       items: clip.items.map((item) => ({
         ...item,
-        src: resolveItemSrc(item),
-      })),
+        src: resolveItemSrc(item)
+      }))
     });
     // Replace any stale image in the system clipboard so paste prefers desk content.
     void navigator.clipboard.writeText("").catch(() => {});
-  }, [
-    items,
-    shapes,
-    texts,
-    strokes,
-    groups,
-    selection,
-    onStoreDeskClipboard,
-    resolveItemSrc,
-  ]);
+  }, [items, shapes, texts, strokes, groups, selection, onStoreDeskClipboard, resolveItemSrc]);
 
   const pasteDesk = useCallback(() => {
     if (!deskClipboard) return;
@@ -354,7 +290,7 @@ export function useImageBoard({
       shapes: result.shapes,
       texts: result.texts,
       strokes: result.strokes,
-      groups: result.groups,
+      groups: result.groups
     });
     setSelection(result.selection);
     surfaceRef.current?.focus();
@@ -367,7 +303,7 @@ export function useImageBoard({
       memberItemIds: [...selection.itemIds],
       memberShapeIds: [...selection.shapeIds],
       memberTextIds: [...selection.textIds],
-      memberStrokeIds: [...selection.strokeIds],
+      memberStrokeIds: [...selection.strokeIds]
     });
   }, [onAddGroup, selection, selectionSize]);
 
@@ -387,10 +323,7 @@ export function useImageBoard({
   );
 
   const applyTextStyle = useCallback(
-    (
-      textIds: string[],
-      patch: Pick<BoardText, "bold" | "italic" | "strikethrough">
-    ) => {
+    (textIds: string[], patch: Pick<BoardText, "bold" | "italic" | "strikethrough">) => {
       for (const id of textIds) {
         onUpdateText(id, patch, { recordHistory: true });
       }
@@ -413,12 +346,7 @@ export function useImageBoard({
     const shapeIds = selection.shapeIds.filter((id) => !isSelectionLocked.shape(id));
     const textIds = selection.textIds.filter((id) => !isSelectionLocked.text(id));
     const strokeIds = selection.strokeIds.filter((id) => !isSelectionLocked.stroke(id));
-    if (
-      itemIds.length === 0 &&
-      shapeIds.length === 0 &&
-      textIds.length === 0 &&
-      strokeIds.length === 0
-    ) {
+    if (itemIds.length === 0 && shapeIds.length === 0 && textIds.length === 0 && strokeIds.length === 0) {
       return;
     }
     onRemoveSelection(itemIds, shapeIds, textIds, strokeIds);
@@ -426,14 +354,9 @@ export function useImageBoard({
       itemIds: selection.itemIds.filter((id) => isSelectionLocked.item(id)),
       shapeIds: selection.shapeIds.filter((id) => isSelectionLocked.shape(id)),
       textIds: selection.textIds.filter((id) => isSelectionLocked.text(id)),
-      strokeIds: selection.strokeIds.filter((id) => isSelectionLocked.stroke(id)),
+      strokeIds: selection.strokeIds.filter((id) => isSelectionLocked.stroke(id))
     });
-  }, [
-    onRemoveSelection,
-    selection,
-    selectionSize,
-    isSelectionLocked,
-  ]);
+  }, [onRemoveSelection, selection, selectionSize, isSelectionLocked]);
 
   const lockSelection = useCallback(() => {
     for (const id of selection.itemIds) onUpdate(id, { locked: true });
@@ -449,10 +372,7 @@ export function useImageBoard({
     for (const id of selection.strokeIds) onUpdateStroke(id, { locked: false });
   }, [selection, onUpdate, onUpdateShape, onUpdateText, onUpdateStroke]);
 
-  const deskLayerState = useMemo(
-    () => ({ items, shapes, texts, strokes }),
-    [items, shapes, texts, strokes]
-  );
+  const deskLayerState = useMemo(() => ({ items, shapes, texts, strokes }), [items, shapes, texts, strokes]);
 
   const singleImageSelection = useMemo(
     () => (isSingleImageSelection(selection) ? selection.itemIds[0]! : null),
@@ -466,23 +386,19 @@ export function useImageBoard({
             itemIds: [singleImageSelection],
             shapeIds: [],
             textIds: [],
-            strokeIds: [],
+            strokeIds: []
           }
         : EMPTY_SELECTION,
     [singleImageSelection]
   );
 
   const canBringForward = useMemo(
-    () =>
-      singleImageSelection !== null &&
-      canReorderDeskLayer(deskLayerState, singleImageLayerSelection, "forward"),
+    () => singleImageSelection !== null && canReorderDeskLayer(deskLayerState, singleImageLayerSelection, "forward"),
     [deskLayerState, singleImageLayerSelection, singleImageSelection]
   );
 
   const canSendBackward = useMemo(
-    () =>
-      singleImageSelection !== null &&
-      canReorderDeskLayer(deskLayerState, singleImageLayerSelection, "backward"),
+    () => singleImageSelection !== null && canReorderDeskLayer(deskLayerState, singleImageLayerSelection, "backward"),
     [deskLayerState, singleImageLayerSelection, singleImageSelection]
   );
 
@@ -496,22 +412,12 @@ export function useImageBoard({
   const bringSelectionForward = useCallback(() => {
     if (!canBringForward || !singleImageSelection) return;
     onReorderLayer(singleImageLayerSelection, "forward");
-  }, [
-    canBringForward,
-    onReorderLayer,
-    singleImageLayerSelection,
-    singleImageSelection,
-  ]);
+  }, [canBringForward, onReorderLayer, singleImageLayerSelection, singleImageSelection]);
 
   const sendSelectionBackward = useCallback(() => {
     if (!canSendBackward || !singleImageSelection) return;
     onReorderLayer(singleImageLayerSelection, "backward");
-  }, [
-    canSendBackward,
-    onReorderLayer,
-    singleImageLayerSelection,
-    singleImageSelection,
-  ]);
+  }, [canSendBackward, onReorderLayer, singleImageLayerSelection, singleImageSelection]);
 
   const flipSelectionHorizontal = useCallback(() => {
     if (!singleImageSelection || isSelectionLocked.item(singleImageSelection)) return;
@@ -539,21 +445,19 @@ export function useImageBoard({
             id: "desk.copy",
             label: t("menu.copy"),
             onClick: copyDesk,
-            disabled: selectionCount(nextSelection) === 0,
+            disabled: selectionCount(nextSelection) === 0
           },
           {
             id: "desk.lock",
             label: t("desk.lock"),
             onClick: lockSelection,
-            disabled:
-              selectionCount(nextSelection) === 0 || selectionLockSummary.unlocked === 0,
+            disabled: selectionCount(nextSelection) === 0 || selectionLockSummary.unlocked === 0
           },
           {
             id: "desk.unlock",
             label: t("desk.unlock"),
             onClick: unlockSelection,
-            disabled:
-              selectionCount(nextSelection) === 0 || selectionLockSummary.locked === 0,
+            disabled: selectionCount(nextSelection) === 0 || selectionLockSummary.locked === 0
           },
           ...(isSingleImageSelection(nextSelection)
             ? [
@@ -567,10 +471,10 @@ export function useImageBoard({
                       itemIds: [nextSelection.itemIds[0]!],
                       shapeIds: [],
                       textIds: [],
-                      strokeIds: [],
+                      strokeIds: []
                     },
                     "forward"
-                  ),
+                  )
                 },
                 {
                   id: "desk.sendBackward",
@@ -582,26 +486,26 @@ export function useImageBoard({
                       itemIds: [nextSelection.itemIds[0]!],
                       shapeIds: [],
                       textIds: [],
-                      strokeIds: [],
+                      strokeIds: []
                     },
                     "backward"
-                  ),
+                  )
                 },
                 {
                   id: "desk.flipHorizontal",
                   label: t("desk.flipHorizontal"),
                   onClick: flipSelectionHorizontal,
-                  disabled: isSelectionLocked.item(nextSelection.itemIds[0]!),
+                  disabled: isSelectionLocked.item(nextSelection.itemIds[0]!)
                 },
                 {
                   id: "desk.flipVertical",
                   label: t("desk.flipVertical"),
                   onClick: flipSelectionVertical,
-                  disabled: isSelectionLocked.item(nextSelection.itemIds[0]!),
-                },
+                  disabled: isSelectionLocked.item(nextSelection.itemIds[0]!)
+                }
               ]
-            : []),
-        ],
+            : [])
+        ]
       });
     },
     [
@@ -617,7 +521,7 @@ export function useImageBoard({
       selectionLockSummary.unlocked,
       sendSelectionBackward,
       t,
-      unlockSelection,
+      unlockSelection
     ]
   );
 
@@ -638,7 +542,7 @@ export function useImageBoard({
       if (!rect) return { x: 0, y: 0 };
       return {
         x: (clientX - rect.left - viewport.panX) / viewport.scale,
-        y: (clientY - rect.top - viewport.panY) / viewport.scale,
+        y: (clientY - rect.top - viewport.panY) / viewport.scale
       };
     },
     [viewport.panX, viewport.panY, viewport.scale]
@@ -652,7 +556,12 @@ export function useImageBoard({
       return;
     }
 
-    setSelection({ itemIds: [item.id], shapeIds: [], textIds: [], strokeIds: [] });
+    setSelection({
+      itemIds: [item.id],
+      shapeIds: [],
+      textIds: [],
+      strokeIds: []
+    });
     const { w, h } = surfaceSizeRef.current;
     if (w > 0 && h > 0) {
       setViewport((v) => {
@@ -663,7 +572,7 @@ export function useImageBoard({
           {
             scale,
             panX: w / 2 - cx * scale,
-            panY: h / 2 - cy * scale,
+            panY: h / 2 - cy * scale
           },
           w,
           h,
@@ -685,7 +594,12 @@ export function useImageBoard({
       return;
     }
 
-    setSelection({ itemIds: [], shapeIds: [], textIds: [text.id], strokeIds: [] });
+    setSelection({
+      itemIds: [],
+      shapeIds: [],
+      textIds: [text.id],
+      strokeIds: []
+    });
     const { w, h } = surfaceSizeRef.current;
     if (w > 0 && h > 0) {
       setViewport((v) => {
@@ -696,7 +610,7 @@ export function useImageBoard({
           {
             scale,
             panX: w / 2 - cx * scale,
-            panY: h / 2 - cy * scale,
+            panY: h / 2 - cy * scale
           },
           w,
           h,
@@ -715,7 +629,7 @@ export function useImageBoard({
     const n = pasteCount.current++;
     return {
       x: base.x + (n % 6) * PASTE_OFFSET,
-      y: base.y + Math.floor(n / 6) * PASTE_OFFSET,
+      y: base.y + Math.floor(n / 6) * PASTE_OFFSET
     };
   }, []);
 
@@ -736,7 +650,7 @@ export function useImageBoard({
         x: Math.max(0, Math.min(pos.x, canvasWidth - width)),
         y: Math.max(0, Math.min(pos.y, canvasHeight - height)),
         width,
-        height,
+        height
       });
       setSelection({ itemIds: [id], shapeIds: [], textIds: [], strokeIds: [] });
       setPasteHint(false);
@@ -763,7 +677,7 @@ export function useImageBoard({
         x: Math.max(0, Math.min(pos.x, canvasWidth - width)),
         y: Math.max(0, Math.min(pos.y, canvasHeight - height)),
         width,
-        height,
+        height
       });
       setSelection({ itemIds: [id], shapeIds: [], textIds: [], strokeIds: [] });
       setPasteHint(false);
@@ -799,9 +713,7 @@ export function useImageBoard({
   const handleDrop = useCallback(
     async (e: React.DragEvent) => {
       e.preventDefault();
-      const file = [...e.dataTransfer.files].find((f) =>
-        f.type.startsWith("image/")
-      );
+      const file = [...e.dataTransfer.files].find((f) => f.type.startsWith("image/"));
       if (!file) return;
       const world = screenToWorld(e.clientX, e.clientY);
       await placeImage(file, { x: world.x - 40, y: world.y - 40 });
@@ -823,16 +735,13 @@ export function useImageBoard({
         const worldY = (mouseY - v.panY) / v.scale;
         const factor = Math.exp(-e.deltaY * ZOOM_INTENSITY);
         const { w, h } = surfaceSizeRef.current;
-        const minScale =
-          w > 0 && h > 0
-            ? Math.max(w / canvasWidth, h / canvasHeight)
-            : 0.15;
+        const minScale = w > 0 && h > 0 ? Math.max(w / canvasWidth, h / canvasHeight) : 0.15;
         const nextScale = clamp(v.scale * factor, minScale, BOARD_MAX_SCALE);
 
         return {
           scale: nextScale,
           panX: mouseX - worldX * nextScale,
-          panY: mouseY - worldY * nextScale,
+          panY: mouseY - worldY * nextScale
         };
       });
     },
@@ -847,9 +756,7 @@ export function useImageBoard({
       const w = el.clientWidth;
       const h = el.clientHeight;
       surfaceSizeRef.current = { w, h };
-      setViewport((v) =>
-        constrainBoardViewport(v, w, h, canvasWidth, canvasHeight)
-      );
+      setViewport((v) => constrainBoardViewport(v, w, h, canvasWidth, canvasHeight));
     };
 
     syncSize();
@@ -871,19 +778,8 @@ export function useImageBoard({
     const saved = savedBoardViewportRef.current;
     setViewport(
       saved
-        ? constrainBoardViewport(
-            saved,
-            el.clientWidth,
-            el.clientHeight,
-            canvasWidth,
-            canvasHeight
-          )
-        : fitBoardViewport(
-            el.clientWidth,
-            el.clientHeight,
-            canvasWidth,
-            canvasHeight
-          )
+        ? constrainBoardViewport(saved, el.clientWidth, el.clientHeight, canvasWidth, canvasHeight)
+        : fitBoardViewport(el.clientWidth, el.clientHeight, canvasWidth, canvasHeight)
     );
     clearSelection();
   }, [projectId, sectionId, canvasWidth, canvasHeight, clearSelection]);
@@ -906,11 +802,7 @@ export function useImageBoard({
     const onKey = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement).tagName;
       const target = e.target as HTMLElement;
-      if (
-        tag === "INPUT" ||
-        tag === "TEXTAREA" ||
-        target.isContentEditable
-      ) {
+      if (tag === "INPUT" || tag === "TEXTAREA" || target.isContentEditable) {
         return;
       }
 
@@ -983,7 +875,7 @@ export function useImageBoard({
     isDeskFocused,
     selectionSize,
     ungroupSelection,
-    editingTextId,
+    editingTextId
   ]);
 
   const commitDraw = useCallback(
@@ -996,9 +888,14 @@ export function useImageBoard({
           id,
           type: session.type,
           start: session.start,
-          end,
+          end
         });
-        setSelection({ itemIds: [], shapeIds: [id], textIds: [], strokeIds: [] });
+        setSelection({
+          itemIds: [],
+          shapeIds: [id],
+          textIds: [],
+          strokeIds: []
+        });
       }
       drawSession.current = null;
       setDrawPreview(null);
@@ -1019,7 +916,7 @@ export function useImageBoard({
       id,
       points: session.points,
       color: penColor,
-      width: penWidth,
+      width: penWidth
     });
     penSession.current = null;
     setPenPreview(null);
@@ -1029,10 +926,7 @@ export function useImageBoard({
     onEndTransientEdit?.();
   }, [onEndTransientEdit]);
 
-  const startMultiDrag = (
-    e: React.PointerEvent,
-    activeSelection: DeskSelection
-  ) => {
+  const startMultiDrag = (e: React.PointerEvent, activeSelection: DeskSelection) => {
     const hasUnlocked =
       activeSelection.itemIds.some((id) => !isSelectionLocked.item(id)) ||
       activeSelection.shapeIds.some((id) => !isSelectionLocked.shape(id)) ||
@@ -1045,9 +939,7 @@ export function useImageBoard({
     const scale = viewport.scale;
     const startX = e.clientX;
     const startY = e.clientY;
-    const movedItems = new Set(
-      activeSelection.itemIds.filter((id) => !isSelectionLocked.item(id))
-    );
+    const movedItems = new Set(activeSelection.itemIds.filter((id) => !isSelectionLocked.item(id)));
 
     const itemOrigins = activeSelection.itemIds
       .filter((id) => !isSelectionLocked.item(id))
@@ -1078,7 +970,7 @@ export function useImageBoard({
       for (const orig of itemOrigins) {
         onUpdate(orig.id, {
           x: Math.max(0, orig.x + dx),
-          y: Math.max(0, orig.y + dy),
+          y: Math.max(0, orig.y + dy)
         });
       }
       for (const orig of shapeOrigins) {
@@ -1087,7 +979,7 @@ export function useImageBoard({
       for (const orig of textOrigins) {
         onUpdateText(orig.id, {
           x: Math.max(0, orig.x + dx),
-          y: Math.max(0, orig.y + dy),
+          y: Math.max(0, orig.y + dy)
         });
       }
       for (const orig of strokeOrigins) {
@@ -1112,7 +1004,7 @@ export function useImageBoard({
         onRemoveText(textId);
         setSelection((prev) => ({
           ...prev,
-          textIds: prev.textIds.filter((id) => id !== textId),
+          textIds: prev.textIds.filter((id) => id !== textId)
         }));
         return;
       }
@@ -1129,18 +1021,14 @@ export function useImageBoard({
       content: "Text",
       x: Math.max(0, pos.x),
       y: Math.max(0, pos.y),
-      width: DEFAULT_TEXT_WIDTH,
+      width: DEFAULT_TEXT_WIDTH
     });
     setSelection({ itemIds: [], shapeIds: [], textIds: [id], strokeIds: [] });
     setEditingTextId(id);
     surfaceRef.current?.focus();
   }, [onAddText]);
 
-  const startTextDrag = (
-    e: React.PointerEvent,
-    text: BoardText,
-    activeSelection: DeskSelection
-  ) => {
+  const startTextDrag = (e: React.PointerEvent, text: BoardText, activeSelection: DeskSelection) => {
     if (selectionCount(activeSelection) > 1) {
       startMultiDrag(e, activeSelection);
       return;
@@ -1157,7 +1045,7 @@ export function useImageBoard({
       const dy = (ev.clientY - startY) / scale;
       onUpdateText(text.id, {
         x: Math.max(0, orig.x + dx),
-        y: Math.max(0, orig.y + dy),
+        y: Math.max(0, orig.y + dy)
       });
     };
 
@@ -1171,23 +1059,14 @@ export function useImageBoard({
     window.addEventListener("pointerup", onUp);
   };
 
-  const handleTextPointerDown = (
-    e: React.PointerEvent,
-    text: BoardText
-  ) => {
+  const handleTextPointerDown = (e: React.PointerEvent, text: BoardText) => {
     if (text.locked) return;
     if (isDrawing && e.button === 0) return;
     e.stopPropagation();
     e.preventDefault();
     if (editingTextId === text.id) return;
 
-    const next = applyDeskSelectClick(
-      "text",
-      text.id,
-      e.shiftKey,
-      selection,
-      groups
-    );
+    const next = applyDeskSelectClick("text", text.id, e.shiftKey, selection, groups);
     setSelection(next);
     armDragAfterThreshold(e, () => startTextDrag(e, text, next));
   };
@@ -1199,10 +1078,7 @@ export function useImageBoard({
     activeSelection: DeskSelection
   ) => {
     if (item.locked) return;
-    if (
-      mode === "move" &&
-      selectionCount(activeSelection) > 1
-    ) {
+    if (mode === "move" && selectionCount(activeSelection) > 1) {
       startMultiDrag(e, activeSelection);
       return;
     }
@@ -1221,12 +1097,12 @@ export function useImageBoard({
       if (mode === "move") {
         onUpdate(item.id, {
           x: Math.max(0, orig.x + dx),
-          y: Math.max(0, orig.y + dy),
+          y: Math.max(0, orig.y + dy)
         });
       } else {
         onUpdate(item.id, {
           width: Math.max(80, orig.width + dx),
-          height: Math.max(60, orig.height + dy),
+          height: Math.max(60, orig.height + dy)
         });
       }
     };
@@ -1241,11 +1117,7 @@ export function useImageBoard({
     window.addEventListener("pointerup", onUp);
   };
 
-  const startShapeBodyDrag = (
-    e: React.PointerEvent,
-    shapeId: string,
-    activeSelection: DeskSelection
-  ) => {
+  const startShapeBodyDrag = (e: React.PointerEvent, shapeId: string, activeSelection: DeskSelection) => {
     const lockedShape = shapes.find((s) => s.id === shapeId)?.locked;
     if (lockedShape) return;
     if (selectionCount(activeSelection) > 1) {
@@ -1291,12 +1163,7 @@ export function useImageBoard({
     const centerY = item.y + item.height / 2;
     const origRotation = item.rotation ?? 0;
     const startWorld = screenToWorld(e.clientX, e.clientY);
-    const startRad = pointerAngleRad(
-      centerX,
-      centerY,
-      startWorld.x,
-      startWorld.y
-    );
+    const startRad = pointerAngleRad(centerX, centerY, startWorld.x, startWorld.y);
 
     const rotationAt = (clientX: number, clientY: number) => {
       const world = screenToWorld(clientX, clientY);
@@ -1310,7 +1177,7 @@ export function useImageBoard({
 
     const onUp = (ev: PointerEvent) => {
       onUpdate(item.id, {
-        rotation: snapRotationAngle(rotationAt(ev.clientX, ev.clientY)),
+        rotation: snapRotationAngle(rotationAt(ev.clientX, ev.clientY))
       });
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
@@ -1321,23 +1188,13 @@ export function useImageBoard({
     window.addEventListener("pointerup", onUp);
   };
 
-  const handleItemPointerDown = (
-    e: React.PointerEvent,
-    item: BoardItem,
-    mode: "move" | "resize"
-  ) => {
+  const handleItemPointerDown = (e: React.PointerEvent, item: BoardItem, mode: "move" | "resize") => {
     if (item.locked) return;
     if (isDrawing && e.button === 0) return;
     e.stopPropagation();
     e.preventDefault();
 
-    const next = applyDeskSelectClick(
-      "item",
-      item.id,
-      e.shiftKey,
-      selection,
-      groups
-    );
+    const next = applyDeskSelectClick("item", item.id, e.shiftKey, selection, groups);
     setSelection(next);
 
     const startDrag = () => {
@@ -1356,23 +1213,14 @@ export function useImageBoard({
     startDrag();
   };
 
-  const handleShapePointerDown = (
-    e: React.PointerEvent,
-    shapeId: string
-  ) => {
+  const handleShapePointerDown = (e: React.PointerEvent, shapeId: string) => {
     const lockedShape = shapes.find((s) => s.id === shapeId)?.locked;
     if (lockedShape) return;
     if (isDrawing && e.button === 0) return;
     e.stopPropagation();
     e.preventDefault();
 
-    const next = applyDeskSelectClick(
-      "shape",
-      shapeId,
-      e.shiftKey,
-      selection,
-      groups
-    );
+    const next = applyDeskSelectClick("shape", shapeId, e.shiftKey, selection, groups);
     setSelection(next);
 
     const startDrag = () => {
@@ -1391,11 +1239,7 @@ export function useImageBoard({
     startDrag();
   };
 
-  const startStrokeDrag = (
-    e: React.PointerEvent,
-    strokeId: string,
-    activeSelection: DeskSelection
-  ) => {
+  const startStrokeDrag = (e: React.PointerEvent, strokeId: string, activeSelection: DeskSelection) => {
     const lockedStroke = strokes.find((s) => s.id === strokeId)?.locked;
     if (lockedStroke) return;
     if (selectionCount(activeSelection) > 1) {
@@ -1428,23 +1272,14 @@ export function useImageBoard({
     window.addEventListener("pointerup", onUp);
   };
 
-  const handleStrokePointerDown = (
-    e: React.PointerEvent,
-    strokeId: string
-  ) => {
+  const handleStrokePointerDown = (e: React.PointerEvent, strokeId: string) => {
     const lockedStroke = strokes.find((s) => s.id === strokeId)?.locked;
     if (lockedStroke) return;
     if (isDrawing && e.button === 0) return;
     e.stopPropagation();
     e.preventDefault();
 
-    const next = applyDeskSelectClick(
-      "stroke",
-      strokeId,
-      e.shiftKey,
-      selection,
-      groups
-    );
+    const next = applyDeskSelectClick("stroke", strokeId, e.shiftKey, selection, groups);
     setSelection(next);
 
     const startDrag = () => startStrokeDrag(e, strokeId, next);
@@ -1457,17 +1292,18 @@ export function useImageBoard({
     startDrag();
   };
 
-  const startEndpointDrag = (
-    e: React.PointerEvent,
-    shapeId: string,
-    endpoint: "start" | "end"
-  ) => {
+  const startEndpointDrag = (e: React.PointerEvent, shapeId: string, endpoint: "start" | "end") => {
     const lockedShape = shapes.find((s) => s.id === shapeId)?.locked;
     if (lockedShape) return;
     if (isDrawing && e.button === 0) return;
     e.preventDefault();
     e.stopPropagation();
-    setSelection({ itemIds: [], shapeIds: [shapeId], textIds: [], strokeIds: [] });
+    setSelection({
+      itemIds: [],
+      shapeIds: [shapeId],
+      textIds: [],
+      strokeIds: []
+    });
 
     const shape = shapes.find((s) => s.id === shapeId);
     if (!shape) return;
@@ -1537,11 +1373,7 @@ export function useImageBoard({
       return;
     }
 
-    if (
-      target.closest(".board-item") ||
-      target.closest(".board-shape-handle") ||
-      target.closest(".board-text")
-    ) {
+    if (target.closest(".board-item") || target.closest(".board-shape-handle") || target.closest(".board-text")) {
       return;
     }
     e.preventDefault();
@@ -1550,11 +1382,11 @@ export function useImageBoard({
   const isPanBlocker = (target: HTMLElement) =>
     Boolean(
       target.closest(".board-item") ||
-        target.closest(".board-shape-handle") ||
-        target.closest(".board-text") ||
-        target.closest(".board-stroke") ||
-        target.closest(".board-item-rotate") ||
-        target.closest(".board-item-resize")
+      target.closest(".board-shape-handle") ||
+      target.closest(".board-text") ||
+      target.closest(".board-stroke") ||
+      target.closest(".board-item-rotate") ||
+      target.closest(".board-item-resize")
     );
 
   const startPanSession = (e: React.PointerEvent) => {
@@ -1564,7 +1396,7 @@ export function useImageBoard({
       origPanX: viewport.panX,
       origPanY: viewport.panY,
       moved: false,
-      button: e.button,
+      button: e.button
     };
     surfaceRef.current?.setPointerCapture(e.pointerId);
   };
@@ -1599,15 +1431,7 @@ export function useImageBoard({
 
       return false;
     },
-    [
-      isDrawing,
-      activeTool,
-      screenToWorld,
-      penColor,
-      penWidth,
-      clearSelection,
-      items,
-    ]
+    [isDrawing, activeTool, screenToWorld, penColor, penWidth, clearSelection, items]
   );
 
   const onSurfacePointerDownCapture = (e: React.PointerEvent) => {
@@ -1621,10 +1445,7 @@ export function useImageBoard({
     const target = e.target as HTMLElement;
     const onCanvas = Boolean(target.closest(".board-canvas"));
 
-    if (
-      e.button === 1 ||
-      (e.button === 0 && spaceHeld.current && onCanvas)
-    ) {
+    if (e.button === 1 || (e.button === 0 && spaceHeld.current && onCanvas)) {
       e.preventDefault();
       startPanSession(e);
       return;
@@ -1655,7 +1476,7 @@ export function useImageBoard({
     marqueeSession.current = {
       startWorld: world,
       shiftKey: e.shiftKey,
-      moved: false,
+      moved: false
     };
     setMarqueePreview({ start: world, end: world });
     surfaceRef.current?.setPointerCapture(e.pointerId);
@@ -1684,7 +1505,7 @@ export function useImageBoard({
         setPenPreview({
           points: nextPoints,
           color: penColor,
-          width: penWidth,
+          width: penWidth
         });
       }
       return;
@@ -1695,7 +1516,7 @@ export function useImageBoard({
       setDrawPreview({
         type: drawSession.current.type,
         start: drawSession.current.start,
-        end,
+        end
       });
       return;
     }
@@ -1710,7 +1531,7 @@ export function useImageBoard({
     applyViewport((v) => ({
       ...v,
       panX: session.origPanX + dx,
-      panY: session.origPanY + dy,
+      panY: session.origPanY + dy
     }));
   };
 
@@ -1735,16 +1556,7 @@ export function useImageBoard({
         const rect = boardRectFromPoints(marqueePreview.start, marqueePreview.end);
         if (rect.width >= 2 || rect.height >= 2) {
           setSelection(
-            selectionFromMarqueeRect(
-              rect,
-              items,
-              shapes,
-              texts,
-              strokes,
-              groups,
-              session.shiftKey,
-              selection
-            )
+            selectionFromMarqueeRect(rect, items, shapes, texts, strokes, groups, session.shiftKey, selection)
           );
         } else if (!session.shiftKey) {
           clearSelection();
@@ -1860,7 +1672,7 @@ export function useImageBoard({
     drawPreview,
     setPasteHint,
     pickDeskTool,
-    placeVideo,
+    placeVideo
   };
 }
 

@@ -9,7 +9,7 @@ type GizmoHost = THREE.Object3D & {
 const AXIS_CENTER_KEY: Record<string, "x" | "y" | "z"> = {
   X: "x",
   Y: "y",
-  Z: "z",
+  Z: "z"
 };
 
 /** Remove translate/scale handles on the negative side of each axis. */

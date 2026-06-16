@@ -1,7 +1,9 @@
+import "@/shared/styles/LinkMenus.css";
+
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+
 import { useLocale } from "@/shared/context/LocaleContext";
-import "@/shared/styles/LinkMenus.css";
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -12,14 +14,7 @@ interface ConfirmDialogProps {
   onConfirm: () => void;
 }
 
-export function ConfirmDialog({
-  open,
-  title,
-  message,
-  confirmLabel,
-  onClose,
-  onConfirm,
-}: ConfirmDialogProps) {
+export function ConfirmDialog({ open, title, message, confirmLabel, onClose, onConfirm }: ConfirmDialogProps) {
   const { t } = useLocale();
   const confirmRef = useRef<HTMLButtonElement>(null);
 
@@ -59,12 +54,7 @@ export function ConfirmDialog({
           <button type="button" className="btn btn-ghost" onClick={onClose}>
             {t("link.cancel")}
           </button>
-          <button
-            ref={confirmRef}
-            type="button"
-            className="btn"
-            onClick={onConfirm}
-          >
+          <button ref={confirmRef} type="button" className="btn" onClick={onConfirm}>
             {confirmLabel ?? t("dialog.confirm")}
           </button>
         </div>

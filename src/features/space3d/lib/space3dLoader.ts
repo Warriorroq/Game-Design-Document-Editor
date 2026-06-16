@@ -27,12 +27,7 @@ export function modelFormatFromSrc(src: string): Space3DModelFormat | null {
 
 export function isSupportedModelFileName(name: string): boolean {
   const lower = name.toLowerCase();
-  return (
-    lower.endsWith(".glb") ||
-    lower.endsWith(".gltf") ||
-    lower.endsWith(".fbx") ||
-    lower.endsWith(".obj")
-  );
+  return lower.endsWith(".glb") || lower.endsWith(".gltf") || lower.endsWith(".fbx") || lower.endsWith(".obj");
 }
 
 export function modelMimeForFileName(name: string): string {
@@ -70,34 +65,19 @@ function prepareLoadedRoot(root: THREE.Object3D): THREE.Group {
 
 function loadGltf(src: string): Promise<THREE.Group> {
   return new Promise((resolve, reject) => {
-    gltfLoader.load(
-      src,
-      (gltf) => resolve(prepareLoadedRoot(gltf.scene)),
-      undefined,
-      reject
-    );
+    gltfLoader.load(src, (gltf) => resolve(prepareLoadedRoot(gltf.scene)), undefined, reject);
   });
 }
 
 function loadFbx(src: string): Promise<THREE.Group> {
   return new Promise((resolve, reject) => {
-    fbxLoader.load(
-      src,
-      (object) => resolve(prepareLoadedRoot(object)),
-      undefined,
-      reject
-    );
+    fbxLoader.load(src, (object) => resolve(prepareLoadedRoot(object)), undefined, reject);
   });
 }
 
 function loadObj(src: string): Promise<THREE.Group> {
   return new Promise((resolve, reject) => {
-    objLoader.load(
-      src,
-      (object) => resolve(prepareLoadedRoot(object)),
-      undefined,
-      reject
-    );
+    objLoader.load(src, (object) => resolve(prepareLoadedRoot(object)), undefined, reject);
   });
 }
 

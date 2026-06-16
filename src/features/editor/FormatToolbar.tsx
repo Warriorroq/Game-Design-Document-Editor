@@ -1,11 +1,12 @@
-import { useCallback, useLayoutEffect, useState, type RefObject } from "react";
+import { type RefObject, useCallback, useLayoutEffect, useState } from "react";
 import { createPortal } from "react-dom";
+
 import {
   applyEditorFormat,
   applyEditorTextColor,
   editorHasTextSelection,
-  getEditorSelectionColor,
   type FormatAction,
+  getEditorSelectionColor
 } from "@/features/editor/lib/editorFormat";
 import { TextColorSwatches } from "@/shared/components/TextColorSwatches";
 
@@ -24,44 +25,39 @@ const TOOLS: { group: ToolButton[] }[] = [
   {
     group: [
       { action: "bold", label: "B", title: "Bold" },
-      { action: "italic", label: "I", title: "Italic" },
-    ],
+      { action: "italic", label: "I", title: "Italic" }
+    ]
   },
   {
     group: [
       { action: "h1", label: "H1", title: "Heading 1" },
       { action: "h2", label: "H2", title: "Heading 2" },
       { action: "h3", label: "H3", title: "Heading 3" },
-      { action: "paragraph", label: "P", title: "Paragraph" },
-    ],
+      { action: "paragraph", label: "P", title: "Paragraph" }
+    ]
   },
   {
     group: [
       { action: "bulletList", label: "List", title: "Bullet list" },
-      { action: "orderedList", label: "1.", title: "Numbered list" },
-    ],
+      { action: "orderedList", label: "1.", title: "Numbered list" }
+    ]
   },
   {
     group: [
       { action: "hr", label: "Line", title: "Horizontal line" },
-      { action: "table", label: "Table", title: "Insert table" },
-    ],
-  },
+      { action: "table", label: "Table", title: "Insert table" }
+    ]
+  }
 ];
 
 function measureContentColumn() {
-  const col = document.querySelector(
-    ".content-column:not(.content-column--hidden)"
-  );
+  const col = document.querySelector(".content-column:not(.content-column--hidden)");
   if (!col) return { left: 0, width: 0 };
   const rect = col.getBoundingClientRect();
   return { left: rect.left, width: rect.width };
 }
 
-export function FormatToolbar({
-  editorRef,
-  onContentChange,
-}: FormatToolbarProps) {
+export function FormatToolbar({ editorRef, onContentChange }: FormatToolbarProps) {
   const [dock, setDock] = useState(measureContentColumn);
   const [hasTextSelection, setHasTextSelection] = useState(false);
   const [activeColor, setActiveColor] = useState<string | null>(null);
@@ -82,9 +78,7 @@ export function FormatToolbar({
     const update = () => setDock(measureContentColumn());
     update();
 
-    const col = document.querySelector(
-      ".content-column:not(.content-column--hidden)"
-    );
+    const col = document.querySelector(".content-column:not(.content-column--hidden)");
     const observer = new ResizeObserver(update);
     if (col) observer.observe(col);
 

@@ -1,11 +1,11 @@
+import type { GddDocument } from "@/domain/types";
 import { isDesktopApp } from "@/infrastructure/desktop/desktop";
 import { documentFromLegacyJson } from "@/infrastructure/project/gdeArchive";
 import {
   documentToFolderPayload,
   folderPayloadToDocument,
-  type FolderProjectPayload,
+  type FolderProjectPayload
 } from "@/infrastructure/project/projectLayout";
-import type { GddDocument } from "@/domain/types";
 
 const FOLDER_STORAGE_KEY = "gdd-editor-project-folder";
 
@@ -44,13 +44,11 @@ export async function pickProjectFolder(): Promise<PickFolderResult | null> {
 
   return {
     folderPath: result.folderPath,
-    hasProject: Boolean(result.hasProject),
+    hasProject: Boolean(result.hasProject)
   };
 }
 
-async function readFolderPayload(
-  folderPath: string
-): Promise<FolderProjectPayload> {
+async function readFolderPayload(folderPath: string): Promise<FolderProjectPayload> {
   if (!window.gddDesktop?.project) {
     throw new Error("Desktop project API is unavailable.");
   }
@@ -72,17 +70,12 @@ async function readFolderPayload(
   return result.payload;
 }
 
-export async function loadProjectFromFolder(
-  folderPath: string
-): Promise<GddDocument> {
+export async function loadProjectFromFolder(folderPath: string): Promise<GddDocument> {
   const payload = await readFolderPayload(folderPath);
   return folderPayloadToDocument(payload);
 }
 
-export async function saveProjectToFolder(
-  folderPath: string,
-  doc: GddDocument
-): Promise<void> {
+export async function saveProjectToFolder(folderPath: string, doc: GddDocument): Promise<void> {
   if (!window.gddDesktop?.project) return;
 
   const payload = documentToFolderPayload(doc);

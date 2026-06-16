@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
-import { useLocale } from "@/shared/context/LocaleContext";
+
 import type { GlobalSearchResult } from "@/features/search/lib/globalSearch";
+import { useLocale } from "@/shared/context/LocaleContext";
 
 interface GlobalSearchProps {
   query: string;
@@ -9,13 +10,7 @@ interface GlobalSearchProps {
   onSelectResult: (result: GlobalSearchResult) => void;
 }
 
-function SnippetHighlight({
-  snippet,
-  query,
-}: {
-  snippet: string;
-  query: string;
-}) {
+function SnippetHighlight({ snippet, query }: { snippet: string; query: string }) {
   const q = query.trim();
   if (!q) return <>{snippet}</>;
 
@@ -32,12 +27,7 @@ function SnippetHighlight({
   );
 }
 
-export function GlobalSearch({
-  query,
-  onChange,
-  results,
-  onSelectResult,
-}: GlobalSearchProps) {
+export function GlobalSearch({ query, onChange, results, onSelectResult }: GlobalSearchProps) {
   const { t } = useLocale();
   const rootRef = useRef<HTMLDivElement>(null);
   const searchActive = query.trim().length > 0;
@@ -115,9 +105,7 @@ export function GlobalSearch({
                   )}
                 </span>
                 <span className="global-search-item-section">
-                  {result.folderTitle &&
-                  result.kind !== "folder-title" &&
-                  result.sectionTitle
+                  {result.folderTitle && result.kind !== "folder-title" && result.sectionTitle
                     ? `${result.folderTitle} / ${result.sectionTitle}`
                     : result.folderTitle && result.kind === "folder-title"
                       ? result.folderTitle

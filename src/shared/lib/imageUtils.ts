@@ -41,11 +41,8 @@ export async function blobToDataUrl(blob: Blob): Promise<string> {
   ctx.drawImage(bitmap, 0, 0, width, height);
   bitmap.close();
 
-  const usePng =
-    mimeSupportsAlpha(blob.type) || imageHasAlpha(ctx, width, height);
-  return usePng
-    ? canvas.toDataURL("image/png")
-    : canvas.toDataURL("image/jpeg", JPEG_QUALITY);
+  const usePng = mimeSupportsAlpha(blob.type) || imageHasAlpha(ctx, width, height);
+  return usePng ? canvas.toDataURL("image/png") : canvas.toDataURL("image/jpeg", JPEG_QUALITY);
 }
 
 export function getImageFromClipboard(clipboard: DataTransfer): Blob | null {
@@ -135,18 +132,15 @@ export function copyImageSrcToClipboard(src: string): Promise<void> {
 
   return navigator.clipboard.write([
     new ClipboardItem({
-      "image/png": pngPromise,
-    }),
+      "image/png": pngPromise
+    })
   ]);
 }
 
-export function loadImageDimensions(
-  src: string
-): Promise<{ width: number; height: number }> {
+export function loadImageDimensions(src: string): Promise<{ width: number; height: number }> {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    img.onload = () =>
-      resolve({ width: img.naturalWidth, height: img.naturalHeight });
+    img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
     img.onerror = () => reject(new Error("Failed to load image"));
     img.src = src;
   });

@@ -1,8 +1,10 @@
+import "@/shared/styles/LinkMenus.css";
+
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+
 import { parseVideoEmbed } from "@/domain/board/videoEmbed";
 import { useLocale } from "@/shared/context/LocaleContext";
-import "@/shared/styles/LinkMenus.css";
 
 interface VideoInsertDialogProps {
   open: boolean;

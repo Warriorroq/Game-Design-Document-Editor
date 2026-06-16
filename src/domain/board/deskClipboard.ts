@@ -1,11 +1,4 @@
-import type {
-  BoardGroup,
-  BoardItem,
-  BoardPoint,
-  BoardShape,
-  BoardStroke,
-  BoardText,
-} from "@/domain/types";
+import type { BoardGroup, BoardItem, BoardPoint, BoardShape, BoardStroke, BoardText } from "@/domain/types";
 
 export interface DeskClipboard {
   items: BoardItem[];
@@ -43,25 +36,20 @@ export function buildAssetDeskClipboard(
         x: 0,
         y: 0,
         width,
-        height,
-      },
+        height
+      }
     ],
     shapes: [],
     texts: [],
     strokes: [],
-    groups: [],
+    groups: []
   };
 }
 
-function clonePoint(
-  point: BoardPoint,
-  idMap: Map<string, string>,
-  dx: number,
-  dy: number
-): BoardPoint {
+function clonePoint(point: BoardPoint, idMap: Map<string, string>, dx: number, dy: number): BoardPoint {
   const next: BoardPoint = {
     x: point.x + dx,
-    y: point.y + dy,
+    y: point.y + dy
   };
   if (point.attach) {
     const mapped = idMap.get(point.attach.itemId);
@@ -85,12 +73,7 @@ export function buildDeskClipboard(
   const shapeSet = new Set(selection.shapeIds);
   const textSet = new Set(selection.textIds);
   const strokeSet = new Set(selection.strokeIds);
-  if (
-    itemSet.size === 0 &&
-    shapeSet.size === 0 &&
-    textSet.size === 0 &&
-    strokeSet.size === 0
-  ) {
+  if (itemSet.size === 0 && shapeSet.size === 0 && textSet.size === 0 && strokeSet.size === 0) {
     return null;
   }
 
@@ -104,30 +87,28 @@ export function buildDeskClipboard(
       memberItemIds: g.memberItemIds.filter((id) => itemSet.has(id)),
       memberShapeIds: g.memberShapeIds.filter((id) => shapeSet.has(id)),
       memberTextIds: g.memberTextIds.filter((id) => textSet.has(id)),
-      memberStrokeIds: g.memberStrokeIds.filter((id) => strokeSet.has(id)),
+      memberStrokeIds: g.memberStrokeIds.filter((id) => strokeSet.has(id))
     }))
     .filter(
-      (g) =>
-        g.memberItemIds.length +
-          g.memberShapeIds.length +
-          g.memberTextIds.length +
-          g.memberStrokeIds.length >=
-        2
+      (g) => g.memberItemIds.length + g.memberShapeIds.length + g.memberTextIds.length + g.memberStrokeIds.length >= 2
     );
 
   return {
     items: clipItems.map((i) => ({ ...i })),
     shapes: clipShapes.map((s) => ({
       ...s,
-      start: { ...s.start, attach: s.start.attach ? { ...s.start.attach } : undefined },
-      end: { ...s.end, attach: s.end.attach ? { ...s.end.attach } : undefined },
+      start: {
+        ...s.start,
+        attach: s.start.attach ? { ...s.start.attach } : undefined
+      },
+      end: { ...s.end, attach: s.end.attach ? { ...s.end.attach } : undefined }
     })),
     texts: clipTexts.map((t) => ({ ...t })),
     strokes: clipStrokes.map((s) => ({
       ...s,
-      points: s.points.map((p) => ({ ...p })),
+      points: s.points.map((p) => ({ ...p }))
     })),
-    groups: clipGroups,
+    groups: clipGroups
   };
 }
 
@@ -177,7 +158,7 @@ export function pasteDeskClipboard(
       ...item,
       id,
       x: item.x + dx,
-      y: item.y + dy,
+      y: item.y + dy
     };
   });
 
@@ -188,7 +169,7 @@ export function pasteDeskClipboard(
       ...shape,
       id,
       start: clonePoint(shape.start, idMap, dx, dy),
-      end: clonePoint(shape.end, idMap, dx, dy),
+      end: clonePoint(shape.end, idMap, dx, dy)
     };
   });
 
@@ -199,7 +180,7 @@ export function pasteDeskClipboard(
       ...text,
       id,
       x: text.x + dx,
-      y: text.y + dy,
+      y: text.y + dy
     };
   });
 
@@ -211,25 +192,17 @@ export function pasteDeskClipboard(
       id,
       points: stroke.points.map((p) => ({
         x: p.x + dx,
-        y: p.y + dy,
-      })),
+        y: p.y + dy
+      }))
     };
   });
 
   const newGroups: BoardGroup[] = clipboard.groups.map((group) => ({
     id: crypto.randomUUID(),
-    memberItemIds: group.memberItemIds
-      .map((id) => idMap.get(id))
-      .filter((id): id is string => Boolean(id)),
-    memberShapeIds: group.memberShapeIds
-      .map((id) => idMap.get(id))
-      .filter((id): id is string => Boolean(id)),
-    memberTextIds: group.memberTextIds
-      .map((id) => idMap.get(id))
-      .filter((id): id is string => Boolean(id)),
-    memberStrokeIds: group.memberStrokeIds
-      .map((id) => idMap.get(id))
-      .filter((id): id is string => Boolean(id)),
+    memberItemIds: group.memberItemIds.map((id) => idMap.get(id)).filter((id): id is string => Boolean(id)),
+    memberShapeIds: group.memberShapeIds.map((id) => idMap.get(id)).filter((id): id is string => Boolean(id)),
+    memberTextIds: group.memberTextIds.map((id) => idMap.get(id)).filter((id): id is string => Boolean(id)),
+    memberStrokeIds: group.memberStrokeIds.map((id) => idMap.get(id)).filter((id): id is string => Boolean(id))
   }));
 
   return {
@@ -242,7 +215,7 @@ export function pasteDeskClipboard(
       itemIds: newItems.map((i) => i.id),
       shapeIds: newShapes.map((s) => s.id),
       textIds: newTexts.map((t) => t.id),
-      strokeIds: newStrokes.map((s) => s.id),
-    },
+      strokeIds: newStrokes.map((s) => s.id)
+    }
   };
 }

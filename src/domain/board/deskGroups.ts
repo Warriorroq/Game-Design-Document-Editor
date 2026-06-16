@@ -1,41 +1,24 @@
-import type { BoardGroup } from "@/domain/types";
 import type { DeskSelection } from "@/domain/board/deskClipboard";
+import type { BoardGroup } from "@/domain/types";
 
-export function findGroupForItem(
-  groups: BoardGroup[],
-  itemId: string
-): BoardGroup | undefined {
+export function findGroupForItem(groups: BoardGroup[], itemId: string): BoardGroup | undefined {
   return groups.find((g) => g.memberItemIds.includes(itemId));
 }
 
-export function findGroupForShape(
-  groups: BoardGroup[],
-  shapeId: string
-): BoardGroup | undefined {
+export function findGroupForShape(groups: BoardGroup[], shapeId: string): BoardGroup | undefined {
   return groups.find((g) => g.memberShapeIds.includes(shapeId));
 }
 
-export function findGroupForText(
-  groups: BoardGroup[],
-  textId: string
-): BoardGroup | undefined {
+export function findGroupForText(groups: BoardGroup[], textId: string): BoardGroup | undefined {
   return groups.find((g) => g.memberTextIds.includes(textId));
 }
 
-export function findGroupForStroke(
-  groups: BoardGroup[],
-  strokeId: string
-): BoardGroup | undefined {
+export function findGroupForStroke(groups: BoardGroup[], strokeId: string): BoardGroup | undefined {
   return groups.find((g) => g.memberStrokeIds.includes(strokeId));
 }
 
 export function groupMemberIds(group: BoardGroup): string[] {
-  return [
-    ...group.memberItemIds,
-    ...group.memberShapeIds,
-    ...group.memberTextIds,
-    ...group.memberStrokeIds,
-  ];
+  return [...group.memberItemIds, ...group.memberShapeIds, ...group.memberTextIds, ...group.memberStrokeIds];
 }
 
 export function selectionFromGroup(group: BoardGroup): DeskSelection {
@@ -43,7 +26,7 @@ export function selectionFromGroup(group: BoardGroup): DeskSelection {
     itemIds: [...group.memberItemIds],
     shapeIds: [...group.memberShapeIds],
     textIds: [...group.memberTextIds],
-    strokeIds: [...group.memberStrokeIds],
+    strokeIds: [...group.memberStrokeIds]
   };
 }
 
@@ -52,7 +35,7 @@ export function mergeSelections(a: DeskSelection, b: DeskSelection): DeskSelecti
     itemIds: [...new Set([...a.itemIds, ...b.itemIds])],
     shapeIds: [...new Set([...a.shapeIds, ...b.shapeIds])],
     textIds: [...new Set([...a.textIds, ...b.textIds])],
-    strokeIds: [...new Set([...a.strokeIds, ...b.strokeIds])],
+    strokeIds: [...new Set([...a.strokeIds, ...b.strokeIds])]
   };
 }
 
@@ -74,22 +57,14 @@ export function removeMembersFromGroups(
       memberItemIds: g.memberItemIds.filter((id) => !itemSet.has(id)),
       memberShapeIds: g.memberShapeIds.filter((id) => !shapeSet.has(id)),
       memberTextIds: g.memberTextIds.filter((id) => !textSet.has(id)),
-      memberStrokeIds: g.memberStrokeIds.filter((id) => !strokeSet.has(id)),
+      memberStrokeIds: g.memberStrokeIds.filter((id) => !strokeSet.has(id))
     }))
     .filter(
-      (g) =>
-        g.memberItemIds.length +
-          g.memberShapeIds.length +
-          g.memberTextIds.length +
-          g.memberStrokeIds.length >=
-        2
+      (g) => g.memberItemIds.length + g.memberShapeIds.length + g.memberTextIds.length + g.memberStrokeIds.length >= 2
     );
 }
 
-export function groupsTouchingSelection(
-  groups: BoardGroup[],
-  selection: DeskSelection
-): BoardGroup[] {
+export function groupsTouchingSelection(groups: BoardGroup[], selection: DeskSelection): BoardGroup[] {
   const itemSet = new Set(selection.itemIds);
   const shapeSet = new Set(selection.shapeIds);
   const textSet = new Set(selection.textIds);
@@ -104,12 +79,7 @@ export function groupsTouchingSelection(
 }
 
 export function selectionCount(selection: DeskSelection): number {
-  return (
-    selection.itemIds.length +
-    selection.shapeIds.length +
-    selection.textIds.length +
-    selection.strokeIds.length
-  );
+  return selection.itemIds.length + selection.shapeIds.length + selection.textIds.length + selection.strokeIds.length;
 }
 
 /** Exactly one board image selected, nothing else. */
@@ -138,7 +108,7 @@ export function applyDeskSelectClick(
         itemIds: [...itemIds],
         shapeIds: [...prev.shapeIds],
         textIds: [...prev.textIds],
-        strokeIds: [...prev.strokeIds],
+        strokeIds: [...prev.strokeIds]
       };
     }
     if (kind === "shape") {
@@ -149,7 +119,7 @@ export function applyDeskSelectClick(
         itemIds: [...prev.itemIds],
         shapeIds: [...shapeIds],
         textIds: [...prev.textIds],
-        strokeIds: [...prev.strokeIds],
+        strokeIds: [...prev.strokeIds]
       };
     }
     if (kind === "text") {
@@ -160,7 +130,7 @@ export function applyDeskSelectClick(
         itemIds: [...prev.itemIds],
         shapeIds: [...prev.shapeIds],
         textIds: [...textIds],
-        strokeIds: [...prev.strokeIds],
+        strokeIds: [...prev.strokeIds]
       };
     }
     const strokeIds = new Set(prev.strokeIds);
@@ -170,7 +140,7 @@ export function applyDeskSelectClick(
       itemIds: [...prev.itemIds],
       shapeIds: [...prev.shapeIds],
       textIds: [...prev.textIds],
-      strokeIds: [...strokeIds],
+      strokeIds: [...strokeIds]
     };
   }
 

@@ -1,25 +1,27 @@
+import "@/features/space3d/Space3D.css";
+
 import type { RefObject } from "react";
 import { useCallback, useRef } from "react";
-import { DocumentMeta } from "@/features/editor/DocumentMeta";
+
+import type { DocumentStore } from "@/application/document/useDocumentStore";
+import { resolveBoardItemSrc } from "@/domain/board/boardImageRegistry";
+import type { DeskClipboard } from "@/domain/board/deskClipboard";
+import { isSpace3DSection } from "@/domain/space3d/space3d";
+import type { GddSection, GddSectionFolder } from "@/domain/types";
 import { ImageBoard } from "@/features/board/ImageBoard";
+import { DocumentMeta } from "@/features/editor/DocumentMeta";
+import { SectionEditor } from "@/features/editor/SectionEditor";
+import type { SearchFocusTarget } from "@/features/search/lib/globalSearch";
+import { Sidebar } from "@/features/sidebar/Sidebar";
+import { Space3DView } from "@/features/space3d/Space3DView";
+import { restoreAppFocus } from "@/infrastructure/desktop/desktop";
 import { CompactPaneToggle } from "@/shared/components/CompactPaneToggle";
 import { PanelSplitter } from "@/shared/components/PanelSplitter";
 import { useCompactPane } from "@/shared/hooks/useCompactPane";
 import { useMediaQuery } from "@/shared/hooks/useMediaQuery";
+import { panelFlexStyle } from "@/shared/hooks/useResizablePanels";
 import { useSectionEditorScroll } from "@/shared/hooks/useSectionEditorScroll";
 import { COMPACT_LAYOUT_MEDIA } from "@/shared/lib/panelLayout";
-import { SectionEditor } from "@/features/editor/SectionEditor";
-import { Sidebar } from "@/features/sidebar/Sidebar";
-import { Space3DView } from "@/features/space3d/Space3DView";
-import { isSpace3DSection } from "@/domain/space3d/space3d";
-import { resolveBoardItemSrc } from "@/domain/board/boardImageRegistry";
-import { restoreAppFocus } from "@/infrastructure/desktop/desktop";
-import { panelFlexStyle } from "@/shared/hooks/useResizablePanels";
-import type { DocumentStore } from "@/application/document/useDocumentStore";
-import type { SearchFocusTarget } from "@/features/search/lib/globalSearch";
-import type { GddSection, GddSectionFolder } from "@/domain/types";
-import type { DeskClipboard } from "@/domain/board/deskClipboard";
-import "@/features/space3d/Space3D.css";
 
 export interface EditorLayoutProps {
   doc: DocumentStore["doc"];
@@ -146,7 +148,7 @@ export function EditorLayout({
   onEndTransientEdit,
   onAddSpace3DModel,
   onRemoveSpace3DModelAsset,
-  onRenameSpace3DModelAsset,
+  onRenameSpace3DModelAsset
 }: EditorLayoutProps) {
   const isSpace3D = activeSection ? isSpace3DSection(activeSection) : false;
   const resizingPanels = draggingEditor || draggingBoard;
@@ -155,19 +157,13 @@ export function EditorLayout({
   const showCompactSwitch = compactLayout && !isSpace3D;
   const compactEditorFull = showCompactSwitch && compactPane === "editor";
   const compactBoardFull = showCompactSwitch && compactPane === "board";
-  const hideEditorPane = showCompactSwitch
-    ? compactPane !== "editor"
-    : editorHidden;
-  const hideBoardPane = isSpace3D
-    ? false
-    : showCompactSwitch
-      ? compactPane !== "board"
-      : boardHidden;
+  const hideEditorPane = showCompactSwitch ? compactPane !== "editor" : editorHidden;
+  const hideBoardPane = isSpace3D ? false : showCompactSwitch ? compactPane !== "board" : boardHidden;
 
   const mainPanelClass = [
     "main-panel",
     isSpace3D ? "main-panel--space3d" : "",
-    showCompactSwitch ? `main-panel--compact main-panel--compact-${compactPane}` : "",
+    showCompactSwitch ? `main-panel--compact main-panel--compact-${compactPane}` : ""
   ]
     .filter(Boolean)
     .join(" ");
@@ -177,7 +173,7 @@ export function EditorLayout({
     alignSelf: "stretch",
     width: "100%",
     minWidth: "0",
-    flexShrink: 1,
+    flexShrink: 1
   } as const;
 
   const editorScrollRef = useRef<HTMLDivElement>(null);
@@ -187,12 +183,7 @@ export function EditorLayout({
     },
     [onUpdateSectionViewState]
   );
-  useSectionEditorScroll(
-    editorScrollRef,
-    activeSectionId,
-    activeSection?.editorScrollTop,
-    saveEditorScrollTop
-  );
+  useSectionEditorScroll(editorScrollRef, activeSectionId, activeSection?.editorScrollTop, saveEditorScrollTop);
 
   return (
     <div className="app-body">
@@ -212,9 +203,7 @@ export function EditorLayout({
         onReorder={onReorderSidebar}
       />
       <div ref={mainRef} className={mainPanelClass}>
-        {showCompactSwitch && (
-          <CompactPaneToggle value={compactPane} onChange={setCompactPane} />
-        )}
+        {showCompactSwitch && <CompactPaneToggle value={compactPane} onChange={setCompactPane} />}
         {!isSpace3D && !compactLayout && (
           <PanelSplitter
             edge="start"
@@ -228,11 +217,7 @@ export function EditorLayout({
         {!isSpace3D && (
           <div
             className={`content-column ${hideEditorPane ? "content-column--hidden" : ""}`}
-            style={
-              compactEditorFull
-                ? compactFlex
-                : panelFlexStyle(editorHidden, editorWidth, 280, resizingPanels)
-            }
+            style={compactEditorFull ? compactFlex : panelFlexStyle(editorHidden, editorWidth, 280, resizingPanels)}
           >
             {!hideEditorPane && (
               <div className="content-column-scroll" ref={editorScrollRef}>
@@ -244,11 +229,7 @@ export function EditorLayout({
                       section={activeSection}
                       scrollToAnchorId={scrollAnchorId}
                       onScrollAnchorDone={onScrollAnchorDone}
-                      searchFocus={
-                        searchFocus?.sectionId === activeSection.id
-                          ? searchFocus
-                          : null
-                      }
+                      searchFocus={searchFocus?.sectionId === activeSection.id ? searchFocus : null}
                       onSearchFocusDone={onSearchFocusDone}
                       onChange={(patch) => onUpdateSection(activeSection.id, patch)}
                     />
@@ -308,69 +289,49 @@ export function EditorLayout({
                   onEndTransientEdit={onEndTransientEdit}
                 />
               ) : (
-              <ImageBoard
-                key={activeSection.id}
-                projectId={doc.id}
-                sectionId={activeSection.id}
-                savedBoardViewport={activeSection.boardViewport}
-                onBoardViewportChange={(boardViewport) =>
-                  onUpdateSectionViewState(activeSection.id, { boardViewport })
-                }
-                items={activeSection.board}
-                shapes={activeSection.shapes}
-                strokes={activeSection.strokes}
-                texts={activeSection.texts}
-                groups={activeSection.groups}
-                highlightMediaId={highlightMediaId}
-                highlightTextId={highlightTextId}
-                onHighlightDone={onHighlightDone}
-                onAdd={(item) => onAddBoardItem(activeSection.id, item)}
-                onUpdate={(itemId, patch) =>
-                  onUpdateBoardItem(activeSection.id, itemId, patch)
-                }
-                onRemove={(itemId) => onRemoveBoardItem(activeSection.id, itemId)}
-                onAddShape={(shape) => onAddBoardShape(activeSection.id, shape)}
-                onUpdateShape={(shapeId, patch) =>
-                  onUpdateBoardShape(activeSection.id, shapeId, patch)
-                }
-                onRemoveShape={(shapeId) =>
-                  onRemoveBoardShape(activeSection.id, shapeId)
-                }
-                onAddText={(text) => onAddBoardText(activeSection.id, text)}
-                onUpdateText={(textId, patch, options) =>
-                  onUpdateBoardText(activeSection.id, textId, patch, options)
-                }
-                onRemoveText={(textId) => onRemoveBoardText(activeSection.id, textId)}
-                onAddStroke={(stroke) => onAddBoardStroke(activeSection.id, stroke)}
-                onUpdateStroke={(strokeId, patch) =>
-                  onUpdateBoardStroke(activeSection.id, strokeId, patch)
-                }
-                onRemoveStroke={(strokeId) =>
-                  onRemoveBoardStroke(activeSection.id, strokeId)
-                }
-                onAddGroup={(group) => onAddBoardGroup(activeSection.id, group)}
-                onRemoveGroup={(groupId) =>
-                  onRemoveBoardGroup(activeSection.id, groupId)
-                }
-                onPasteDesk={(payload) => onPasteDesk(activeSection.id, payload)}
-                onReorderLayer={(selection, direction) =>
-                  onReorderLayer(activeSection.id, selection, direction)
-                }
-                onRemoveSelection={(itemIds, shapeIds, textIds, strokeIds) =>
-                  onRemoveSelection(
-                    activeSection.id,
-                    itemIds,
-                    shapeIds,
-                    textIds,
-                    strokeIds
-                  )
-                }
-                resolveItemSrc={(item) => resolveBoardItemSrc(doc, item)}
-                deskClipboard={deskClipboard}
-                onStoreDeskClipboard={onStoreDeskClipboard}
-                onBeginTransientEdit={onBeginTransientEdit}
-                onEndTransientEdit={onEndTransientEdit}
-              />
+                <ImageBoard
+                  key={activeSection.id}
+                  projectId={doc.id}
+                  sectionId={activeSection.id}
+                  savedBoardViewport={activeSection.boardViewport}
+                  onBoardViewportChange={(boardViewport) =>
+                    onUpdateSectionViewState(activeSection.id, {
+                      boardViewport
+                    })
+                  }
+                  items={activeSection.board}
+                  shapes={activeSection.shapes}
+                  strokes={activeSection.strokes}
+                  texts={activeSection.texts}
+                  groups={activeSection.groups}
+                  highlightMediaId={highlightMediaId}
+                  highlightTextId={highlightTextId}
+                  onHighlightDone={onHighlightDone}
+                  onAdd={(item) => onAddBoardItem(activeSection.id, item)}
+                  onUpdate={(itemId, patch) => onUpdateBoardItem(activeSection.id, itemId, patch)}
+                  onRemove={(itemId) => onRemoveBoardItem(activeSection.id, itemId)}
+                  onAddShape={(shape) => onAddBoardShape(activeSection.id, shape)}
+                  onUpdateShape={(shapeId, patch) => onUpdateBoardShape(activeSection.id, shapeId, patch)}
+                  onRemoveShape={(shapeId) => onRemoveBoardShape(activeSection.id, shapeId)}
+                  onAddText={(text) => onAddBoardText(activeSection.id, text)}
+                  onUpdateText={(textId, patch, options) => onUpdateBoardText(activeSection.id, textId, patch, options)}
+                  onRemoveText={(textId) => onRemoveBoardText(activeSection.id, textId)}
+                  onAddStroke={(stroke) => onAddBoardStroke(activeSection.id, stroke)}
+                  onUpdateStroke={(strokeId, patch) => onUpdateBoardStroke(activeSection.id, strokeId, patch)}
+                  onRemoveStroke={(strokeId) => onRemoveBoardStroke(activeSection.id, strokeId)}
+                  onAddGroup={(group) => onAddBoardGroup(activeSection.id, group)}
+                  onRemoveGroup={(groupId) => onRemoveBoardGroup(activeSection.id, groupId)}
+                  onPasteDesk={(payload) => onPasteDesk(activeSection.id, payload)}
+                  onReorderLayer={(selection, direction) => onReorderLayer(activeSection.id, selection, direction)}
+                  onRemoveSelection={(itemIds, shapeIds, textIds, strokeIds) =>
+                    onRemoveSelection(activeSection.id, itemIds, shapeIds, textIds, strokeIds)
+                  }
+                  resolveItemSrc={(item) => resolveBoardItemSrc(doc, item)}
+                  deskClipboard={deskClipboard}
+                  onStoreDeskClipboard={onStoreDeskClipboard}
+                  onBeginTransientEdit={onBeginTransientEdit}
+                  onEndTransientEdit={onEndTransientEdit}
+                />
               )
             ) : (
               <div className="board-empty" aria-hidden />

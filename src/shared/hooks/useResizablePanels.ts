@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+
 import {
   clampBoardWidth,
   loadBoardPanelWidth,
@@ -7,7 +8,7 @@ import {
   STORAGE_BOARD_HIDDEN,
   STORAGE_BOARD_WIDTH,
   STORAGE_EDITOR_HIDDEN,
-  STORAGE_EDITOR_WIDTH,
+  STORAGE_EDITOR_WIDTH
 } from "@/shared/lib/panelLayout";
 
 const SPLITTER_SIZE = 6;
@@ -61,11 +62,7 @@ function persist(state: PanelState) {
   }
 }
 
-function fitPanels(
-  editorW: number,
-  boardW: number,
-  panelW: number
-): { editorWidth: number; boardWidth: number } {
+function fitPanels(editorW: number, boardW: number, panelW: number): { editorWidth: number; boardWidth: number } {
   const available = panelW - SPLITTER_SIZE * 2;
   let e = Math.max(0, editorW);
   let b = Math.max(0, boardW);
@@ -88,27 +85,20 @@ function reflowToPanelWidth(state: PanelState, panelW: number): PanelState {
   if (state.editorHidden) {
     return {
       ...state,
-      boardWidth: Math.max(
-        MIN_BOARD,
-        panelW - COLLAPSED_SPLITTER - SPLITTER_SIZE
-      ),
+      boardWidth: Math.max(MIN_BOARD, panelW - COLLAPSED_SPLITTER - SPLITTER_SIZE)
     };
   }
 
   if (state.boardHidden) {
     return {
       ...state,
-      editorWidth: Math.max(
-        MIN_EDITOR,
-        panelW - COLLAPSED_SPLITTER - SPLITTER_SIZE
-      ),
+      editorWidth: Math.max(MIN_EDITOR, panelW - COLLAPSED_SPLITTER - SPLITTER_SIZE)
     };
   }
 
   const available = panelW - SPLITTER_SIZE * 2;
   const total = state.editorWidth + state.boardWidth;
-  const ratio =
-    total > 0 ? state.editorWidth / total : DEFAULT_EDITOR_RATIO;
+  const ratio = total > 0 ? state.editorWidth / total : DEFAULT_EDITOR_RATIO;
 
   let editorWidth = Math.round(available * ratio);
   let boardWidth = available - editorWidth;
@@ -132,12 +122,15 @@ function reflowToPanelWidth(state: PanelState, panelW: number): PanelState {
   return { ...state, editorWidth: e, boardWidth: b };
 }
 
-function readPanelWidths(panel: HTMLElement): { editor: number; board: number } {
+function readPanelWidths(panel: HTMLElement): {
+  editor: number;
+  board: number;
+} {
   const editorEl = panel.querySelector<HTMLElement>(".content-column");
   const boardEl = panel.querySelector<HTMLElement>(".board-pane");
   return {
     editor: editorEl?.getBoundingClientRect().width ?? 0,
-    board: boardEl?.getBoundingClientRect().width ?? 0,
+    board: boardEl?.getBoundingClientRect().width ?? 0
   };
 }
 
@@ -153,7 +146,7 @@ function finalizeAfterDrag(state: PanelState, panelW: number): PanelState {
       editorWidth: 0,
       boardWidth: panelW - COLLAPSED_SPLITTER - SPLITTER_SIZE,
       editorHidden: true,
-      boardHidden: false,
+      boardHidden: false
     };
   }
   if (boardWidth < COLLAPSE_AT) {
@@ -162,7 +155,7 @@ function finalizeAfterDrag(state: PanelState, panelW: number): PanelState {
       editorWidth: panelW - COLLAPSED_SPLITTER - SPLITTER_SIZE,
       boardWidth: 0,
       editorHidden: false,
-      boardHidden: true,
+      boardHidden: true
     };
   }
 
@@ -202,19 +195,19 @@ export function useResizablePanels(sidebarVisible: boolean) {
     editorWidth: MIN_EDITOR,
     boardWidth: MIN_BOARD,
     editorHidden: false,
-    boardHidden: loadBool(STORAGE_BOARD_HIDDEN),
+    boardHidden: loadBool(STORAGE_BOARD_HIDDEN)
   });
   const [editorWidth, setEditorWidth] = useState(MIN_EDITOR);
   const [boardWidth, setBoardWidth] = useState(MIN_BOARD);
   const [editorHidden, setEditorHidden] = useState(false);
-  const [boardHidden, setBoardHidden] = useState(() =>
-    loadBool(STORAGE_BOARD_HIDDEN)
-  );
+  const [boardHidden, setBoardHidden] = useState(() => loadBool(STORAGE_BOARD_HIDDEN));
   const [dragTarget, setDragTarget] = useState<DragTarget | null>(null);
   const dragTargetRef = useRef<DragTarget | null>(null);
-  const dragRef = useRef<{ startX: number; startEditor: number; startBoard: number } | null>(
-    null
-  );
+  const dragRef = useRef<{
+    startX: number;
+    startEditor: number;
+    startBoard: number;
+  } | null>(null);
   const initialized = useRef(false);
 
   useEffect(() => {
@@ -247,7 +240,7 @@ export function useResizablePanels(sidebarVisible: boolean) {
         editorWidth: 0,
         boardWidth: 0,
         editorHidden: true,
-        boardHidden: true,
+        boardHidden: true
       });
       return;
     }
@@ -258,7 +251,7 @@ export function useResizablePanels(sidebarVisible: boolean) {
         editorWidth: 0,
         boardWidth: Math.max(MIN_BOARD, b),
         editorHidden: true,
-        boardHidden: false,
+        boardHidden: false
       });
       return;
     }
@@ -269,21 +262,21 @@ export function useResizablePanels(sidebarVisible: boolean) {
         editorWidth: Math.max(MIN_EDITOR, e),
         boardWidth: 0,
         editorHidden: false,
-        boardHidden: true,
+        boardHidden: true
       });
       return;
     }
 
     const available = panelW - SPLITTER_SIZE * 2;
-    let e = storedEditor ?? Math.round(available * DEFAULT_EDITOR_RATIO);
-    let b = storedBoard ?? available - e;
+    const e = storedEditor ?? Math.round(available * DEFAULT_EDITOR_RATIO);
+    const b = storedBoard ?? available - e;
     applyState(
       reflowToPanelWidth(
         {
           editorWidth: e,
           boardWidth: b,
           editorHidden: false,
-          boardHidden: false,
+          boardHidden: false
         },
         panelW
       )
@@ -338,7 +331,7 @@ export function useResizablePanels(sidebarVisible: boolean) {
             editorWidth: panelW - COLLAPSED_SPLITTER - SPLITTER_SIZE,
             boardWidth: 0,
             editorHidden: false,
-            boardHidden: true,
+            boardHidden: true
           });
           return;
         }
@@ -348,7 +341,7 @@ export function useResizablePanels(sidebarVisible: boolean) {
             editorWidth: 0,
             boardWidth: panelW - COLLAPSED_SPLITTER - SPLITTER_SIZE,
             editorHidden: true,
-            boardHidden: false,
+            boardHidden: false
           });
           return;
         }
@@ -356,7 +349,7 @@ export function useResizablePanels(sidebarVisible: boolean) {
           editorWidth: eW,
           boardWidth: boardW,
           editorHidden: false,
-          boardHidden: false,
+          boardHidden: false
         });
         return;
       }
@@ -367,7 +360,7 @@ export function useResizablePanels(sidebarVisible: boolean) {
           editorWidth: 0,
           boardWidth: panelW - COLLAPSED_SPLITTER - SPLITTER_SIZE,
           editorHidden: true,
-          boardHidden: false,
+          boardHidden: false
         });
         return;
       }
@@ -377,7 +370,7 @@ export function useResizablePanels(sidebarVisible: boolean) {
           editorWidth: panelW - COLLAPSED_SPLITTER - SPLITTER_SIZE,
           boardWidth: 0,
           editorHidden: false,
-          boardHidden: true,
+          boardHidden: true
         });
         return;
       }
@@ -385,7 +378,7 @@ export function useResizablePanels(sidebarVisible: boolean) {
         editorWidth: editorW,
         boardWidth: bW,
         editorHidden: false,
-        boardHidden: false,
+        boardHidden: false
       });
     };
 
@@ -394,10 +387,7 @@ export function useResizablePanels(sidebarVisible: boolean) {
       setDragTarget(null);
       document.body.classList.remove("panel-resizing");
       const panelW = mainRef.current?.clientWidth ?? 0;
-      const next =
-        panelW > 0
-          ? finalizeAfterDrag(stateRef.current, panelW)
-          : stateRef.current;
+      const next = panelW > 0 ? finalizeAfterDrag(stateRef.current, panelW) : stateRef.current;
       applyState(next);
       persist(next);
     };
@@ -429,7 +419,7 @@ export function useResizablePanels(sidebarVisible: boolean) {
             editorWidth: startEditor,
             boardWidth: startBoard,
             editorHidden: false,
-            boardHidden: false,
+            boardHidden: false
           });
         } else if (target === "board" && s.boardHidden) {
           startBoard = Math.max(COLLAPSE_AT, rect.right - e.clientX - SPLITTER_SIZE);
@@ -438,20 +428,17 @@ export function useResizablePanels(sidebarVisible: boolean) {
             editorWidth: startEditor,
             boardWidth: startBoard,
             editorHidden: false,
-            boardHidden: false,
+            boardHidden: false
           });
         } else {
           const actual = readPanelWidths(panel);
           startEditor = actual.editor;
           startBoard = actual.board;
-          if (
-            Math.abs(actual.editor - s.editorWidth) > 1 ||
-            Math.abs(actual.board - s.boardWidth) > 1
-          ) {
+          if (Math.abs(actual.editor - s.editorWidth) > 1 || Math.abs(actual.board - s.boardWidth) > 1) {
             applyState({
               ...s,
               editorWidth: actual.editor,
-              boardWidth: actual.board,
+              boardWidth: actual.board
             });
           }
         }
@@ -460,7 +447,7 @@ export function useResizablePanels(sidebarVisible: boolean) {
       dragRef.current = {
         startX: e.clientX,
         startEditor,
-        startBoard,
+        startBoard
       };
       setDragTarget(target);
       document.body.classList.add("panel-resizing");
@@ -477,7 +464,7 @@ export function useResizablePanels(sidebarVisible: boolean) {
     const next: PanelState = {
       ...s,
       editorHidden: nextHidden,
-      editorWidth: nextHidden ? 0 : s.editorWidth,
+      editorWidth: nextHidden ? 0 : s.editorWidth
     };
     applyState(reflowToPanelWidth(next, panelW));
     persist(stateRef.current);
@@ -491,7 +478,7 @@ export function useResizablePanels(sidebarVisible: boolean) {
     const next: PanelState = {
       ...s,
       boardHidden: nextHidden,
-      boardWidth: nextHidden ? 0 : s.boardWidth,
+      boardWidth: nextHidden ? 0 : s.boardWidth
     };
     applyState(reflowToPanelWidth(next, panelW));
     persist(stateRef.current);
@@ -506,7 +493,7 @@ export function useResizablePanels(sidebarVisible: boolean) {
         {
           ...s,
           boardWidth: w,
-          boardHidden: false,
+          boardHidden: false
         },
         panelW
       );
@@ -524,7 +511,7 @@ export function useResizablePanels(sidebarVisible: boolean) {
         {
           ...s,
           boardHidden: hidden,
-          boardWidth: hidden ? 0 : s.boardWidth || loadBoardPanelWidth() || MIN_BOARD,
+          boardWidth: hidden ? 0 : s.boardWidth || loadBoardPanelWidth() || MIN_BOARD
         },
         panelW
       );
@@ -548,6 +535,6 @@ export function useResizablePanels(sidebarVisible: boolean) {
     onEditorSplitterDoubleClick: toggleEditor,
     onBoardSplitterDoubleClick: toggleBoard,
     setBoardPanelWidth,
-    setBoardPanelHidden,
+    setBoardPanelHidden
   };
 }

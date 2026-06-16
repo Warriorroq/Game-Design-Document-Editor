@@ -10,11 +10,7 @@ export function CompactPaneToggle({ value, onChange }: CompactPaneToggleProps) {
   const { t } = useLocale();
 
   return (
-    <div
-      className="compact-pane-switch"
-      role="tablist"
-      aria-label={t("layout.compactSwitchAria")}
-    >
+    <div className="compact-pane-switch" role="tablist" aria-label={t("layout.compactSwitchAria")}>
       <button
         type="button"
         role="tab"

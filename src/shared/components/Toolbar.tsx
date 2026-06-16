@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { useLocale } from "@/shared/context/LocaleContext";
+
+import type { GitStatus } from "@/features/git/lib/git";
+import { ProjectMenu } from "@/features/project/ProjectMenu";
 import { GlobalSearch } from "@/features/search/GlobalSearch";
 import type { GlobalSearchResult } from "@/features/search/lib/globalSearch";
-import { ProjectMenu } from "@/features/project/ProjectMenu";
+import { useLocale } from "@/shared/context/LocaleContext";
 import { isWindowsDesktopApp } from "@/shared/lib/desktop";
-import type { GitStatus } from "@/features/git/lib/git";
 import type { GddDocument } from "@/shared/types";
 
 interface ToolbarProps {
@@ -52,7 +53,7 @@ export function Toolbar({
   onRefreshGitStatus,
   onAfterGitPull,
   onFlushProject,
-  onOpenImageAssets,
+  onOpenImageAssets
 }: ToolbarProps) {
   const { t } = useLocale();
   const [isMaximized, setIsMaximized] = useState(false);
@@ -76,11 +77,7 @@ export function Toolbar({
     <header className="toolbar">
       <div className="toolbar-brand">
         {settingsOpen ? (
-          <button
-            type="button"
-            className="btn btn-ghost"
-            onClick={onBackFromSettings}
-          >
+          <button type="button" className="btn btn-ghost" onClick={onBackFromSettings}>
             {t("toolbar.back")}
           </button>
         ) : (
@@ -89,12 +86,8 @@ export function Toolbar({
             className={`btn btn-ghost sections-toggle ${sidebarVisible ? "active" : ""}`}
             onClick={onToggleSidebar}
             aria-pressed={sidebarVisible}
-            aria-label={
-              sidebarVisible ? t("toolbar.hideSections") : t("toolbar.showSections")
-            }
-            title={
-              sidebarVisible ? t("toolbar.hideSections") : t("toolbar.showSections")
-            }
+            aria-label={sidebarVisible ? t("toolbar.hideSections") : t("toolbar.showSections")}
+            title={sidebarVisible ? t("toolbar.hideSections") : t("toolbar.showSections")}
           >
             {t("toolbar.sections")}
           </button>
@@ -159,10 +152,7 @@ export function Toolbar({
               aria-label={isMaximized ? "Restore" : "Maximize"}
               title={isMaximized ? "Restore" : "Maximize"}
             >
-              <span
-                aria-hidden
-                className={`win-glyph ${isMaximized ? "win-glyph-restore" : "win-glyph-max"}`}
-              />
+              <span aria-hidden className={`win-glyph ${isMaximized ? "win-glyph-restore" : "win-glyph-max"}`} />
             </button>
             <button
               type="button"

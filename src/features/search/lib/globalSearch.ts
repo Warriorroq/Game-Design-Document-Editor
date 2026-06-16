@@ -1,15 +1,7 @@
-import {
-  displayBoardImageAssetName,
-  listBoardImageAssetDesks,
-} from "@/features/board/lib/boardImageRegistry";
+import { displayBoardImageAssetName, listBoardImageAssetDesks } from "@/features/board/lib/boardImageRegistry";
+import { buildAnchorHref, buildMediaHref, buildSectionHref, buildTextHref } from "@/features/links/lib/links";
 import type { MessageKey } from "@/shared/i18n";
-import { translate, type AppLanguage } from "@/shared/i18n";
-import {
-  buildAnchorHref,
-  buildMediaHref,
-  buildSectionHref,
-  buildTextHref,
-} from "@/features/links/lib/links";
+import { type AppLanguage, translate } from "@/shared/i18n";
 import type { GddDocument, GddSection } from "@/shared/types";
 
 export type GlobalSearchMatchKind =
@@ -66,11 +58,7 @@ export function countMatches(haystack: string, needle: string): number {
   return count;
 }
 
-export function snippetAround(
-  text: string,
-  query: string,
-  radius = 36
-): string {
+export function snippetAround(text: string, query: string, radius = 36): string {
   const normalized = normalizeWhitespace(text);
   if (!normalized) return "";
   const idx = normalized.toLowerCase().indexOf(query.toLowerCase());
@@ -80,13 +68,10 @@ export function snippetAround(
   return normalized.slice(start, end);
 }
 
-function pushResult(
-  results: GlobalSearchResult[],
-  item: Omit<GlobalSearchResult, "key"> & { key?: string }
-) {
+function pushResult(results: GlobalSearchResult[], item: Omit<GlobalSearchResult, "key"> & { key?: string }) {
   results.push({
     ...item,
-    key: item.key ?? `${item.href}:${results.length}`,
+    key: item.key ?? `${item.href}:${results.length}`
   });
 }
 
@@ -97,15 +82,10 @@ const SEARCH_WHERE_KEYS: Record<GlobalSearchMatchKind, MessageKey> = {
   "folder-title": "search.where.folderTitle",
   anchor: "search.where.anchor",
   "desk-text": "search.where.deskText",
-  "board-image": "search.where.boardImage",
+  "board-image": "search.where.boardImage"
 };
 
-function searchSection(
-  section: GddSection,
-  query: string,
-  results: GlobalSearchResult[],
-  lang: AppLanguage
-) {
+function searchSection(section: GddSection, query: string, results: GlobalSearchResult[], lang: AppLanguage) {
   const sectionTitle = section.title || "Untitled";
 
   if (section.title && matches(section.title, query)) {
@@ -116,7 +96,7 @@ function searchSection(
       kind: "section-title",
       where: translate(lang, SEARCH_WHERE_KEYS["section-title"]),
       snippet: snippetAround(section.title, query),
-      matchCount: countMatches(section.title, query),
+      matchCount: countMatches(section.title, query)
     });
   }
 
@@ -128,7 +108,7 @@ function searchSection(
       kind: "section-description",
       where: translate(lang, SEARCH_WHERE_KEYS["section-description"]),
       snippet: snippetAround(section.description, query),
-      matchCount: countMatches(section.description, query),
+      matchCount: countMatches(section.description, query)
     });
   }
 
@@ -141,15 +121,12 @@ function searchSection(
       kind: "section-content",
       where: translate(lang, SEARCH_WHERE_KEYS["section-content"]),
       snippet: snippetAround(bodyText, query),
-      matchCount: countMatches(bodyText, query),
+      matchCount: countMatches(bodyText, query)
     });
   }
 
   if (section.content.trim()) {
-    const parsed = new DOMParser().parseFromString(
-      section.content,
-      "text/html"
-    );
+    const parsed = new DOMParser().parseFromString(section.content, "text/html");
     parsed.querySelectorAll("[id]").forEach((el) => {
       const anchorId = el.id;
       if (!anchorId) return;
@@ -164,7 +141,7 @@ function searchSection(
         where: translate(lang, SEARCH_WHERE_KEYS.anchor),
         snippet: snippetAround(text, query),
         matchCount: countMatches(text, query),
-        anchorId,
+        anchorId
       });
     });
   }
@@ -181,17 +158,12 @@ function searchSection(
       where: translate(lang, SEARCH_WHERE_KEYS["desk-text"]),
       snippet: snippetAround(content, query),
       matchCount: countMatches(content, query),
-      textId: text.id,
+      textId: text.id
     });
   }
 }
 
-function searchBoardImages(
-  doc: GddDocument,
-  query: string,
-  results: GlobalSearchResult[],
-  lang: AppLanguage
-) {
+function searchBoardImages(doc: GddDocument, query: string, results: GlobalSearchResult[], lang: AppLanguage) {
   for (const asset of Object.values(doc.boardImages ?? {})) {
     const displayName = displayBoardImageAssetName(asset);
     if (!matches(displayName, query)) continue;
@@ -206,7 +178,7 @@ function searchBoardImages(
         kind: "board-image",
         where: translate(lang, SEARCH_WHERE_KEYS["board-image"]),
         snippet: snippetAround(displayName, query),
-        matchCount: countMatches(displayName, query),
+        matchCount: countMatches(displayName, query)
       });
       continue;
     }
@@ -221,18 +193,13 @@ function searchBoardImages(
         where: translate(lang, SEARCH_WHERE_KEYS["board-image"]),
         snippet: snippetAround(displayName, query),
         matchCount: countMatches(displayName, query),
-        mediaId: desk.itemId,
+        mediaId: desk.itemId
       });
     }
   }
 }
 
-function searchFolders(
-  doc: GddDocument,
-  query: string,
-  results: GlobalSearchResult[],
-  lang: AppLanguage
-) {
+function searchFolders(doc: GddDocument, query: string, results: GlobalSearchResult[], lang: AppLanguage) {
   for (const folder of doc.folders ?? []) {
     if (!folder.title || !matches(folder.title, query)) continue;
     const firstSection = doc.sections
@@ -247,7 +214,7 @@ function searchFolders(
       kind: "folder-title",
       where: translate(lang, SEARCH_WHERE_KEYS["folder-title"]),
       snippet: snippetAround(folder.title, query),
-      matchCount: countMatches(folder.title, query),
+      matchCount: countMatches(folder.title, query)
     });
   }
 }
@@ -261,11 +228,7 @@ export interface SearchFocusTarget {
   anchorId?: string;
 }
 
-export function searchDocument(
-  doc: GddDocument,
-  query: string,
-  lang: AppLanguage = "en"
-): GlobalSearchResult[] {
+export function searchDocument(doc: GddDocument, query: string, lang: AppLanguage = "en"): GlobalSearchResult[] {
   const q = query.trim();
   if (!q) return [];
 

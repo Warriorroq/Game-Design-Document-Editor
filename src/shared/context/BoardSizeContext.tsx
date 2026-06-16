@@ -1,16 +1,6 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
-import {
-  loadBoardSize,
-  saveBoardSize,
-  type BoardSize,
-} from "@/features/board/lib/boardSettings";
+import { createContext, type ReactNode, useCallback, useContext, useMemo, useState } from "react";
+
+import { type BoardSize, loadBoardSize, saveBoardSize } from "@/features/board/lib/boardSettings";
 
 interface BoardSizeContextValue extends BoardSize {
   setBoardSize: (size: BoardSize) => void;
@@ -29,14 +19,12 @@ export function BoardSizeProvider({ children }: { children: ReactNode }) {
     () => ({
       width: size.width,
       height: size.height,
-      setBoardSize,
+      setBoardSize
     }),
     [size.width, size.height, setBoardSize]
   );
 
-  return (
-    <BoardSizeContext.Provider value={value}>{children}</BoardSizeContext.Provider>
-  );
+  return <BoardSizeContext.Provider value={value}>{children}</BoardSizeContext.Provider>;
 }
 
 export function useBoardSize(): BoardSizeContextValue {

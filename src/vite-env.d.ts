@@ -60,47 +60,32 @@ interface Window {
     git?: {
       isAvailable: () => Promise<boolean>;
       status: (folderPath: string) => Promise<GitStatusResult>;
-      init: (
-        folderPath: string
-      ) => Promise<{ ok: boolean; alreadyInitialized?: boolean; error?: string }>;
+      init: (folderPath: string) => Promise<{
+        ok: boolean;
+        alreadyInitialized?: boolean;
+        error?: string;
+      }>;
       commit: (
         folderPath: string,
         message: string,
         identity?: { name: string; email: string }
       ) => Promise<{ ok: boolean; error?: string }>;
-      getIdentity: (
-        folderPath: string
-      ) => Promise<{ ok: boolean; name?: string; email?: string; error?: string }>;
-      setIdentity: (
-        folderPath: string,
-        name: string,
-        email: string
-      ) => Promise<{ ok: boolean; error?: string }>;
+      getIdentity: (folderPath: string) => Promise<{
+        ok: boolean;
+        name?: string;
+        email?: string;
+        error?: string;
+      }>;
+      setIdentity: (folderPath: string, name: string, email: string) => Promise<{ ok: boolean; error?: string }>;
       push: (folderPath: string) => Promise<{ ok: boolean; error?: string }>;
       pull: (folderPath: string) => Promise<{ ok: boolean; error?: string }>;
-      stash: (
-        folderPath: string
-      ) => Promise<{ ok: boolean; stashed?: boolean; error?: string }>;
-      discardProject: (
-        folderPath: string
-      ) => Promise<{ ok: boolean; error?: string }>;
-      onProgress: (
-        listener: (payload: { phase: string; line: string }) => void
-      ) => () => void;
-      getRemote: (
-        folderPath: string
-      ) => Promise<{ ok: boolean; url?: string | null }>;
-      setRemote: (
-        folderPath: string,
-        url: string
-      ) => Promise<{ ok: boolean; error?: string }>;
-      authenticate: (
-        folderPath: string
-      ) => Promise<{ ok: boolean; error?: string }>;
-      storeToken: (
-        folderPath: string,
-        token: string
-      ) => Promise<{ ok: boolean; error?: string }>;
+      stash: (folderPath: string) => Promise<{ ok: boolean; stashed?: boolean; error?: string }>;
+      discardProject: (folderPath: string) => Promise<{ ok: boolean; error?: string }>;
+      onProgress: (listener: (payload: { phase: string; line: string }) => void) => () => void;
+      getRemote: (folderPath: string) => Promise<{ ok: boolean; url?: string | null }>;
+      setRemote: (folderPath: string, url: string) => Promise<{ ok: boolean; error?: string }>;
+      authenticate: (folderPath: string) => Promise<{ ok: boolean; error?: string }>;
+      storeToken: (folderPath: string, token: string) => Promise<{ ok: boolean; error?: string }>;
     };
   };
 }

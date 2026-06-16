@@ -9,7 +9,7 @@ export const SHORTCUT_ACTION_IDS = [
   "desk.copy",
   "desk.paste",
   "desk.delete",
-  "desk.cancel",
+  "desk.cancel"
 ] as const;
 
 export type ShortcutActionId = (typeof SHORTCUT_ACTION_IDS)[number];
@@ -33,74 +33,75 @@ export const SHORTCUT_DEFINITIONS: ShortcutDefinition[] = [
   {
     id: "undo",
     group: "editor",
-    defaultBinding: { key: "z", ctrlOrMeta: true, shift: false, alt: false },
+    defaultBinding: { key: "z", ctrlOrMeta: true, shift: false, alt: false }
   },
   {
     id: "editor.format.bold",
     group: "editor",
-    defaultBinding: { key: "b", ctrlOrMeta: true, shift: false, alt: false },
+    defaultBinding: { key: "b", ctrlOrMeta: true, shift: false, alt: false }
   },
   {
     id: "editor.format.italic",
     group: "editor",
-    defaultBinding: { key: "i", ctrlOrMeta: true, shift: false, alt: false },
+    defaultBinding: { key: "i", ctrlOrMeta: true, shift: false, alt: false }
   },
   {
     id: "editor.format.h1",
     group: "editor",
-    defaultBinding: { key: "1", ctrlOrMeta: true, shift: false, alt: true },
+    defaultBinding: { key: "1", ctrlOrMeta: true, shift: false, alt: true }
   },
   {
     id: "editor.format.h2",
     group: "editor",
-    defaultBinding: { key: "2", ctrlOrMeta: true, shift: false, alt: true },
+    defaultBinding: { key: "2", ctrlOrMeta: true, shift: false, alt: true }
   },
   {
     id: "editor.format.h3",
     group: "editor",
-    defaultBinding: { key: "3", ctrlOrMeta: true, shift: false, alt: true },
+    defaultBinding: { key: "3", ctrlOrMeta: true, shift: false, alt: true }
   },
   {
     id: "editor.format.paragraph",
     group: "editor",
-    defaultBinding: { key: "0", ctrlOrMeta: true, shift: false, alt: true },
+    defaultBinding: { key: "0", ctrlOrMeta: true, shift: false, alt: true }
   },
   {
     id: "desk.copy",
     group: "desk",
-    defaultBinding: { key: "c", ctrlOrMeta: true, shift: false, alt: false },
+    defaultBinding: { key: "c", ctrlOrMeta: true, shift: false, alt: false }
   },
   {
     id: "desk.paste",
     group: "desk",
-    defaultBinding: { key: "v", ctrlOrMeta: true, shift: false, alt: false },
+    defaultBinding: { key: "v", ctrlOrMeta: true, shift: false, alt: false }
   },
   {
     id: "desk.delete",
     group: "desk",
-    defaultBinding: { key: "Delete", ctrlOrMeta: false, shift: false, alt: false },
+    defaultBinding: {
+      key: "Delete",
+      ctrlOrMeta: false,
+      shift: false,
+      alt: false
+    }
   },
   {
     id: "desk.cancel",
     group: "desk",
-    defaultBinding: { key: "Escape", ctrlOrMeta: false, shift: false, alt: false },
-  },
+    defaultBinding: {
+      key: "Escape",
+      ctrlOrMeta: false,
+      shift: false,
+      alt: false
+    }
+  }
 ];
 
 const STORAGE_KEY = "gdd-editor-shortcuts";
 
-const MODIFIER_KEYS = new Set([
-  "Control",
-  "Shift",
-  "Alt",
-  "Meta",
-  "OS",
-]);
+const MODIFIER_KEYS = new Set(["Control", "Shift", "Alt", "Meta", "OS"]);
 
-export function defaultShortcutBindings(): Record<
-  ShortcutActionId,
-  ShortcutBinding
-> {
+export function defaultShortcutBindings(): Record<ShortcutActionId, ShortcutBinding> {
   const out = {} as Record<ShortcutActionId, ShortcutBinding>;
   for (const def of SHORTCUT_DEFINITIONS) {
     out[def.id] = { ...def.defaultBinding };
@@ -136,9 +137,7 @@ export function loadShortcutBindings(): Record<ShortcutActionId, ShortcutBinding
   return bindings;
 }
 
-export function saveShortcutBindings(
-  bindings: Record<ShortcutActionId, ShortcutBinding>
-): void {
+export function saveShortcutBindings(bindings: Record<ShortcutActionId, ShortcutBinding>): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(bindings));
   } catch {
@@ -153,25 +152,18 @@ export function normalizeEventKey(e: KeyboardEvent): string {
   return e.key;
 }
 
-export function bindingFromKeyboardEvent(
-  e: KeyboardEvent
-): ShortcutBinding | null {
+export function bindingFromKeyboardEvent(e: KeyboardEvent): ShortcutBinding | null {
   if (MODIFIER_KEYS.has(e.key)) return null;
   return {
     key: normalizeEventKey(e),
     ctrlOrMeta: e.ctrlKey || e.metaKey,
     shift: e.shiftKey,
-    alt: e.altKey,
+    alt: e.altKey
   };
 }
 
 export function bindingsEqual(a: ShortcutBinding, b: ShortcutBinding): boolean {
-  return (
-    a.key === b.key &&
-    a.ctrlOrMeta === b.ctrlOrMeta &&
-    a.shift === b.shift &&
-    a.alt === b.alt
-  );
+  return a.key === b.key && a.ctrlOrMeta === b.ctrlOrMeta && a.shift === b.shift && a.alt === b.alt;
 }
 
 export function findBindingConflict(
@@ -186,10 +178,7 @@ export function findBindingConflict(
   return null;
 }
 
-export function eventMatchesBinding(
-  e: KeyboardEvent,
-  binding: ShortcutBinding
-): boolean {
+export function eventMatchesBinding(e: KeyboardEvent, binding: ShortcutBinding): boolean {
   const mod = e.ctrlKey || e.metaKey;
   if (binding.ctrlOrMeta !== mod) return false;
   if (binding.shift !== e.shiftKey) return false;

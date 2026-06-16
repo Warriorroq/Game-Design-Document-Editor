@@ -1,26 +1,23 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
+import type { DocumentStore } from "@/application/document/useDocumentStore";
+import { useDesktopArchiveOpen } from "@/application/project/useDesktopArchiveOpen";
+import { useProjectFolder } from "@/application/project/useProjectFolder";
+import { importAsNewProject } from "@/domain/document/document";
+import type { GddDocument } from "@/domain/types";
+import { BoardAssetsDialog } from "@/features/board/components/BoardAssetsDialog";
+import { useLinkContext } from "@/features/links/LinkContext";
 import { LinkContextMenu } from "@/features/links/LinkContextMenu";
 import { LinkPasteDialog } from "@/features/links/LinkPasteDialog";
 import { LinkPreviewLayer } from "@/features/links/LinkPreviewLayer";
+import { type GlobalSearchResult, searchDocument, type SearchFocusTarget } from "@/features/search/lib/globalSearch";
 import { SettingsPage } from "@/features/settings/SettingsPage";
+import { EditorLayout } from "@/presentation/shell/EditorLayout";
 import { Toolbar } from "@/shared/components/Toolbar";
-import { useLinkContext } from "@/features/links/LinkContext";
 import { useLocale } from "@/shared/context/LocaleContext";
 import { useShortcuts } from "@/shared/context/ShortcutsContext";
-import { useDesktopArchiveOpen } from "@/application/project/useDesktopArchiveOpen";
-import { useProjectFolder } from "@/application/project/useProjectFolder";
 import { useResizablePanels } from "@/shared/hooks/useResizablePanels";
-import {
-  searchDocument,
-  type GlobalSearchResult,
-  type SearchFocusTarget,
-} from "@/features/search/lib/globalSearch";
 import { useSidebarVisible } from "@/shared/hooks/useSidebarVisible";
-import { BoardAssetsDialog } from "@/features/board/components/BoardAssetsDialog";
-import { importAsNewProject } from "@/domain/document/document";
-import type { DocumentStore } from "@/application/document/useDocumentStore";
-import type { GddDocument } from "@/domain/types";
-import { EditorLayout } from "@/presentation/shell/EditorLayout";
 
 type AppView = "editor" | "settings";
 
@@ -69,24 +66,22 @@ export function AppMain(props: DocumentStore) {
     beginTransient,
     endTransient,
     replaceDocument,
-    newProject,
+    newProject
   } = props;
 
   const [view, setView] = useState<AppView>("editor");
   const [imageAssetsOpen, setImageAssetsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFocus, setSearchFocus] = useState<SearchFocusTarget | null>(null);
-  const lastSearchResultRef = useRef<{ key: string; matchIndex: number } | null>(
-    null
-  );
+  const lastSearchResultRef = useRef<{
+    key: string;
+    matchIndex: number;
+  } | null>(null);
   const { language, t } = useLocale();
   const projectFolder = useProjectFolder();
   const { matches: shortcutMatches } = useShortcuts();
   const { sidebarVisible, toggleSidebar } = useSidebarVisible();
-  const searchResults = useMemo(
-    () => searchDocument(doc, searchQuery, language),
-    [doc, searchQuery, language]
-  );
+  const searchResults = useMemo(() => searchDocument(doc, searchQuery, language), [doc, searchQuery, language]);
   const {
     mainRef,
     editorWidth,
@@ -98,7 +93,7 @@ export function AppMain(props: DocumentStore) {
     onEditorSplitterDown,
     onBoardSplitterDown,
     onEditorSplitterDoubleClick,
-    onBoardSplitterDoubleClick,
+    onBoardSplitterDoubleClick
   } = useResizablePanels(sidebarVisible);
 
   const { linkTarget, clearLinkTarget, navigateToHref } = useLinkContext();
@@ -130,8 +125,7 @@ export function AppMain(props: DocumentStore) {
         const matchCount = Math.max(1, result.matchCount);
         let matchIndex = 0;
         if (lastSearchResultRef.current?.key === result.key) {
-          matchIndex =
-            (lastSearchResultRef.current.matchIndex + 1) % matchCount;
+          matchIndex = (lastSearchResultRef.current.matchIndex + 1) % matchCount;
         }
         lastSearchResultRef.current = { key: result.key, matchIndex };
         setSearchFocus({
@@ -140,7 +134,7 @@ export function AppMain(props: DocumentStore) {
           kind: result.kind,
           matchIndex,
           matchCount,
-          anchorId: result.anchorId,
+          anchorId: result.anchorId
         });
       } else {
         setSearchFocus(null);
@@ -183,8 +177,7 @@ export function AppMain(props: DocumentStore) {
       try {
         await projectFolder.saveDoc(doc);
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : t("project.readError");
+        const message = err instanceof Error ? err.message : t("project.readError");
         window.alert(message);
         return;
       }
@@ -201,8 +194,7 @@ export function AppMain(props: DocumentStore) {
         const imported = await projectFolder.loadFromFolder(picked.folderPath);
         replaceDocument(imported);
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : t("project.readError");
+        const message = err instanceof Error ? err.message : t("project.readError");
         window.alert(message);
       }
       return;
@@ -215,8 +207,7 @@ export function AppMain(props: DocumentStore) {
       projectFolder.bindProjectFolder(picked.folderPath);
       await projectFolder.saveDocTo(picked.folderPath, doc);
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : t("project.readError");
+      const message = err instanceof Error ? err.message : t("project.readError");
       window.alert(message);
     }
   }, [doc, projectFolder, replaceDocument, t]);
@@ -227,8 +218,7 @@ export function AppMain(props: DocumentStore) {
       const imported = await projectFolder.loadFromFolder(projectFolder.folderPath);
       replaceDocument(imported);
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : t("project.readError");
+      const message = err instanceof Error ? err.message : t("project.readError");
       window.alert(message);
     }
   }, [projectFolder, replaceDocument, t]);
@@ -253,19 +243,13 @@ export function AppMain(props: DocumentStore) {
   }, [shortcutMatches, undo, view]);
 
   const scrollAnchorId =
-    linkTarget?.anchorId && linkTarget.sectionId === activeSection?.id
-      ? linkTarget.anchorId
-      : undefined;
+    linkTarget?.anchorId && linkTarget.sectionId === activeSection?.id ? linkTarget.anchorId : undefined;
 
   const highlightMediaId =
-    linkTarget?.mediaId && linkTarget.sectionId === activeSection?.id
-      ? linkTarget.mediaId
-      : undefined;
+    linkTarget?.mediaId && linkTarget.sectionId === activeSection?.id ? linkTarget.mediaId : undefined;
 
   const highlightTextId =
-    linkTarget?.textId && linkTarget.sectionId === activeSection?.id
-      ? linkTarget.textId
-      : undefined;
+    linkTarget?.textId && linkTarget.sectionId === activeSection?.id ? linkTarget.textId : undefined;
 
   return (
     <div className="app">
@@ -287,9 +271,7 @@ export function AppMain(props: DocumentStore) {
         gitStatus={projectFolder.gitStatus}
         gitAvailable={projectFolder.gitAvailable}
         onOpenProjectFolder={() => void handleOpenProjectFolder()}
-        onRefreshGitStatus={() =>
-          void projectFolder.refreshGitStatus(projectFolder.folderPath)
-        }
+        onRefreshGitStatus={() => void projectFolder.refreshGitStatus(projectFolder.folderPath)}
         onAfterGitPull={() => void handleAfterGitPull()}
         onFlushProject={() => projectFolder.saveDoc(doc)}
         onOpenImageAssets={() => setImageAssetsOpen(true)}
@@ -299,9 +281,7 @@ export function AppMain(props: DocumentStore) {
           projectFolderPath={projectFolder.folderPath}
           gitAvailable={projectFolder.gitAvailable}
           gitStatus={projectFolder.gitStatus}
-          onRefreshGitStatus={() =>
-            void projectFolder.refreshGitStatus(projectFolder.folderPath)
-          }
+          onRefreshGitStatus={() => void projectFolder.refreshGitStatus(projectFolder.folderPath)}
         />
       ) : (
         <EditorLayout

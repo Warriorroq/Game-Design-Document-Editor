@@ -1,19 +1,19 @@
-import { isBoardVideoItem } from "@/domain/board/boardItem";
 import {
   assetIdFromAssetPath,
   collectBoardImageAsset,
   migrateBoardImages,
-  resolveBoardItemSrc,
+  resolveBoardItemSrc
 } from "@/domain/board/boardImageRegistry";
-import { collectSpace3DModelRegistryAssets } from "@/domain/space3d/modelRegistry";
+import { isBoardVideoItem } from "@/domain/board/boardItem";
 import { normalizeDocument } from "@/domain/document/document";
+import { collectSpace3DModelRegistryAssets } from "@/domain/space3d/modelRegistry";
 import type {
   BoardImageAsset,
   BoardItem,
   GddDocument,
   GddSection,
   GddSectionFolder,
-  Space3DModelAsset,
+  Space3DModelAsset
 } from "@/domain/types";
 
 export const FOLDER_FORMAT = "gdd-editor-folder" as const;
@@ -120,7 +120,7 @@ const MIME_EXT: Record<string, string> = {
   "model/gltf-binary": "glb",
   "model/gltf+json": "gltf",
   "model/fbx": "fbx",
-  "model/obj": "obj",
+  "model/obj": "obj"
 };
 
 function extensionForMime(mime: string): string {
@@ -145,10 +145,7 @@ function assetFilePath(assetId: string, mime: string): string {
   return `${ASSETS_DIR}/${assetId}.${extensionForMime(mime)}`;
 }
 
-function registryAssetToFolder(
-  asset: { id: string; src: string },
-  assets: Map<string, FolderAsset>
-): void {
+function registryAssetToFolder(asset: { id: string; src: string }, assets: Map<string, FolderAsset>): void {
   const parsed = parseDataUrl(asset.src);
   if (!parsed) return;
 
@@ -158,33 +155,23 @@ function registryAssetToFolder(
   assets.set(path, {
     path,
     mime: parsed.mime,
-    dataBase64: parsed.dataBase64,
+    dataBase64: parsed.dataBase64
   });
 }
 
-function collectBoardImageRegistryAssets(
-  doc: GddDocument,
-  assets: Map<string, FolderAsset>
-): void {
+function collectBoardImageRegistryAssets(doc: GddDocument, assets: Map<string, FolderAsset>): void {
   for (const asset of Object.values(doc.boardImages ?? {})) {
     registryAssetToFolder(asset, assets);
   }
 }
 
-function collectSpace3DModelRegistryAssetsToFolder(
-  doc: GddDocument,
-  assets: Map<string, FolderAsset>
-): void {
+function collectSpace3DModelRegistryAssetsToFolder(doc: GddDocument, assets: Map<string, FolderAsset>): void {
   for (const asset of collectSpace3DModelRegistryAssets(doc)) {
     registryAssetToFolder(asset, assets);
   }
 }
 
-function boardItemToFile(
-  doc: GddDocument,
-  item: BoardItem,
-  assets: Map<string, FolderAsset>
-): SectionFileBoardItem {
+function boardItemToFile(doc: GddDocument, item: BoardItem, assets: Map<string, FolderAsset>): SectionFileBoardItem {
   if (isBoardVideoItem(item)) {
     const embedUrl = item.src;
     if (!embedUrl) {
@@ -200,14 +187,12 @@ function boardItemToFile(
       y: item.y,
       width: item.width,
       height: item.height,
-      locked: item.locked,
+      locked: item.locked
     };
   }
 
   const src = resolveBoardItemSrc(doc, item);
-  const assetId =
-    item.assetId ??
-    Object.entries(doc.boardImages ?? {}).find(([, asset]) => asset.src === src)?.[0];
+  const assetId = item.assetId ?? Object.entries(doc.boardImages ?? {}).find(([, asset]) => asset.src === src)?.[0];
   if (!assetId) {
     throw new Error(`Board item ${item.id} has no asset id`);
   }
@@ -219,7 +204,7 @@ function boardItemToFile(
       assets.set(path, {
         path,
         mime: parsed.mime,
-        dataBase64: parsed.dataBase64,
+        dataBase64: parsed.dataBase64
       });
     }
     return {
@@ -232,7 +217,7 @@ function boardItemToFile(
       locked: item.locked,
       rotation: item.rotation,
       flipH: item.flipH,
-      flipV: item.flipV,
+      flipV: item.flipV
     };
   }
 
@@ -247,7 +232,7 @@ function boardItemToFile(
       locked: item.locked,
       rotation: item.rotation,
       flipH: item.flipH,
-      flipV: item.flipV,
+      flipV: item.flipV
     };
   }
 
@@ -270,7 +255,7 @@ function boardItemFromFile(
       y: item.y,
       width: item.width,
       height: item.height,
-      locked: item.locked,
+      locked: item.locked
     };
   }
 
@@ -293,14 +278,14 @@ function boardItemFromFile(
     locked: item.locked,
     rotation: item.rotation,
     flipH: item.flipH,
-    flipV: item.flipV,
+    flipV: item.flipV
   };
 }
 
 export function documentToFolderPayload(doc: GddDocument): FolderProjectPayload {
   const updated = migrateBoardImages({
     ...doc,
-    lastModified: new Date().toISOString(),
+    lastModified: new Date().toISOString()
   });
   const assets = new Map<string, FolderAsset>();
   const sections: FolderSectionEntry[] = [];
@@ -316,21 +301,19 @@ export function documentToFolderPayload(doc: GddDocument): FolderProjectPayload 
       folderId: section.folderId,
       kind: section.kind,
       space3d: section.space3d,
-      ...(section.editorScrollTop != null
-        ? { editorScrollTop: section.editorScrollTop }
-        : {}),
+      ...(section.editorScrollTop != null ? { editorScrollTop: section.editorScrollTop } : {}),
       ...(section.boardViewport ? { boardViewport: section.boardViewport } : {}),
       board: section.board.map((item) => boardItemToFile(updated, item, assets)),
       shapes: section.shapes,
       strokes: section.strokes,
       texts: section.texts,
-      groups: section.groups,
+      groups: section.groups
     };
     const path = sectionFilePath(section.id);
     sections.push({
       id: section.id,
       path,
-      content: JSON.stringify(sectionFile, null, 2),
+      content: JSON.stringify(sectionFile, null, 2)
     });
   }
 
@@ -362,21 +345,21 @@ export function documentToFolderPayload(doc: GddDocument): FolderProjectPayload 
       title: folder.title,
       order: folder.order,
       parentFolderId: folder.parentFolderId,
-      collapsed: folder.collapsed,
+      collapsed: folder.collapsed
     })),
     sections: sorted.map((section) => ({
       id: section.id,
       file: sectionFilePath(section.id),
-      order: section.order,
+      order: section.order
     })),
     ...(boardImageMeta.length > 0 ? { boardImages: boardImageMeta } : {}),
-    ...(space3DModelMeta.length > 0 ? { space3DModels: space3DModelMeta } : {}),
+    ...(space3DModelMeta.length > 0 ? { space3DModels: space3DModelMeta } : {})
   };
 
   return {
     manifest: JSON.stringify(manifest, null, 2),
     sections,
-    assets: Array.from(assets.values()),
+    assets: Array.from(assets.values())
   };
 }
 
@@ -396,9 +379,7 @@ export function folderPayloadToDocument(payload: FolderProjectPayload): GddDocum
   const boardImages: Record<string, BoardImageAsset> = {};
   const space3DModels: Record<string, Space3DModelAsset> = {};
   const modelMetaIds = new Set((manifest.space3DModels ?? []).map((meta) => meta.id));
-  const sectionById = new Map(
-    payload.sections.map((entry) => [entry.id, entry.content])
-  );
+  const sectionById = new Map(payload.sections.map((entry) => [entry.id, entry.content]));
 
   const sections: GddSection[] = manifest.sections
     .slice()
@@ -432,7 +413,7 @@ export function folderPayloadToDocument(payload: FolderProjectPayload): GddDocum
         shapes: sectionFile.shapes ?? [],
         strokes: sectionFile.strokes ?? [],
         texts: sectionFile.texts ?? [],
-        groups: sectionFile.groups ?? [],
+        groups: sectionFile.groups ?? []
       };
     });
 
@@ -457,7 +438,7 @@ export function folderPayloadToDocument(payload: FolderProjectPayload): GddDocum
     if (!space3DModels[meta.id]) continue;
     space3DModels[meta.id] = {
       ...space3DModels[meta.id],
-      ...(name ? { name } : {}),
+      ...(name ? { name } : {})
     };
   }
 
@@ -474,16 +455,14 @@ export function folderPayloadToDocument(payload: FolderProjectPayload): GddDocum
         title: folder.title,
         order: folder.order,
         parentFolderId: folder.parentFolderId,
-        collapsed: folder.collapsed,
+        collapsed: folder.collapsed
       })
     ),
-    sections,
+    sections
   });
 }
 
-export function documentToFolderFiles(
-  doc: GddDocument
-): Map<string, string | Uint8Array> {
+export function documentToFolderFiles(doc: GddDocument): Map<string, string | Uint8Array> {
   const payload = documentToFolderPayload(doc);
   const files = new Map<string, string | Uint8Array>();
   files.set(MANIFEST_FILE, payload.manifest);
@@ -497,9 +476,7 @@ export function documentToFolderFiles(
   return files;
 }
 
-export function folderFilesToDocument(
-  files: Map<string, string | Uint8Array>
-): GddDocument {
+export function folderFilesToDocument(files: Map<string, string | Uint8Array>): GddDocument {
   const manifest = files.get(MANIFEST_FILE);
   if (typeof manifest !== "string") {
     throw new Error("Missing gdd.json in project folder.");
@@ -508,7 +485,7 @@ export function folderFilesToDocument(
   const payload: FolderProjectPayload = {
     manifest,
     sections: [],
-    assets: [],
+    assets: []
   };
 
   for (const [path, content] of files) {
@@ -520,9 +497,7 @@ export function folderFilesToDocument(
     }
     if (path.startsWith(`${ASSETS_DIR}/`) && content instanceof Uint8Array) {
       const ext = path.split(".").pop() ?? "bin";
-      const mime =
-        Object.entries(MIME_EXT).find(([, value]) => value === ext)?.[0] ??
-        "application/octet-stream";
+      const mime = Object.entries(MIME_EXT).find(([, value]) => value === ext)?.[0] ?? "application/octet-stream";
       let binary = "";
       for (const byte of content) {
         binary += String.fromCharCode(byte);
@@ -530,7 +505,7 @@ export function folderFilesToDocument(
       payload.assets.push({
         path,
         mime,
-        dataBase64: btoa(binary),
+        dataBase64: btoa(binary)
       });
     }
   }

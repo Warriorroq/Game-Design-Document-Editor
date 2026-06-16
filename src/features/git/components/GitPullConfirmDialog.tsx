@@ -1,8 +1,10 @@
+import "@/shared/styles/LinkMenus.css";
+
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
-import { useLocale } from "@/shared/context/LocaleContext";
+
 import type { GitFileStatus } from "@/features/git/lib/git";
-import "@/shared/styles/LinkMenus.css";
+import { useLocale } from "@/shared/context/LocaleContext";
 
 export type GitPullConfirmAction = "stash" | "discard";
 
@@ -14,13 +16,7 @@ interface GitPullConfirmDialogProps {
   onConfirm: (action: GitPullConfirmAction) => void;
 }
 
-export function GitPullConfirmDialog({
-  open,
-  files,
-  busy = false,
-  onClose,
-  onConfirm,
-}: GitPullConfirmDialogProps) {
+export function GitPullConfirmDialog({ open, files, busy = false, onClose, onConfirm }: GitPullConfirmDialogProps) {
   const { t } = useLocale();
 
   useEffect(() => {
@@ -35,10 +31,7 @@ export function GitPullConfirmDialog({
   if (!open) return null;
 
   const dialog = (
-    <div
-      className="link-dialog-backdrop"
-      onPointerDown={busy ? undefined : onClose}
-    >
+    <div className="link-dialog-backdrop" onPointerDown={busy ? undefined : onClose}>
       <div
         className="link-paste-dialog git-pull-confirm-dialog"
         role="dialog"
@@ -60,34 +53,17 @@ export function GitPullConfirmDialog({
             ))}
           </ul>
           {files.length > 12 && (
-            <p className="git-pull-confirm-more">
-              {t("git.pullConfirmMore", { count: files.length - 12 })}
-            </p>
+            <p className="git-pull-confirm-more">{t("git.pullConfirmMore", { count: files.length - 12 })}</p>
           )}
         </div>
         <div className="link-paste-actions git-pull-confirm-actions">
-          <button
-            type="button"
-            className="btn btn-ghost"
-            disabled={busy}
-            onClick={onClose}
-          >
+          <button type="button" className="btn btn-ghost" disabled={busy} onClick={onClose}>
             {t("link.cancel")}
           </button>
-          <button
-            type="button"
-            className="btn btn-ghost"
-            disabled={busy}
-            onClick={() => onConfirm("stash")}
-          >
+          <button type="button" className="btn btn-ghost" disabled={busy} onClick={() => onConfirm("stash")}>
             {t("git.pullConfirmStash")}
           </button>
-          <button
-            type="button"
-            className="btn btn-warning"
-            disabled={busy}
-            onClick={() => onConfirm("discard")}
-          >
+          <button type="button" className="btn btn-warning" disabled={busy} onClick={() => onConfirm("discard")}>
             {t("git.pullConfirmDiscard")}
           </button>
         </div>

@@ -11,5 +11,5 @@ export const BOARD_TEXT_COLORS = [
   "#f87171",
   "#c084fc",
   "#22d3ee",
-  "#fb923c",
+  "#fb923c"
 ] as const;

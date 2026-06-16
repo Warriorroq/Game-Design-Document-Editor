@@ -1,18 +1,11 @@
 import type { CSSProperties } from "react";
+
+import { BOARD_PEN_COLORS, BOARD_PEN_WIDTHS, type BoardPenWidth } from "@/features/board/lib/boardPen";
+import { nextUniformFlag, uniformFlag, uniformTextAlign } from "@/features/board/lib/boardTextStyle";
+import { TextColorSwatches } from "@/shared/components/TextColorSwatches";
 import { useLocale } from "@/shared/context/LocaleContext";
-import {
-  BOARD_PEN_COLORS,
-  BOARD_PEN_WIDTHS,
-  type BoardPenWidth,
-} from "@/features/board/lib/boardPen";
-import {
-  nextUniformFlag,
-  uniformFlag,
-  uniformTextAlign,
-} from "@/features/board/lib/boardTextStyle";
 import { resolveBoardTextColor } from "@/shared/lib/textColorUtils";
 import type { BoardText, BoardTextAlign } from "@/shared/types";
-import { TextColorSwatches } from "@/shared/components/TextColorSwatches";
 
 interface BoardToolbarProps {
   penMode: boolean;
@@ -24,10 +17,7 @@ interface BoardToolbarProps {
   selectedTextIds: string[];
   texts: BoardText[];
   onTextColorChange: (textIds: string[], color: string) => void;
-  onTextStyleChange: (
-    textIds: string[],
-    patch: Pick<BoardText, "bold" | "italic" | "strikethrough">
-  ) => void;
+  onTextStyleChange: (textIds: string[], patch: Pick<BoardText, "bold" | "italic" | "strikethrough">) => void;
   onTextAlignChange: (textIds: string[], align: BoardTextAlign) => void;
 }
 
@@ -42,22 +32,17 @@ export function BoardToolbar({
   texts,
   onTextColorChange,
   onTextStyleChange,
-  onTextAlignChange,
+  onTextAlignChange
 }: BoardToolbarProps) {
   const { t } = useLocale();
   const hasTextSelection = selectedTextIds.length > 0;
 
   const selectedTexts = hasTextSelection
-    ? selectedTextIds
-        .map((id) => texts.find((t) => t.id === id))
-        .filter((t): t is BoardText => Boolean(t))
+    ? selectedTextIds.map((id) => texts.find((t) => t.id === id)).filter((t): t is BoardText => Boolean(t))
     : [];
 
   const textColors = selectedTexts.map((t) => resolveBoardTextColor(t.color));
-  const activeTextColor =
-    textColors.length > 0 && textColors.every((c) => c === textColors[0])
-      ? textColors[0]
-      : null;
+  const activeTextColor = textColors.length > 0 && textColors.every((c) => c === textColors[0]) ? textColors[0] : null;
 
   const boldState = uniformFlag(selectedTexts, "bold");
   const italicState = uniformFlag(selectedTexts, "italic");
@@ -67,11 +52,7 @@ export function BoardToolbar({
   return (
     <footer className="board-toolbar">
       <div className="board-toolbar-row">
-        <div
-          className="board-desk-mode-group"
-          role="group"
-          aria-label={t("desk.modeAria")}
-        >
+        <div className="board-desk-mode-group" role="group" aria-label={t("desk.modeAria")}>
           <button
             type="button"
             className={`board-desk-mode-btn ${penMode ? "active" : ""}`}
@@ -96,11 +77,7 @@ export function BoardToolbar({
 
         {penMode && (
           <>
-            <div
-              className="board-pen-colors"
-              role="group"
-              aria-label={t("desk.penColorAria")}
-            >
+            <div className="board-pen-colors" role="group" aria-label={t("desk.penColorAria")}>
               {BOARD_PEN_COLORS.map((color) => (
                 <button
                   key={color}
@@ -113,11 +90,7 @@ export function BoardToolbar({
                 />
               ))}
             </div>
-            <div
-              className="board-pen-widths"
-              role="group"
-              aria-label={t("desk.penThicknessAria")}
-            >
+            <div className="board-pen-widths" role="group" aria-label={t("desk.penThicknessAria")}>
               {BOARD_PEN_WIDTHS.map((w) => (
                 <button
                   key={w}
@@ -128,10 +101,7 @@ export function BoardToolbar({
                   aria-pressed={penWidth === w}
                   onClick={() => onPenWidthChange(w)}
                 >
-                  <span
-                    className="board-pen-width-dot"
-                    style={{ width: w + 4, height: w + 4 }}
-                  />
+                  <span className="board-pen-width-dot" style={{ width: w + 4, height: w + 4 }} />
                 </button>
               ))}
             </div>
@@ -140,11 +110,7 @@ export function BoardToolbar({
 
         {hasTextSelection && (
           <>
-            <div
-              className="board-text-style-group"
-              role="group"
-              aria-label={t("desk.textStyleAria")}
-            >
+            <div className="board-text-style-group" role="group" aria-label={t("desk.textStyleAria")}>
               <button
                 type="button"
                 className={`board-text-style-btn ${boldState === true ? "active" : ""}`}
@@ -153,7 +119,7 @@ export function BoardToolbar({
                 aria-pressed={boldState === true}
                 onClick={() =>
                   onTextStyleChange(selectedTextIds, {
-                    bold: nextUniformFlag(boldState),
+                    bold: nextUniformFlag(boldState)
                   })
                 }
               >
@@ -167,7 +133,7 @@ export function BoardToolbar({
                 aria-pressed={italicState === true}
                 onClick={() =>
                   onTextStyleChange(selectedTextIds, {
-                    italic: nextUniformFlag(italicState),
+                    italic: nextUniformFlag(italicState)
                   })
                 }
               >
@@ -181,23 +147,19 @@ export function BoardToolbar({
                 aria-pressed={strikeState === true}
                 onClick={() =>
                   onTextStyleChange(selectedTextIds, {
-                    strikethrough: nextUniformFlag(strikeState),
+                    strikethrough: nextUniformFlag(strikeState)
                   })
                 }
               >
                 <span className="board-text-style-btn-strike">S</span>
               </button>
             </div>
-            <div
-              className="board-text-align-group"
-              role="group"
-              aria-label={t("desk.textAlignAria")}
-            >
+            <div className="board-text-align-group" role="group" aria-label={t("desk.textAlignAria")}>
               {(
                 [
                   ["left", "desk.textAlignLeft"],
                   ["center", "desk.textAlignCenter"],
-                  ["right", "desk.textAlignRight"],
+                  ["right", "desk.textAlignRight"]
                 ] as const
               ).map(([align, labelKey]) => (
                 <button
@@ -209,10 +171,7 @@ export function BoardToolbar({
                   aria-pressed={alignState === align}
                   onClick={() => onTextAlignChange(selectedTextIds, align)}
                 >
-                  <span
-                    className={`board-text-align-icon board-text-align-icon--${align}`}
-                    aria-hidden
-                  >
+                  <span className={`board-text-align-icon board-text-align-icon--${align}`} aria-hidden>
                     <span />
                     <span />
                     <span />

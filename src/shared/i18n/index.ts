@@ -1,11 +1,6 @@
 import type { BoardSizePresetId } from "@/features/board/lib/boardSettings";
+import { APP_LANGUAGES, type AppLanguage, type MessageKey, MESSAGES } from "@/shared/i18n/messages";
 import type { AppThemeId } from "@/shared/lib/themeTokens";
-import {
-  APP_LANGUAGES,
-  MESSAGES,
-  type AppLanguage,
-  type MessageKey,
-} from "@/shared/i18n/messages";
 
 export type { AppLanguage, MessageKey };
 export { APP_LANGUAGES, MESSAGES };
@@ -37,11 +32,7 @@ export function applyStoredLanguage(): void {
 
 export type TranslateParams = Record<string, string | number>;
 
-export function translate(
-  lang: AppLanguage,
-  key: MessageKey,
-  params?: TranslateParams
-): string {
+export function translate(lang: AppLanguage, key: MessageKey, params?: TranslateParams): string {
   let text = MESSAGES[lang][key] ?? MESSAGES.en[key] ?? key;
   if (params) {
     for (const [name, value] of Object.entries(params)) {

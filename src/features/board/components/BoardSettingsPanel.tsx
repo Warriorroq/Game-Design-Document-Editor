@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
-import { useLocale } from "@/shared/context/LocaleContext";
-import { useBoardSize } from "@/shared/context/BoardSizeContext";
+
 import {
   BOARD_SIZE_PRESET_IDS,
   BOARD_SIZE_PRESETS,
   boardSizeMatchesPreset,
-  normalizeBoardSize,
   type BoardSizePresetId,
+  normalizeBoardSize
 } from "@/features/board/lib/boardSettings";
+import { useBoardSize } from "@/shared/context/BoardSizeContext";
+import { useLocale } from "@/shared/context/LocaleContext";
 import { boardPresetDescKey, boardPresetNameKey } from "@/shared/i18n";
 
 export function BoardSettingsPanel() {
@@ -47,9 +48,7 @@ export function BoardSettingsPanel() {
   return (
     <div className="settings-board">
       <p className="settings-hint">{t("settings.boardHint")}</p>
-      <p className="settings-board-current">
-        {t("settings.boardCurrent", { width, height })}
-      </p>
+      <p className="settings-board-current">{t("settings.boardCurrent", { width, height })}</p>
 
       <div className="board-preset-grid">
         {BOARD_SIZE_PRESET_IDS.map((id) => {
@@ -63,15 +62,11 @@ export function BoardSettingsPanel() {
               aria-pressed={active}
               onClick={() => applyPreset(id)}
             >
-              <span className="board-preset-label">
-                {t(boardPresetNameKey(id))}
-              </span>
+              <span className="board-preset-label">{t(boardPresetNameKey(id))}</span>
               <span className="board-preset-size">
                 {preset.width} × {preset.height}
               </span>
-              <span className="board-preset-desc">
-                {t(boardPresetDescKey(id))}
-              </span>
+              <span className="board-preset-desc">{t(boardPresetDescKey(id))}</span>
             </button>
           );
         })}

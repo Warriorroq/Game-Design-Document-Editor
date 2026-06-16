@@ -1,9 +1,4 @@
-import {
-  applyThemeVars,
-  resolveThemeId,
-  THEME_VARS,
-  type AppThemeId,
-} from "@/shared/lib/themeTokens";
+import { applyThemeVars, type AppThemeId, resolveThemeId, THEME_VARS } from "@/shared/lib/themeTokens";
 
 export type { AppThemeId };
 

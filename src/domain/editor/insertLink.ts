@@ -17,29 +17,21 @@ export function restoreEditorSelection(range: Range | null): boolean {
   return true;
 }
 
-export function insertLinkInEditor(
-  root: HTMLElement,
-  href: string,
-  text: string,
-  savedRange?: Range | null
-): void {
+export function insertLinkInEditor(root: HTMLElement, href: string, text: string, savedRange?: Range | null): void {
   root.focus();
   const sel = window.getSelection();
   if (!sel) return;
 
   const a = document.createElement("a");
   a.href = href;
-  a.className = isExternalHref(href)
-    ? "gdd-link gdd-link--external"
-    : "gdd-link";
+  a.className = isExternalHref(href) ? "gdd-link gdd-link--external" : "gdd-link";
   if (isExternalHref(href)) {
     a.target = "_blank";
     a.rel = "noopener noreferrer";
   }
   a.textContent = text || href;
 
-  const rangeInRoot = (range: Range) =>
-    root.contains(range.startContainer) && root.contains(range.endContainer);
+  const rangeInRoot = (range: Range) => root.contains(range.startContainer) && root.contains(range.endContainer);
 
   if (savedRange && rangeInRoot(savedRange)) {
     restoreEditorSelection(savedRange);

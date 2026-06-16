@@ -2,29 +2,30 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
+
 import { resolveSpace3DModelSrc } from "@/domain/space3d/modelRegistry";
 import {
   defaultSpace3DData,
   normalizeSpace3DGrid,
   normalizeSpace3DObject,
-  transformModeToControls,
+  transformModeToControls
 } from "@/domain/space3d/space3d";
 import type { GddDocument, Space3DData, Space3DEditMode, Space3DObject } from "@/domain/types";
 import {
   createInfiniteGrid,
   disposeInfiniteGrid,
   snapTransformPatch,
-  updateInfiniteGrid,
+  updateInfiniteGrid
 } from "@/features/space3d/lib/space3dGrid";
 import { cloneModelInstance, loadSpace3DModelTemplate } from "@/features/space3d/lib/space3dLoader";
-import { configureTransformControlsGizmo } from "@/features/space3d/lib/space3dTransformControls";
 import {
   applyObjectTransform,
   disposeObject3D,
   findObjectRoot,
   patchFromObject3D,
-  primitiveMesh,
+  primitiveMesh
 } from "@/features/space3d/lib/space3dObject";
+import { configureTransformControlsGizmo } from "@/features/space3d/lib/space3dTransformControls";
 
 interface UseSpace3DSceneOptions {
   containerRef: React.RefObject<HTMLDivElement | null>;
@@ -63,7 +64,7 @@ export function useSpace3DScene({
   onObjectChange,
   onCameraChange,
   onBeginTransientEdit,
-  onEndTransientEdit,
+  onEndTransientEdit
 }: UseSpace3DSceneOptions) {
   const sceneRef = useRef<SceneContext | null>(null);
   const space3dRef = useRef(space3d);
@@ -108,7 +109,7 @@ export function useSpace3DScene({
     controls.mouseButtons = {
       LEFT: THREE.MOUSE.ROTATE,
       MIDDLE: THREE.MOUSE.DOLLY,
-      RIGHT: THREE.MOUSE.PAN,
+      RIGHT: THREE.MOUSE.PAN
     };
 
     const transformControls = new TransformControls(camera, renderer.domElement);
@@ -144,7 +145,7 @@ export function useSpace3DScene({
           scaleZ: patch.scaleZ,
           rotationX: patch.rotationX,
           rotationY: patch.rotationY,
-          rotationZ: patch.rotationZ,
+          rotationZ: patch.rotationZ
         });
       }
       onObjectChangeRef.current(objectId, patch);
@@ -182,7 +183,7 @@ export function useSpace3DScene({
       selectionHelper,
       raycaster: new THREE.Raycaster(),
       pointer: new THREE.Vector2(),
-      gridHelper,
+      gridHelper
     };
     sceneRef.current = ctx;
 
@@ -204,12 +205,7 @@ export function useSpace3DScene({
       frameId = requestAnimationFrame(tick);
       controls.update();
       if (gridHelper.visible) {
-        updateInfiniteGrid(
-          gridHelper,
-          camera,
-          controls.target,
-          normalizeSpace3DGrid(space3dRef.current.grid)
-        );
+        updateInfiniteGrid(gridHelper, camera, controls.target, normalizeSpace3DGrid(space3dRef.current.grid));
       }
       renderer.render(scene, camera);
     };
@@ -220,13 +216,13 @@ export function useSpace3DScene({
         position: {
           x: camera.position.x,
           y: camera.position.y,
-          z: camera.position.z,
+          z: camera.position.z
         },
         target: {
           x: controls.target.x,
           y: controls.target.y,
-          z: controls.target.z,
-        },
+          z: controls.target.z
+        }
       });
     };
     const onOrbitStart = () => {
@@ -364,9 +360,7 @@ export function useSpace3DScene({
 
         if (existing) {
           const mesh = existing as THREE.Mesh;
-          const needsRebuild =
-            mesh.userData.primitiveType !== obj.type ||
-            mesh.userData.color !== obj.color;
+          const needsRebuild = mesh.userData.primitiveType !== obj.type || mesh.userData.color !== obj.color;
           if (needsRebuild) {
             ctx!.objectGroup.remove(existing);
             disposeObject3D(existing);

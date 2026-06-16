@@ -89,7 +89,7 @@ function registerIpcHandlers(win) {
   ipcMain.handle("project:pick-folder", async () => {
     const result = await dialog.showOpenDialog(win, {
       properties: ["openDirectory", "createDirectory"],
-      title: "Open GDD project folder",
+      title: "Open GDD project folder"
     });
     if (result.canceled || !result.filePaths[0]) {
       return { ok: false, canceled: true };
@@ -98,7 +98,7 @@ function registerIpcHandlers(win) {
     return {
       ok: true,
       folderPath,
-      hasProject: project.hasProjectFile(folderPath),
+      hasProject: project.hasProjectFile(folderPath)
     };
   });
 
@@ -152,10 +152,8 @@ function registerIpcHandlers(win) {
     const parsedIdentity =
       identity && typeof identity === "object"
         ? {
-            name:
-              typeof identity.name === "string" ? identity.name.trim() : "",
-            email:
-              typeof identity.email === "string" ? identity.email.trim() : "",
+            name: typeof identity.name === "string" ? identity.name.trim() : "",
+            email: typeof identity.email === "string" ? identity.email.trim() : ""
           }
         : undefined;
     return git.commit(folderPath, message.trim(), parsedIdentity);
@@ -266,8 +264,8 @@ function createWindow() {
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
-      preload: path.join(__dirname, "preload.cjs"),
-    },
+      preload: path.join(__dirname, "preload.cjs")
+    }
   });
 
   mainWindow = win;
@@ -280,8 +278,7 @@ function createWindow() {
     ipcRegistered = true;
   }
 
-  const emitMaxChanged = () =>
-    win.webContents.send("window:maximized-changed", win.isMaximized());
+  const emitMaxChanged = () => win.webContents.send("window:maximized-changed", win.isMaximized());
   win.on("maximize", emitMaxChanged);
   win.on("unmaximize", emitMaxChanged);
 
@@ -302,12 +299,7 @@ function createWindow() {
 function configureEmbedReferrer() {
   const embedReferer = "https://localhost/";
   const filter = {
-    urls: [
-      "*://*.youtube.com/*",
-      "*://*.youtube-nocookie.com/*",
-      "*://*.googlevideo.com/*",
-      "*://*.ytimg.com/*",
-    ],
+    urls: ["*://*.youtube.com/*", "*://*.youtube-nocookie.com/*", "*://*.googlevideo.com/*", "*://*.ytimg.com/*"]
   };
 
   session.defaultSession.webRequest.onBeforeSendHeaders(filter, (details, callback) => {

@@ -2,16 +2,7 @@ export type BoardShapeType = "arrow" | "line" | "box";
 
 export type BoardDrawTool = "pen" | BoardShapeType;
 
-export type BoardEdge =
-  | "n"
-  | "s"
-  | "e"
-  | "w"
-  | "nw"
-  | "ne"
-  | "sw"
-  | "se"
-  | "center";
+export type BoardEdge = "n" | "s" | "e" | "w" | "nw" | "ne" | "sw" | "se" | "center";
 
 export interface BoardAttach {
   itemId: string;

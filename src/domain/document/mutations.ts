@@ -1,24 +1,24 @@
-import { removeMembersFromGroups } from "@/domain/board/deskGroups";
-import { reorderDeskLayer } from "@/domain/board/deskLayerOrder";
 import {
   deleteBoardImageAsset,
   prepareBoardItemForDoc,
   prepareBoardItemsForDoc,
-  updateBoardImageAssetName,
+  updateBoardImageAssetName
 } from "@/domain/board/boardImageRegistry";
-import {
-  deleteSpace3DModelAsset,
-  registerSpace3DModel,
-  updateSpace3DModelAssetName,
-} from "@/domain/space3d/modelRegistry";
+import type { DeskClipboard, DeskSelection } from "@/domain/board/deskClipboard";
+import { removeMembersFromGroups } from "@/domain/board/deskGroups";
+import { reorderDeskLayer } from "@/domain/board/deskLayerOrder";
 import {
   applySidebarDrop,
   nextChildOrder,
   removeFolderFromDoc,
   removeSectionFromDoc,
-  type SidebarDropTarget,
+  type SidebarDropTarget
 } from "@/domain/sidebar/sidebarOrder";
-import type { DeskClipboard, DeskSelection } from "@/domain/board/deskClipboard";
+import {
+  deleteSpace3DModelAsset,
+  registerSpace3DModel,
+  updateSpace3DModelAssetName
+} from "@/domain/space3d/modelRegistry";
 import type {
   BoardGroup,
   BoardItem,
@@ -27,24 +27,17 @@ import type {
   BoardText,
   GddDocument,
   GddSection,
-  GddSectionFolder,
+  GddSectionFolder
 } from "@/domain/types";
 
-export function patchDocument(
-  doc: GddDocument,
-  patch: Partial<GddDocument>
-): GddDocument {
+export function patchDocument(doc: GddDocument, patch: Partial<GddDocument>): GddDocument {
   return { ...doc, ...patch };
 }
 
-export function patchSection(
-  doc: GddDocument,
-  id: string,
-  patch: Partial<GddSection>
-): GddDocument {
+export function patchSection(doc: GddDocument, id: string, patch: Partial<GddSection>): GddDocument {
   return {
     ...doc,
-    sections: doc.sections.map((s) => (s.id === id ? { ...s, ...patch } : s)),
+    sections: doc.sections.map((s) => (s.id === id ? { ...s, ...patch } : s))
   };
 }
 
@@ -75,17 +68,14 @@ export function addSection(
           shapes: [],
           strokes: [],
           texts: [],
-          groups: [],
-        },
-      ],
-    },
+          groups: []
+        }
+      ]
+    }
   };
 }
 
-export function addFolder(
-  doc: GddDocument,
-  parentFolderId?: string
-): GddDocument {
+export function addFolder(doc: GddDocument, parentFolderId?: string): GddDocument {
   const id = crypto.randomUUID();
   return {
     ...doc,
@@ -95,22 +85,16 @@ export function addFolder(
         id,
         title: "New Folder",
         order: nextChildOrder(doc, parentFolderId ?? null),
-        parentFolderId,
-      },
-    ],
+        parentFolderId
+      }
+    ]
   };
 }
 
-export function patchFolder(
-  doc: GddDocument,
-  id: string,
-  patch: Partial<GddSectionFolder>
-): GddDocument {
+export function patchFolder(doc: GddDocument, id: string, patch: Partial<GddSectionFolder>): GddDocument {
   return {
     ...doc,
-    folders: (doc.folders ?? []).map((folder) =>
-      folder.id === id ? { ...folder, ...patch } : folder
-    ),
+    folders: (doc.folders ?? []).map((folder) => (folder.id === id ? { ...folder, ...patch } : folder))
   };
 }
 
@@ -119,7 +103,7 @@ export function toggleFolderCollapsed(doc: GddDocument, id: string): GddDocument
     ...doc,
     folders: (doc.folders ?? []).map((folder) =>
       folder.id === id ? { ...folder, collapsed: !folder.collapsed } : folder
-    ),
+    )
   };
 }
 
@@ -151,34 +135,22 @@ export function patchBoardItem(
       s.id === sectionId
         ? {
             ...s,
-            board: s.board.map((item) =>
-              item.id === itemId ? { ...item, ...patch } : item
-            ),
+            board: s.board.map((item) => (item.id === itemId ? { ...item, ...patch } : item))
           }
         : s
-    ),
+    )
   };
 }
 
-export function addBoardItem(
-  doc: GddDocument,
-  sectionId: string,
-  item: BoardItem
-): GddDocument {
+export function addBoardItem(doc: GddDocument, sectionId: string, item: BoardItem): GddDocument {
   const { doc: withAsset, item: normalized } = prepareBoardItemForDoc(doc, item);
   return {
     ...withAsset,
-    sections: withAsset.sections.map((s) =>
-      s.id === sectionId ? { ...s, board: [...s.board, normalized] } : s
-    ),
+    sections: withAsset.sections.map((s) => (s.id === sectionId ? { ...s, board: [...s.board, normalized] } : s))
   };
 }
 
-export function removeBoardItem(
-  doc: GddDocument,
-  sectionId: string,
-  itemId: string
-): GddDocument {
+export function removeBoardItem(doc: GddDocument, sectionId: string, itemId: string): GddDocument {
   return {
     ...doc,
     sections: doc.sections.map((s) =>
@@ -189,31 +161,19 @@ export function removeBoardItem(
             groups: removeMembersFromGroups(s.groups, [itemId], [], [], []),
             shapes: s.shapes.map((shape) => ({
               ...shape,
-              start:
-                shape.start.attach?.itemId === itemId
-                  ? { x: shape.start.x, y: shape.start.y }
-                  : shape.start,
-              end:
-                shape.end.attach?.itemId === itemId
-                  ? { x: shape.end.x, y: shape.end.y }
-                  : shape.end,
-            })),
+              start: shape.start.attach?.itemId === itemId ? { x: shape.start.x, y: shape.start.y } : shape.start,
+              end: shape.end.attach?.itemId === itemId ? { x: shape.end.x, y: shape.end.y } : shape.end
+            }))
           }
         : s
-    ),
+    )
   };
 }
 
-export function addBoardShape(
-  doc: GddDocument,
-  sectionId: string,
-  shape: BoardShape
-): GddDocument {
+export function addBoardShape(doc: GddDocument, sectionId: string, shape: BoardShape): GddDocument {
   return {
     ...doc,
-    sections: doc.sections.map((s) =>
-      s.id === sectionId ? { ...s, shapes: [...s.shapes, shape] } : s
-    ),
+    sections: doc.sections.map((s) => (s.id === sectionId ? { ...s, shapes: [...s.shapes, shape] } : s))
   };
 }
 
@@ -229,20 +189,14 @@ export function patchBoardShape(
       s.id === sectionId
         ? {
             ...s,
-            shapes: s.shapes.map((sh) =>
-              sh.id === shapeId ? { ...sh, ...patch } : sh
-            ),
+            shapes: s.shapes.map((sh) => (sh.id === shapeId ? { ...sh, ...patch } : sh))
           }
         : s
-    ),
+    )
   };
 }
 
-export function removeBoardShape(
-  doc: GddDocument,
-  sectionId: string,
-  shapeId: string
-): GddDocument {
+export function removeBoardShape(doc: GddDocument, sectionId: string, shapeId: string): GddDocument {
   return {
     ...doc,
     sections: doc.sections.map((s) =>
@@ -250,18 +204,14 @@ export function removeBoardShape(
         ? {
             ...s,
             shapes: s.shapes.filter((sh) => sh.id !== shapeId),
-            groups: removeMembersFromGroups(s.groups, [], [shapeId], [], []),
+            groups: removeMembersFromGroups(s.groups, [], [shapeId], [], [])
           }
         : s
-    ),
+    )
   };
 }
 
-export function addBoardGroup(
-  doc: GddDocument,
-  sectionId: string,
-  group: BoardGroup
-): GddDocument {
+export function addBoardGroup(doc: GddDocument, sectionId: string, group: BoardGroup): GddDocument {
   return {
     ...doc,
     sections: doc.sections.map((s) =>
@@ -276,39 +226,27 @@ export function addBoardGroup(
                 group.memberTextIds,
                 group.memberStrokeIds
               ),
-              group,
-            ],
+              group
+            ]
           }
         : s
-    ),
+    )
   };
 }
 
-export function removeBoardGroup(
-  doc: GddDocument,
-  sectionId: string,
-  groupId: string
-): GddDocument {
+export function removeBoardGroup(doc: GddDocument, sectionId: string, groupId: string): GddDocument {
   return {
     ...doc,
     sections: doc.sections.map((s) =>
-      s.id === sectionId
-        ? { ...s, groups: s.groups.filter((g) => g.id !== groupId) }
-        : s
-    ),
+      s.id === sectionId ? { ...s, groups: s.groups.filter((g) => g.id !== groupId) } : s
+    )
   };
 }
 
-export function addBoardText(
-  doc: GddDocument,
-  sectionId: string,
-  text: BoardText
-): GddDocument {
+export function addBoardText(doc: GddDocument, sectionId: string, text: BoardText): GddDocument {
   return {
     ...doc,
-    sections: doc.sections.map((s) =>
-      s.id === sectionId ? { ...s, texts: [...s.texts, text] } : s
-    ),
+    sections: doc.sections.map((s) => (s.id === sectionId ? { ...s, texts: [...s.texts, text] } : s))
   };
 }
 
@@ -324,20 +262,14 @@ export function patchBoardText(
       s.id === sectionId
         ? {
             ...s,
-            texts: s.texts.map((t) =>
-              t.id === textId ? { ...t, ...patch } : t
-            ),
+            texts: s.texts.map((t) => (t.id === textId ? { ...t, ...patch } : t))
           }
         : s
-    ),
+    )
   };
 }
 
-export function removeBoardText(
-  doc: GddDocument,
-  sectionId: string,
-  textId: string
-): GddDocument {
+export function removeBoardText(doc: GddDocument, sectionId: string, textId: string): GddDocument {
   return {
     ...doc,
     sections: doc.sections.map((s) =>
@@ -345,23 +277,17 @@ export function removeBoardText(
         ? {
             ...s,
             texts: s.texts.filter((t) => t.id !== textId),
-            groups: removeMembersFromGroups(s.groups, [], [], [textId], []),
+            groups: removeMembersFromGroups(s.groups, [], [], [textId], [])
           }
         : s
-    ),
+    )
   };
 }
 
-export function addBoardStroke(
-  doc: GddDocument,
-  sectionId: string,
-  stroke: BoardStroke
-): GddDocument {
+export function addBoardStroke(doc: GddDocument, sectionId: string, stroke: BoardStroke): GddDocument {
   return {
     ...doc,
-    sections: doc.sections.map((s) =>
-      s.id === sectionId ? { ...s, strokes: [...s.strokes, stroke] } : s
-    ),
+    sections: doc.sections.map((s) => (s.id === sectionId ? { ...s, strokes: [...s.strokes, stroke] } : s))
   };
 }
 
@@ -377,20 +303,14 @@ export function patchBoardStroke(
       s.id === sectionId
         ? {
             ...s,
-            strokes: s.strokes.map((st) =>
-              st.id === strokeId ? { ...st, ...patch } : st
-            ),
+            strokes: s.strokes.map((st) => (st.id === strokeId ? { ...st, ...patch } : st))
           }
         : s
-    ),
+    )
   };
 }
 
-export function removeBoardStroke(
-  doc: GddDocument,
-  sectionId: string,
-  strokeId: string
-): GddDocument {
+export function removeBoardStroke(doc: GddDocument, sectionId: string, strokeId: string): GddDocument {
   return {
     ...doc,
     sections: doc.sections.map((s) =>
@@ -398,10 +318,10 @@ export function removeBoardStroke(
         ? {
             ...s,
             strokes: s.strokes.filter((st) => st.id !== strokeId),
-            groups: removeMembersFromGroups(s.groups, [], [], [], [strokeId]),
+            groups: removeMembersFromGroups(s.groups, [], [], [], [strokeId])
           }
         : s
-    ),
+    )
   };
 }
 
@@ -427,10 +347,10 @@ export function pasteDeskContent(
             shapes: [...s.shapes, ...payload.shapes],
             texts: [...s.texts, ...payload.texts],
             strokes: [...s.strokes, ...payload.strokes],
-            groups: [...s.groups, ...payload.groups],
+            groups: [...s.groups, ...payload.groups]
           }
         : s
-    ),
+    )
   };
 }
 
@@ -449,7 +369,7 @@ export function reorderDeskLayerOrder(
           items: s.board,
           shapes: s.shapes,
           texts: s.texts,
-          strokes: s.strokes,
+          strokes: s.strokes
         },
         selection,
         direction
@@ -459,9 +379,9 @@ export function reorderDeskLayerOrder(
         board: next.items,
         shapes: next.shapes,
         texts: next.texts,
-        strokes: next.strokes,
+        strokes: next.strokes
       };
-    }),
+    })
   };
 }
 
@@ -491,24 +411,17 @@ export function removeDeskSelection(
           .map((shape) => ({
             ...shape,
             start:
-              shape.start.attach?.itemId &&
-              itemSet.has(shape.start.attach.itemId)
+              shape.start.attach?.itemId && itemSet.has(shape.start.attach.itemId)
                 ? { x: shape.start.x, y: shape.start.y }
                 : shape.start,
             end:
               shape.end.attach?.itemId && itemSet.has(shape.end.attach.itemId)
                 ? { x: shape.end.x, y: shape.end.y }
-                : shape.end,
+                : shape.end
           })),
-        groups: removeMembersFromGroups(
-          s.groups,
-          itemIds,
-          shapeIds,
-          textIds,
-          strokeIds
-        ),
+        groups: removeMembersFromGroups(s.groups, itemIds, shapeIds, textIds, strokeIds)
       };
-    }),
+    })
   };
 }
 
@@ -516,19 +429,11 @@ export function removeBoardImageAsset(doc: GddDocument, assetId: string): GddDoc
   return deleteBoardImageAsset(doc, assetId);
 }
 
-export function renameBoardImageAsset(
-  doc: GddDocument,
-  assetId: string,
-  name: string
-): GddDocument {
+export function renameBoardImageAsset(doc: GddDocument, assetId: string, name: string): GddDocument {
   return updateBoardImageAssetName(doc, assetId, name);
 }
 
-export function addSpace3DModel(
-  doc: GddDocument,
-  src: string,
-  name?: string
-): { doc: GddDocument; assetId: string } {
+export function addSpace3DModel(doc: GddDocument, src: string, name?: string): { doc: GddDocument; assetId: string } {
   return registerSpace3DModel(doc, src, name);
 }
 
@@ -536,11 +441,7 @@ export function removeSpace3DModelAsset(doc: GddDocument, assetId: string): GddD
   return deleteSpace3DModelAsset(doc, assetId);
 }
 
-export function renameSpace3DModelAsset(
-  doc: GddDocument,
-  assetId: string,
-  name: string
-): GddDocument {
+export function renameSpace3DModelAsset(doc: GddDocument, assetId: string, name: string): GddDocument {
   return updateSpace3DModelAssetName(doc, assetId, name);
 }
 

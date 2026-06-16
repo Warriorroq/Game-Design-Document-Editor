@@ -1,16 +1,6 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
-import {
-  linkTargetFromGddLink,
-  parseGddHref,
-  type LinkTarget,
-} from "@/features/links/lib/links";
+import { createContext, type ReactNode, useCallback, useContext, useMemo, useState } from "react";
+
+import { type LinkTarget, linkTargetFromGddLink, parseGddHref } from "@/features/links/lib/links";
 import type { GddDocument } from "@/shared/types";
 
 export interface PasteLinkRequest {
@@ -54,19 +44,15 @@ const LinkContext = createContext<LinkContextValue | null>(null);
 export function LinkProvider({
   doc,
   setActiveSectionId,
-  children,
+  children
 }: {
   doc: GddDocument;
   setActiveSectionId: (id: string) => void;
   children: ReactNode;
 }) {
   const [linkTarget, setLinkTarget] = useState<LinkTarget | null>(null);
-  const [contextMenu, setContextMenu] = useState<ContextMenuRequest | null>(
-    null
-  );
-  const [pasteDialog, setPasteDialog] = useState<PasteLinkRequest | null>(
-    null
-  );
+  const [contextMenu, setContextMenu] = useState<ContextMenuRequest | null>(null);
+  const [pasteDialog, setPasteDialog] = useState<PasteLinkRequest | null>(null);
 
   const clearLinkTarget = useCallback(() => setLinkTarget(null), []);
 
@@ -120,7 +106,7 @@ export function LinkProvider({
       pasteDialog,
       openPasteDialog,
       closePasteDialog,
-      setActiveSectionId,
+      setActiveSectionId
     }),
     [
       doc,
@@ -134,13 +120,11 @@ export function LinkProvider({
       pasteDialog,
       openPasteDialog,
       closePasteDialog,
-      setActiveSectionId,
+      setActiveSectionId
     ]
   );
 
-  return (
-    <LinkContext.Provider value={value}>{children}</LinkContext.Provider>
-  );
+  return <LinkContext.Provider value={value}>{children}</LinkContext.Provider>;
 }
 
 export function useLinkContext(): LinkContextValue {

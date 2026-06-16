@@ -15,6 +15,6 @@ export function translateShapeForDrag(
 
   return {
     start: movePoint(shape.start),
-    end: movePoint(shape.end),
+    end: movePoint(shape.end)
   };
 }

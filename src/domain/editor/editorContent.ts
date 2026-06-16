@@ -1,22 +1,15 @@
-import {
-  stripEphemeralEditorMarkup,
-  stripEphemeralFromHtml,
-} from "@/shared/lib/searchHighlight";
-import { isExternalHref } from "@/features/links/lib/links";
 import { previewMissingTableControls, renderMarkdown } from "@/domain/editor/markdown";
+import { isExternalHref } from "@/features/links/lib/links";
+import { stripEphemeralEditorMarkup, stripEphemeralFromHtml } from "@/shared/lib/searchHighlight";
 
 export { previewMissingTableControls };
 
-const EMPTY_PLACEHOLDER =
-  "<p class='empty-preview'>Click here to start writing</p>";
+const EMPTY_PLACEHOLDER = "<p class='empty-preview'>Click here to start writing</p>";
 
 export function looksLikeMarkdown(text: string): boolean {
   const t = text.trim();
   if (!t) return false;
-  if (
-    t.includes("gdd-table-wrap") ||
-    /^<(p|h[1-6]|ul|ol|div|table)\b/i.test(t)
-  ) {
+  if (t.includes("gdd-table-wrap") || /^<(p|h[1-6]|ul|ol|div|table)\b/i.test(t)) {
     return false;
   }
   return (
@@ -31,9 +24,7 @@ export function looksLikeMarkdown(text: string): boolean {
 
 export function ensureHtmlContent(content: string): string {
   if (!content.trim()) return "";
-  const html = looksLikeMarkdown(content)
-    ? renderMarkdown(content)
-    : content;
+  const html = looksLikeMarkdown(content) ? renderMarkdown(content) : content;
   return stripEphemeralFromHtml(html);
 }
 
