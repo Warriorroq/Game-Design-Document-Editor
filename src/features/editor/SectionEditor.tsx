@@ -9,6 +9,7 @@ import {
 } from "@/features/editor/lib/editorClipboard";
 import {
   contentForEditor,
+  isEffectivelyEmptyContent,
   normalizeEditorDom,
   previewMissingTableControls,
   serializeEditorHtml
@@ -278,6 +279,7 @@ export function SectionEditor({
   }, []);
 
   const wordCount = useMemo(() => {
+    if (isEffectivelyEmptyContent(section.content)) return 0;
     const text = plainTextFromHtml(section.content);
     if (!text) return 0;
     return text.split(/\s+/).filter(Boolean).length;
@@ -402,6 +404,7 @@ export function SectionEditor({
         <article
           ref={editorRef}
           className="markdown-preview markdown-preview--editable"
+          style={{ "--editor-placeholder": JSON.stringify(t("editor.contentPlaceholder")) } as React.CSSProperties}
           contentEditable
           suppressContentEditableWarning
           onInput={handleEditorInput}

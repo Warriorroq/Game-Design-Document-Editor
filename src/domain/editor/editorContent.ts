@@ -4,7 +4,19 @@ import { stripEphemeralEditorMarkup, stripEphemeralFromHtml } from "@/shared/lib
 
 export { previewMissingTableControls };
 
-const EMPTY_PLACEHOLDER = "<p class='empty-preview'>Click here to start writing</p>";
+export const EMPTY_EDITOR_HTML = "<p><br></p>";
+
+export function isEffectivelyEmptyContent(content: string): boolean {
+  const trimmed = content.trim();
+  if (!trimmed) return true;
+
+  const doc = new DOMParser().parseFromString(trimmed, "text/html");
+  // Legacy: empty sections used to store a .empty-preview paragraph as placeholder text.
+  if (doc.querySelector(".empty-preview")) return true;
+
+  const text = (doc.body.textContent ?? "").replace(/\u200B/g, "").trim();
+  return !text;
+}
 
 export function looksLikeMarkdown(text: string): boolean {
   const t = text.trim();
@@ -29,8 +41,9 @@ export function ensureHtmlContent(content: string): string {
 }
 
 export function contentForEditor(content: string): string {
+  if (isEffectivelyEmptyContent(content)) return EMPTY_EDITOR_HTML;
   const html = ensureHtmlContent(content);
-  if (!html.trim()) return EMPTY_PLACEHOLDER;
+  if (!html.trim()) return EMPTY_EDITOR_HTML;
   return html;
 }
 
@@ -74,6 +87,7 @@ export function serializeEditorHtml(root: HTMLElement): string {
   normalizeEditorDom(root);
   const clone = root.cloneNode(true) as HTMLElement;
   stripEphemeralEditorMarkup(clone);
+  // Legacy: strip old .empty-preview placeholder markup from saved section content.
   clone.querySelectorAll(".empty-preview").forEach((el) => {
     const p = el.closest("p");
     if (p && p.childElementCount === 1 && p.contains(el)) {
