@@ -1781,9 +1781,13 @@ body.panel-resizing * {
   outline: none;
 }
 
-.markdown-preview--editable:empty::before,
-.markdown-preview--editable:has(.empty-preview:only-child)::before {
-  content: none;
+.markdown-preview--editable:not(:focus):empty::before,
+.markdown-preview--editable:not(:focus) > p:only-child:is(:empty, :has(> br:only-child))::before {
+  content: var(--editor-placeholder);
+  display: block;
+  color: var(--text-dim);
+  font-style: italic;
+  pointer-events: none;
 }
 
 .markdown-preview h1 {
@@ -1919,11 +1923,6 @@ body.panel-resizing * {
 .markdown-preview th {
   background: var(--bg-panel);
   font-weight: 600;
-}
-
-.markdown-preview .empty-preview {
-  color: var(--text-dim);
-  font-style: italic;
 }
 
 @media print {
