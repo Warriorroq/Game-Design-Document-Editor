@@ -149,15 +149,14 @@ export function Sidebar({
   const [renamingFolderId, setRenamingFolderId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
   const [createMenuParent, setCreateMenuParent] = useState<string | null | false>(false);
-  const [groupSelectMode, setGroupSelectMode] = useState(false);
   const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
 
   const docLike = { folders, sections };
   const selectedGroupSet = useMemo(() => new Set(selectedGroupIds), [selectedGroupIds]);
+  const hasGroupSelection = selectedGroupIds.length > 0;
   const draggingGroup = dragging?.kind === "group";
 
-  const exitGroupMode = useCallback(() => {
-    setGroupSelectMode(false);
+  const clearGroupSelection = useCallback(() => {
     setSelectedGroupIds([]);
   }, []);
 
@@ -167,29 +166,18 @@ export function Sidebar({
     );
   }, []);
 
-  const startGroupSelection = useCallback((sectionId: string) => {
-    setGroupSelectMode(true);
-    setSelectedGroupIds([sectionId]);
-  }, []);
-
   useEffect(() => {
     setSelectedGroupIds((current) => current.filter((id) => sections.some((section) => section.id === id)));
   }, [sections]);
 
   useEffect(() => {
-    if (groupSelectMode && selectedGroupIds.length === 0) {
-      exitGroupMode();
-    }
-  }, [exitGroupMode, groupSelectMode, selectedGroupIds.length]);
-
-  useEffect(() => {
-    if (!groupSelectMode) return;
+    if (!hasGroupSelection) return;
     const onKey = (e: globalThis.KeyboardEvent) => {
-      if (e.key === "Escape") exitGroupMode();
+      if (e.key === "Escape") clearGroupSelection();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [exitGroupMode, groupSelectMode]);
+  }, [clearGroupSelection, hasGroupSelection]);
 
   useEffect(() => {
     if (createMenuParent === false) return;
@@ -209,14 +197,14 @@ export function Sidebar({
     else if (pendingRemove.kind === "folder") onRemoveFolder(pendingRemove.id);
     else {
       onRemoveSections(selectedGroupIds);
-      exitGroupMode();
+      clearGroupSelection();
     }
     setPendingRemove(null);
     restoreAppFocus();
   };
 
   const buildGroupActions = useCallback((): ContextMenuAction[] => {
-    if (!groupSelectMode || selectedGroupIds.length === 0) return [];
+    if (!hasGroupSelection) return [];
 
     return [
       {
@@ -227,10 +215,10 @@ export function Sidebar({
       {
         id: "exit-group-select",
         label: t("sidebar.exitGroupSelect"),
-        onClick: exitGroupMode
+        onClick: clearGroupSelection
       }
     ];
-  }, [exitGroupMode, groupSelectMode, selectedGroupIds.length, t]);
+  }, [clearGroupSelection, hasGroupSelection, selectedGroupIds.length, t]);
 
   const clearDragState = useCallback(() => {
     setDragging(null);
@@ -372,7 +360,7 @@ export function Sidebar({
           space3d ? "section-item--space3d" : "",
           depth > 0 ? "section-item--nested" : "",
           active ? "active" : "",
-          groupSelectMode && inGroup ? "section-item--group-selected" : "",
+          hasGroupSelection && inGroup ? "section-item--group-selected" : "",
           isDragging ? "section-item--dragging" : "",
           dropBefore ? "section-item--drop-before" : "",
           dropAfter ? "section-item--drop-after" : ""
@@ -384,7 +372,7 @@ export function Sidebar({
           e.preventDefault();
           const actions: ContextMenuAction[] = [];
 
-          if (groupSelectMode) {
+          if (hasGroupSelection) {
             actions.push({
               id: "toggle-group-section",
               label: inGroup ? t("sidebar.removeFromGroup") : t("sidebar.addToGroup"),
@@ -395,7 +383,7 @@ export function Sidebar({
             actions.push({
               id: "select-group",
               label: t("sidebar.selectGroup"),
-              onClick: () => startGroupSelection(section.id)
+              onClick: () => toggleGroupSection(section.id)
             });
           }
 
@@ -438,17 +426,17 @@ export function Sidebar({
           role="button"
           tabIndex={-1}
           aria-label={
-            groupSelectMode && inGroup && selectedGroupIds.length > 0
+            hasGroupSelection && inGroup
               ? t("sidebar.dragGroup", { count: selectedGroupIds.length })
               : t("sidebar.reorderSection", { title: section.title })
           }
           title={
-            groupSelectMode && inGroup && selectedGroupIds.length > 0
+            hasGroupSelection && inGroup
               ? t("sidebar.dragGroup", { count: selectedGroupIds.length })
               : t("sidebar.reorderSection", { title: section.title })
           }
           onDragStart={(e) => {
-            if (groupSelectMode && inGroup && selectedGroupIds.length > 0) {
+            if (hasGroupSelection && inGroup) {
               handleGroupDragStart(e, selectedGroupIds);
               return;
             }
@@ -462,8 +450,8 @@ export function Sidebar({
         <button
           type="button"
           className="section-link"
-          onClick={() => {
-            if (groupSelectMode) {
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
               toggleGroupSection(section.id);
               return;
             }
@@ -570,7 +558,7 @@ export function Sidebar({
             );
           }}
           onContextMenu={(e) => {
-            if (!groupSelectMode || selectedGroupIds.length === 0) return;
+            if (!hasGroupSelection) return;
             e.preventDefault();
             openContextMenu({
               x: e.clientX,
@@ -688,7 +676,7 @@ export function Sidebar({
             setGroupDropTarget((current) => (current?.kind === "root" ? null : current));
           }}
           onContextMenu={(e) => {
-            if (!groupSelectMode || selectedGroupIds.length === 0) return;
+            if (!hasGroupSelection) return;
             if ((e.target as HTMLElement).closest(".sidebar-row")) return;
             e.preventDefault();
             openContextMenu({
