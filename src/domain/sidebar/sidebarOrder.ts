@@ -340,3 +340,28 @@ export function firstSectionId(doc: SidebarDoc): string {
   }
   return walk(null);
 }
+
+function walkVisibleSectionIds(doc: SidebarDoc, parentFolderId: string | null): string[] {
+  const ids: string[] = [];
+  for (const entry of childItems(doc, parentFolderId)) {
+    if (entry.kind === "section") {
+      ids.push(entry.item.id);
+    } else if (!entry.item.collapsed) {
+      ids.push(...walkVisibleSectionIds(doc, entry.item.id));
+    }
+  }
+  return ids;
+}
+
+export function visibleSectionIdsInOrder(doc: SidebarDoc): string[] {
+  return walkVisibleSectionIds(doc, null);
+}
+
+export function sectionIdsInRange(orderedIds: string[], fromId: string, toId: string): string[] {
+  const fromIndex = orderedIds.indexOf(fromId);
+  const toIndex = orderedIds.indexOf(toId);
+  if (fromIndex < 0 || toIndex < 0) return toId ? [toId] : [];
+  const start = Math.min(fromIndex, toIndex);
+  const end = Math.max(fromIndex, toIndex);
+  return orderedIds.slice(start, end + 1);
+}

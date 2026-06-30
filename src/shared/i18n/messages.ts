@@ -37,6 +37,7 @@ const en = {
   "settings.shortcutsHint": "Click a shortcut, then press the new key combination. Esc cancels.",
   "settings.shortcutsGroupEditor": "Editor",
   "settings.shortcutsGroupDesk": "Desk",
+  "settings.shortcutsGroupSidebar": "Sidebar",
   "settings.shortcutsResetAll": "Reset all to defaults",
   "settings.shortcutsResetOne": "Reset to default",
   "settings.shortcutsPressKeys": "Press keys",
@@ -65,6 +66,8 @@ const en = {
   "shortcut.desk.delete.desc": "Remove selected items (Backspace also works)",
   "shortcut.desk.cancel.label": "Clear selection",
   "shortcut.desk.cancel.desc": "Deselect and cancel tools",
+  "shortcut.sidebar.exitGroupSelect.label": "Exit group selection",
+  "shortcut.sidebar.exitGroupSelect.desc": "Clear selected sections in the sidebar",
 
   "toolbar.back": "Back",
   "toolbar.sections": "Sections",
@@ -414,6 +417,7 @@ const ru: Record<keyof typeof en, string> = {
   "settings.shortcutsHint": "Нажмите на комбинацию и введите новую. Esc — отмена.",
   "settings.shortcutsGroupEditor": "Редактор",
   "settings.shortcutsGroupDesk": "Доска",
+  "settings.shortcutsGroupSidebar": "Сайдбар",
   "settings.shortcutsResetAll": "Сбросить все",
   "settings.shortcutsResetOne": "По умолчанию",
   "settings.shortcutsPressKeys": "Нажмите клавиши",
@@ -442,6 +446,8 @@ const ru: Record<keyof typeof en, string> = {
   "shortcut.desk.delete.desc": "Удалить выбранное (также Backspace)",
   "shortcut.desk.cancel.label": "Сбросить выделение",
   "shortcut.desk.cancel.desc": "Снять выделение и отменить инструменты",
+  "shortcut.sidebar.exitGroupSelect.label": "Выйти из выбора группы",
+  "shortcut.sidebar.exitGroupSelect.desc": "Сбросить выбранные секции в сайдбаре",
 
   "toolbar.back": "Назад",
   "toolbar.sections": "Секции",

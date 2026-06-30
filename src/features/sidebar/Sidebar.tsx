@@ -3,9 +3,16 @@ import { type KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState }
 import { isSpace3DSection } from "@/domain/space3d/space3d";
 import { buildSectionHref } from "@/features/links/lib/links";
 import { type ContextMenuAction, useLinkContext } from "@/features/links/LinkContext";
-import { childItems, type SectionDropPosition, type SidebarDropTarget } from "@/features/sidebar/lib/sidebarOrder";
+import {
+  childItems,
+  type SectionDropPosition,
+  sectionIdsInRange,
+  type SidebarDropTarget,
+  visibleSectionIdsInOrder
+} from "@/features/sidebar/lib/sidebarOrder";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
 import { useLocale } from "@/shared/context/LocaleContext";
+import { useShortcuts } from "@/shared/context/ShortcutsContext";
 import { restoreAppFocus } from "@/shared/lib/desktop";
 import type { GddSection, GddSectionFolder } from "@/shared/types";
 
@@ -140,8 +147,10 @@ export function Sidebar({
   onReorder
 }: SidebarProps) {
   const { t } = useLocale();
+  const { matches: shortcutMatches } = useShortcuts();
   const { openContextMenu } = useLinkContext();
   const createMenuRef = useRef<HTMLDivElement>(null);
+  const selectionAnchorRef = useRef<string | null>(null);
   const [pendingRemove, setPendingRemove] = useState<PendingRemove | null>(null);
   const [dragging, setDragging] = useState<DragPayload | null>(null);
   const [dropTarget, setDropTarget] = useState<SidebarDropTarget | null>(null);
@@ -154,6 +163,7 @@ export function Sidebar({
   const docLike = { folders, sections };
   const selectedGroupSet = useMemo(() => new Set(selectedGroupIds), [selectedGroupIds]);
   const hasGroupSelection = selectedGroupIds.length > 0;
+  const visibleSectionIds = useMemo(() => visibleSectionIdsInOrder({ folders, sections }), [folders, sections]);
   const draggingGroup = dragging?.kind === "group";
 
   const clearGroupSelection = useCallback(() => {
@@ -166,18 +176,32 @@ export function Sidebar({
     );
   }, []);
 
+  const selectSectionRange = useCallback(
+    (toId: string, additive: boolean) => {
+      const anchor = selectionAnchorRef.current ?? activeId;
+      const rangeIds = sectionIdsInRange(visibleSectionIds, anchor, toId);
+      if (rangeIds.length === 0) return;
+      setSelectedGroupIds((current) => (additive ? [...new Set([...current, ...rangeIds])] : rangeIds));
+    },
+    [activeId, visibleSectionIds]
+  );
+
   useEffect(() => {
     setSelectedGroupIds((current) => current.filter((id) => sections.some((section) => section.id === id)));
   }, [sections]);
 
   useEffect(() => {
-    if (!hasGroupSelection) return;
+    if (hidden || !hasGroupSelection) return;
+
     const onKey = (e: globalThis.KeyboardEvent) => {
-      if (e.key === "Escape") clearGroupSelection();
+      if (!shortcutMatches("sidebar.exitGroupSelect", e)) return;
+      e.preventDefault();
+      clearGroupSelection();
     };
+
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [clearGroupSelection, hasGroupSelection]);
+  }, [clearGroupSelection, hasGroupSelection, hidden, shortcutMatches]);
 
   useEffect(() => {
     if (createMenuParent === false) return;
@@ -376,14 +400,20 @@ export function Sidebar({
             actions.push({
               id: "toggle-group-section",
               label: inGroup ? t("sidebar.removeFromGroup") : t("sidebar.addToGroup"),
-              onClick: () => toggleGroupSection(section.id)
+              onClick: () => {
+                toggleGroupSection(section.id);
+                selectionAnchorRef.current = section.id;
+              }
             });
             actions.push(...buildGroupActions());
           } else {
             actions.push({
               id: "select-group",
               label: t("sidebar.selectGroup"),
-              onClick: () => toggleGroupSection(section.id)
+              onClick: () => {
+                toggleGroupSection(section.id);
+                selectionAnchorRef.current = section.id;
+              }
             });
           }
 
@@ -451,10 +481,16 @@ export function Sidebar({
           type="button"
           className="section-link"
           onClick={(e) => {
-            if (e.ctrlKey || e.metaKey) {
-              toggleGroupSection(section.id);
+            if (e.shiftKey) {
+              selectSectionRange(section.id, e.ctrlKey || e.metaKey);
               return;
             }
+            if (e.ctrlKey || e.metaKey) {
+              toggleGroupSection(section.id);
+              selectionAnchorRef.current = section.id;
+              return;
+            }
+            selectionAnchorRef.current = section.id;
             onSelect(section.id);
           }}
         >
