@@ -257,6 +257,24 @@ export function applySidebarDrop(
   return moveSectionToParent(doc, drag.id, parentFolderId, insertIndex);
 }
 
+export function moveSectionsToFolder(doc: GddDocument, sectionIds: string[], folderId: string | null): GddDocument {
+  const uniqueIds = [...new Set(sectionIds)].filter((id) => doc.sections.some((section) => section.id === id));
+  let nextDoc = doc;
+  for (const sectionId of uniqueIds) {
+    const insertIndex = childItems(nextDoc, folderId).filter((entry) => entry.kind === "section").length;
+    nextDoc = moveSectionToParent(nextDoc, sectionId, folderId, insertIndex);
+  }
+  return nextDoc;
+}
+
+export function removeSectionsFromDoc(doc: GddDocument, sectionIds: string[]): GddDocument {
+  let nextDoc = doc;
+  for (const sectionId of sectionIds) {
+    nextDoc = removeSectionFromDoc(nextDoc, sectionId);
+  }
+  return nextDoc;
+}
+
 export function removeSectionFromDoc(doc: GddDocument, sectionId: string): GddDocument {
   const removed = doc.sections.find((section) => section.id === sectionId);
   if (!removed) return doc;

@@ -9,9 +9,11 @@ import { removeMembersFromGroups } from "@/domain/board/deskGroups";
 import { reorderDeskLayer } from "@/domain/board/deskLayerOrder";
 import {
   applySidebarDrop,
+  moveSectionsToFolder as moveSectionsToFolderInDoc,
   nextChildOrder,
   removeFolderFromDoc,
   removeSectionFromDoc,
+  removeSectionsFromDoc,
   type SidebarDropTarget
 } from "@/domain/sidebar/sidebarOrder";
 import {
@@ -121,6 +123,14 @@ export function reorderSidebar(
 
 export function removeSection(doc: GddDocument, id: string): GddDocument {
   return removeSectionFromDoc(doc, id);
+}
+
+export function removeSections(doc: GddDocument, ids: string[]): GddDocument {
+  return removeSectionsFromDoc(doc, ids);
+}
+
+export function moveSectionsToFolder(doc: GddDocument, ids: string[], folderId: string | null): GddDocument {
+  return moveSectionsToFolderInDoc(doc, ids, folderId);
 }
 
 export function patchBoardItem(

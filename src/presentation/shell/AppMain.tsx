@@ -41,6 +41,8 @@ export function AppMain(props: DocumentStore) {
     removeFolder,
     reorderSidebar,
     removeSection,
+    removeSections,
+    moveSectionsToFolder,
     updateBoardItem,
     addBoardItem,
     removeBoardItem,
@@ -309,6 +311,8 @@ export function AppMain(props: DocumentStore) {
           onAddSpace3DSection={addSpace3DSection}
           onAddFolder={addFolder}
           onRemoveSection={removeSection}
+          onRemoveSections={removeSections}
+          onMoveSectionsToFolder={moveSectionsToFolder}
           onRemoveFolder={removeFolder}
           onUpdateFolder={updateFolder}
           onToggleFolder={toggleFolderCollapsed}
