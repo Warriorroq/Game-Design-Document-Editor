@@ -148,7 +148,7 @@ export function AppMain(props: DocumentStore) {
 
   useEffect(() => {
     projectFolder.scheduleSaveDoc(doc);
-  }, [doc, projectFolder.scheduleSaveDoc]);
+  }, [doc, projectFolder]);
 
   const handleNewProject = useCallback(() => {
     const ok = window.confirm(t("project.confirmNew"));

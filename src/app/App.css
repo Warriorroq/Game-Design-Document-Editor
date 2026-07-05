@@ -715,6 +715,12 @@ mark.gdd-search-hit-active {
   font-size: 12px;
 }
 
+.settings-subsection-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
 .settings-field--token {
   margin-top: 14px;
 }
@@ -733,7 +739,8 @@ mark.gdd-search-hit-active {
   color: var(--text-dim);
 }
 
-.settings-field input {
+.settings-field input,
+.settings-field select {
   padding: 8px 12px;
   font-size: 14px;
   border: 1px solid var(--border);
@@ -742,7 +749,8 @@ mark.gdd-search-hit-active {
   color: var(--text);
 }
 
-.settings-field input:focus {
+.settings-field input:focus,
+.settings-field select:focus {
   outline: none;
   border-color: var(--border-focus);
 }

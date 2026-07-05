@@ -132,12 +132,14 @@ export function SectionEditor({
   }, [searchFocus, section.id, onSearchFocusDone]);
 
   useEffect(() => {
+    const el = editorRef.current;
+    const titleEl = titleRef.current;
+    const descEl = descRef.current;
     return () => {
-      const el = editorRef.current;
       if (!el) return;
       stripEphemeralEditorMarkup(el);
-      titleRef.current?.classList.remove("gdd-search-flash");
-      descRef.current?.classList.remove("gdd-search-flash");
+      titleEl?.classList.remove("gdd-search-flash");
+      descEl?.classList.remove("gdd-search-flash");
     };
   }, [section.id]);
 

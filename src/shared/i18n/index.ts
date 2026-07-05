@@ -1,3 +1,4 @@
+import type { OpenSectionGroupSelectMode } from "@/domain/sidebar/sidebarSettings";
 import type { BoardSizePresetId } from "@/features/board/lib/boardSettings";
 import { APP_LANGUAGES, type AppLanguage, type MessageKey, MESSAGES } from "@/shared/i18n/messages";
 import type { AppThemeId } from "@/shared/lib/themeTokens";
@@ -56,4 +57,8 @@ export function boardPresetNameKey(id: BoardSizePresetId): MessageKey {
 
 export function boardPresetDescKey(id: BoardSizePresetId): MessageKey {
   return `board.preset.${id}.desc` as MessageKey;
+}
+
+export function sidebarOpenSectionModeLabelKey(mode: OpenSectionGroupSelectMode): MessageKey {
+  return `settings.sidebarOpenSectionMode.${mode}` as MessageKey;
 }
