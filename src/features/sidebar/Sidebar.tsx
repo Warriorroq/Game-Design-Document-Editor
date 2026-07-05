@@ -1,24 +1,19 @@
-import { type KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRef } from "react";
 
-import {
-  buildShiftGroupSelection,
-  getOpenSectionGroupSelectMode,
-  includesOpenSectionOnGroupSelectStart,
-  withOpenSectionOnGroupSelectStart
-} from "@/domain/sidebar/sidebarSettings";
 import { isSpace3DSection } from "@/domain/space3d/space3d";
 import { buildSectionHref } from "@/features/links/lib/links";
 import { type ContextMenuAction, useLinkContext } from "@/features/links/LinkContext";
-import {
-  childItems,
-  type SectionDropPosition,
-  type SidebarDropTarget,
-  visibleSectionIdsInOrder
-} from "@/features/sidebar/lib/sidebarOrder";
-import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
+import { SidebarCreateButton } from "@/features/sidebar/components/SidebarCreateButton";
+import { SidebarRemoveDialog } from "@/features/sidebar/components/SidebarRemoveDialog";
+import { useCreateMenu } from "@/features/sidebar/hooks/useCreateMenu";
+import { useFolderRename } from "@/features/sidebar/hooks/useFolderRename";
+import { useSidebarDragDrop } from "@/features/sidebar/hooks/useSidebarDragDrop";
+import { useSidebarGroupSelection } from "@/features/sidebar/hooks/useSidebarGroupSelection";
+import { useSidebarRemoveConfirm } from "@/features/sidebar/hooks/useSidebarRemoveConfirm";
+import { sectionHasContent } from "@/features/sidebar/lib/sectionMeta";
+import { dropPositionFromEvent, folderDropPositionFromEvent } from "@/features/sidebar/lib/sidebarDrag";
+import { childItems, type SidebarDropTarget } from "@/features/sidebar/lib/sidebarOrder";
 import { useLocale } from "@/shared/context/LocaleContext";
-import { useShortcuts } from "@/shared/context/ShortcutsContext";
-import { restoreAppFocus } from "@/shared/lib/desktop";
 import type { GddSection, GddSectionFolder } from "@/shared/types";
 
 interface SidebarProps {
@@ -39,101 +34,6 @@ interface SidebarProps {
   onReorder: (drag: { kind: "section" | "folder"; id: string }, target: SidebarDropTarget) => void;
 }
 
-type DragPayload = { kind: "section" | "folder"; id: string } | { kind: "group"; sectionIds: string[] };
-
-type GroupDropTarget = { kind: "folder"; folderId: string } | { kind: "root" };
-
-type PendingRemove =
-  | { kind: "section"; id: string; title: string }
-  | { kind: "folder"; id: string; title: string }
-  | { kind: "group"; count: number };
-
-function sectionHasContent(section: GddSection): boolean {
-  if (isSpace3DSection(section)) {
-    return (section.space3d?.objects.length ?? 0) > 0;
-  }
-  return section.content.trim().length > 40 || section.board.length > 0;
-}
-
-function dropPositionFromEvent(e: React.DragEvent<HTMLElement>): SectionDropPosition {
-  const rect = e.currentTarget.getBoundingClientRect();
-  return e.clientY < rect.top + rect.height / 2 ? "before" : "after";
-}
-
-function folderDropPositionFromEvent(e: React.DragEvent<HTMLElement>): SectionDropPosition | "inside" {
-  const rect = e.currentTarget.getBoundingClientRect();
-  const relativeY = e.clientY - rect.top;
-  if (relativeY < rect.height * 0.25) return "before";
-  if (relativeY > rect.height * 0.75) return "after";
-  return "inside";
-}
-
-function parseDragPayload(raw: string): DragPayload | null {
-  if (!raw) return null;
-  try {
-    const parsed = JSON.parse(raw) as DragPayload;
-    if (parsed?.kind === "group" && Array.isArray(parsed.sectionIds) && parsed.sectionIds.length > 0) {
-      return { kind: "group", sectionIds: parsed.sectionIds };
-    }
-    if (parsed && (parsed.kind === "section" || parsed.kind === "folder") && typeof parsed.id === "string") {
-      return parsed;
-    }
-  } catch {
-    if (raw.startsWith("section:")) {
-      return { kind: "section", id: raw.slice("section:".length) };
-    }
-  }
-  return null;
-}
-
-function SidebarCreateMenu({
-  parentFolderId,
-  onAddSection,
-  onAddSpace3DSection,
-  onAddFolder,
-  onClose
-}: {
-  parentFolderId: string | null;
-  onAddSection: (folderId?: string) => void;
-  onAddSpace3DSection: (folderId?: string) => void;
-  onAddFolder: (parentFolderId?: string) => void;
-  onClose: () => void;
-}) {
-  const { t } = useLocale();
-
-  const pickSection = () => {
-    onAddSection(parentFolderId ?? undefined);
-    onClose();
-    restoreAppFocus();
-  };
-
-  const pickSpace3D = () => {
-    onAddSpace3DSection(parentFolderId ?? undefined);
-    onClose();
-    restoreAppFocus();
-  };
-
-  const pickFolder = () => {
-    onAddFolder(parentFolderId ?? undefined);
-    onClose();
-    restoreAppFocus();
-  };
-
-  return (
-    <div className="sidebar-create-menu" role="menu">
-      <button type="button" className="sidebar-create-menu-item" role="menuitem" onClick={pickSection}>
-        {t("sidebar.createSection")}
-      </button>
-      <button type="button" className="sidebar-create-menu-item" role="menuitem" onClick={pickSpace3D}>
-        {t("sidebar.createSpace3D")}
-      </button>
-      <button type="button" className="sidebar-create-menu-item" role="menuitem" onClick={pickFolder}>
-        {t("sidebar.createFolder")}
-      </button>
-    </div>
-  );
-}
-
 export function Sidebar({
   hidden,
   folders,
@@ -152,238 +52,82 @@ export function Sidebar({
   onReorder
 }: SidebarProps) {
   const { t } = useLocale();
-  const { matches: shortcutMatches } = useShortcuts();
   const { openContextMenu } = useLinkContext();
-  const createMenuRef = useRef<HTMLDivElement>(null);
-  const selectionAnchorRef = useRef<string | null>(null);
-  const [pendingRemove, setPendingRemove] = useState<PendingRemove | null>(null);
-  const [dragging, setDragging] = useState<DragPayload | null>(null);
-  const [dropTarget, setDropTarget] = useState<SidebarDropTarget | null>(null);
-  const [groupDropTarget, setGroupDropTarget] = useState<GroupDropTarget | null>(null);
-  const [renamingFolderId, setRenamingFolderId] = useState<string | null>(null);
-  const [renameValue, setRenameValue] = useState("");
-  const [createMenuParent, setCreateMenuParent] = useState<string | null | false>(false);
-  const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
+  const selectedGroupIdsRef = useRef<string[]>([]);
+  const clearGroupSelectionRef = useRef<() => void>(() => {});
+
+  const {
+    pendingRemove,
+    requestRemoveSection,
+    requestRemoveFolder,
+    requestRemoveGroup,
+    closeRemoveConfirm,
+    confirmRemove
+  } = useSidebarRemoveConfirm({
+    onRemoveSection: onRemove,
+    onRemoveFolder,
+    onRemoveSections,
+    getSelectedGroupIds: () => selectedGroupIdsRef.current,
+    clearGroupSelection: () => clearGroupSelectionRef.current()
+  });
+
+  const groupSelection = useSidebarGroupSelection({
+    hidden,
+    folders,
+    sections,
+    activeId,
+    onRequestRemoveGroup: requestRemoveGroup
+  });
+
+  selectedGroupIdsRef.current = groupSelection.selectedGroupIds;
+  clearGroupSelectionRef.current = groupSelection.clearGroupSelection;
+
+  const {
+    selectedGroupIds,
+    selectedGroupSet,
+    hasGroupSelection,
+    selectionAnchorRef,
+    toggleGroupSection,
+    selectSectionRange,
+    buildGroupActions
+  } = groupSelection;
+
+  const dragDrop = useSidebarDragDrop({ onReorder, onMoveSectionsToFolder });
+  const {
+    dragging,
+    dropTarget,
+    groupDropTarget,
+    draggingGroup,
+    setDropTarget,
+    setGroupDropTarget,
+    clearDragState,
+    handleDragStart,
+    handleGroupDragStart,
+    handleDrop,
+    handleGroupDropFromEvent
+  } = dragDrop;
+
+  const folderRename = useFolderRename({ onUpdateFolder });
+  const { renamingFolderId, renameValue, setRenameValue, startRenameFolder, commitRenameFolder, onRenameKeyDown } =
+    folderRename;
+
+  const { menuRef, toggleCreateMenu, closeCreateMenu, isCreateMenuOpen } = useCreateMenu();
 
   const docLike = { folders, sections };
-  const selectedGroupSet = useMemo(() => new Set(selectedGroupIds), [selectedGroupIds]);
-  const hasGroupSelection = selectedGroupIds.length > 0;
-  const visibleSectionIds = useMemo(() => visibleSectionIdsInOrder({ folders, sections }), [folders, sections]);
-  const draggingGroup = dragging?.kind === "group";
 
-  const clearGroupSelection = useCallback(() => {
-    setSelectedGroupIds([]);
-  }, []);
-
-  const toggleGroupSection = useCallback(
-    (sectionId: string) => {
-      setSelectedGroupIds((current) => {
-        if (current.length === 0) {
-          const mode = getOpenSectionGroupSelectMode();
-          return withOpenSectionOnGroupSelectStart(
-            [sectionId],
-            activeId,
-            includesOpenSectionOnGroupSelectStart(mode, "ctrl")
-          );
-        }
-        return current.includes(sectionId) ? current.filter((id) => id !== sectionId) : [...current, sectionId];
-      });
-    },
-    [activeId]
+  const renderCreateButton = (parentFolderId: string | null, compact = false) => (
+    <SidebarCreateButton
+      parentFolderId={parentFolderId}
+      compact={compact}
+      open={isCreateMenuOpen(parentFolderId)}
+      menuRef={menuRef}
+      onToggle={toggleCreateMenu}
+      onClose={closeCreateMenu}
+      onAddSection={onAddSection}
+      onAddSpace3DSection={onAddSpace3DSection}
+      onAddFolder={onAddFolder}
+    />
   );
-
-  const selectSectionRange = useCallback(
-    (toId: string, additive: boolean) => {
-      const mode = getOpenSectionGroupSelectMode();
-      const rangeIds = buildShiftGroupSelection(visibleSectionIds, toId, activeId, selectionAnchorRef.current, mode);
-      if (rangeIds.length === 0) return;
-      const includeOpenOnShift = includesOpenSectionOnGroupSelectStart(mode, "shift");
-      setSelectedGroupIds((current) => {
-        const next = additive ? [...new Set([...current, ...rangeIds])] : rangeIds;
-        return current.length === 0 ? withOpenSectionOnGroupSelectStart(next, activeId, includeOpenOnShift) : next;
-      });
-    },
-    [activeId, visibleSectionIds]
-  );
-
-  useEffect(() => {
-    setSelectedGroupIds((current) => current.filter((id) => sections.some((section) => section.id === id)));
-  }, [sections]);
-
-  useEffect(() => {
-    if (hidden || !hasGroupSelection) return;
-
-    const onKey = (e: globalThis.KeyboardEvent) => {
-      if (!shortcutMatches("sidebar.exitGroupSelect", e)) return;
-      e.preventDefault();
-      clearGroupSelection();
-    };
-
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [clearGroupSelection, hasGroupSelection, hidden, shortcutMatches]);
-
-  useEffect(() => {
-    if (createMenuParent === false) return;
-
-    const onPointer = (e: PointerEvent) => {
-      if (createMenuRef.current?.contains(e.target as Node)) return;
-      setCreateMenuParent(false);
-    };
-
-    window.addEventListener("pointerdown", onPointer, true);
-    return () => window.removeEventListener("pointerdown", onPointer, true);
-  }, [createMenuParent]);
-
-  const confirmRemove = () => {
-    if (!pendingRemove) return;
-    if (pendingRemove.kind === "section") onRemove(pendingRemove.id);
-    else if (pendingRemove.kind === "folder") onRemoveFolder(pendingRemove.id);
-    else {
-      onRemoveSections(selectedGroupIds);
-      clearGroupSelection();
-    }
-    setPendingRemove(null);
-    restoreAppFocus();
-  };
-
-  const buildGroupActions = useCallback((): ContextMenuAction[] => {
-    if (!hasGroupSelection) return [];
-
-    return [
-      {
-        id: "remove-group-sections",
-        label: t("sidebar.deleteGroupSections"),
-        onClick: () => setPendingRemove({ kind: "group", count: selectedGroupIds.length })
-      },
-      {
-        id: "exit-group-select",
-        label: t("sidebar.exitGroupSelect"),
-        onClick: clearGroupSelection
-      }
-    ];
-  }, [clearGroupSelection, hasGroupSelection, selectedGroupIds.length, t]);
-
-  const clearDragState = useCallback(() => {
-    setDragging(null);
-    setDropTarget(null);
-    setGroupDropTarget(null);
-  }, []);
-
-  const handleDragStart = useCallback((e: React.DragEvent<HTMLSpanElement>, payload: DragPayload) => {
-    e.dataTransfer.effectAllowed = "move";
-    e.dataTransfer.setData("application/x-gdde-sidebar", JSON.stringify(payload));
-    const item = e.currentTarget.closest(".sidebar-row");
-    if (item instanceof HTMLElement) {
-      e.dataTransfer.setDragImage(item, 16, 16);
-    }
-    setDragging(payload);
-    setGroupDropTarget(null);
-  }, []);
-
-  const handleGroupDragStart = useCallback(
-    (e: React.DragEvent<HTMLSpanElement>, sectionIds: string[]) => {
-      handleDragStart(e, { kind: "group", sectionIds });
-    },
-    [handleDragStart]
-  );
-
-  const handleGroupDrop = useCallback(
-    (target: GroupDropTarget, sectionIds: string[]) => {
-      onMoveSectionsToFolder(sectionIds, target.kind === "root" ? null : target.folderId);
-      clearDragState();
-      restoreAppFocus();
-    },
-    [clearDragState, onMoveSectionsToFolder]
-  );
-
-  const handleDrop = useCallback(
-    (e: React.DragEvent<HTMLElement>, target: SidebarDropTarget) => {
-      e.preventDefault();
-      const payload = parseDragPayload(e.dataTransfer.getData("application/x-gdde-sidebar"));
-      if (!payload) {
-        clearDragState();
-        return;
-      }
-      if (payload.kind === "group") {
-        if (target.kind === "folder" && target.position === "inside") {
-          handleGroupDrop({ kind: "folder", folderId: target.id }, payload.sectionIds);
-        } else {
-          clearDragState();
-        }
-        return;
-      }
-      onReorder(payload, target);
-      clearDragState();
-    },
-    [clearDragState, handleGroupDrop, onReorder]
-  );
-
-  const startRenameFolder = (folder: GddSectionFolder) => {
-    setRenamingFolderId(folder.id);
-    setRenameValue(folder.title);
-  };
-
-  const commitRenameFolder = (folderId: string) => {
-    const title = renameValue.trim();
-    if (title) onUpdateFolder(folderId, { title });
-    setRenamingFolderId(null);
-    setRenameValue("");
-    restoreAppFocus();
-  };
-
-  const cancelRenameFolder = () => {
-    setRenamingFolderId(null);
-    setRenameValue("");
-  };
-
-  const onRenameKeyDown = (e: KeyboardEvent<HTMLInputElement>, folderId: string) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      commitRenameFolder(folderId);
-    } else if (e.key === "Escape") {
-      e.preventDefault();
-      cancelRenameFolder();
-    }
-  };
-
-  const toggleCreateMenu = (parentFolderId: string | null) => {
-    setCreateMenuParent((current) =>
-      current === false ? parentFolderId : current === parentFolderId ? false : parentFolderId
-    );
-  };
-
-  const renderCreateButton = (parentFolderId: string | null, compact = false) => {
-    const open = createMenuParent !== false && createMenuParent === parentFolderId;
-
-    return (
-      <div
-        className={`sidebar-create-wrap ${compact ? "sidebar-create-wrap--compact" : ""}`}
-        ref={open ? createMenuRef : undefined}
-      >
-        <button
-          type="button"
-          className={compact ? "folder-add-section" : "btn btn-icon"}
-          onClick={() => toggleCreateMenu(parentFolderId)}
-          title={t("sidebar.createItem")}
-          aria-label={t("sidebar.createItem")}
-          aria-haspopup="menu"
-          aria-expanded={open}
-        >
-          +
-        </button>
-        {open && (
-          <SidebarCreateMenu
-            parentFolderId={parentFolderId}
-            onAddSection={onAddSection}
-            onAddSpace3DSection={onAddSpace3DSection}
-            onAddFolder={onAddFolder}
-            onClose={() => setCreateMenuParent(false)}
-          />
-        )}
-      </div>
-    );
-  };
 
   const renderSectionRow = (section: GddSection, depth: number) => {
     const filled = sectionHasContent(section);
@@ -529,13 +273,7 @@ export function Sidebar({
         <button
           type="button"
           className="section-remove"
-          onClick={() =>
-            setPendingRemove({
-              kind: "section",
-              id: section.id,
-              title: section.title
-            })
-          }
+          onClick={() => requestRemoveSection(section.id, section.title)}
           title={t("sidebar.removeSection")}
           aria-label={`${t("sidebar.removeSection")} ${section.title}`}
         >
@@ -591,13 +329,7 @@ export function Sidebar({
           }}
           onDrop={(e) => {
             if (draggingGroup) {
-              e.preventDefault();
-              const payload = parseDragPayload(e.dataTransfer.getData("application/x-gdde-sidebar"));
-              if (payload?.kind === "group") {
-                handleGroupDrop({ kind: "folder", folderId: folder.id }, payload.sectionIds);
-              } else {
-                clearDragState();
-              }
+              handleGroupDropFromEvent(e, { kind: "folder", folderId: folder.id });
               return;
             }
             handleDrop(e, {
@@ -671,13 +403,7 @@ export function Sidebar({
           <button
             type="button"
             className="section-remove"
-            onClick={() =>
-              setPendingRemove({
-                kind: "folder",
-                id: folder.id,
-                title: folder.title
-              })
-            }
+            onClick={() => requestRemoveFolder(folder.id, folder.title)}
             title={t("sidebar.removeFolder")}
             aria-label={`${t("sidebar.removeFolder")} ${folder.title}`}
           >
@@ -718,13 +444,7 @@ export function Sidebar({
           onDrop={(e) => {
             if (!draggingGroup) return;
             if ((e.target as HTMLElement).closest(".sidebar-row")) return;
-            e.preventDefault();
-            const payload = parseDragPayload(e.dataTransfer.getData("application/x-gdde-sidebar"));
-            if (payload?.kind === "group") {
-              handleGroupDrop({ kind: "root" }, payload.sectionIds);
-            } else {
-              clearDragState();
-            }
+            handleGroupDropFromEvent(e, { kind: "root" });
           }}
           onDragLeave={(e) => {
             if (!draggingGroup) return;
@@ -748,34 +468,7 @@ export function Sidebar({
         </nav>
       </aside>
 
-      <ConfirmDialog
-        open={pendingRemove !== null}
-        title={
-          pendingRemove?.kind === "folder"
-            ? t("sidebar.removeFolder")
-            : pendingRemove?.kind === "group"
-              ? t("sidebar.deleteGroupSections")
-              : t("sidebar.removeSection")
-        }
-        message={
-          pendingRemove
-            ? pendingRemove.kind === "folder"
-              ? t("sidebar.confirmRemoveFolder", { title: pendingRemove.title })
-              : pendingRemove.kind === "group"
-                ? t("sidebar.confirmDeleteGroupSections", { count: pendingRemove.count })
-                : t("sidebar.confirmRemove", { title: pendingRemove.title })
-            : ""
-        }
-        confirmLabel={
-          pendingRemove?.kind === "folder"
-            ? t("sidebar.removeFolder")
-            : pendingRemove?.kind === "group"
-              ? t("sidebar.deleteGroupSections")
-              : t("sidebar.removeSection")
-        }
-        onClose={() => setPendingRemove(null)}
-        onConfirm={confirmRemove}
-      />
+      <SidebarRemoveDialog pendingRemove={pendingRemove} onClose={closeRemoveConfirm} onConfirm={confirmRemove} />
     </>
   );
 }
