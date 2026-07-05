@@ -1,12 +1,17 @@
 import { type KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import {
+  buildShiftGroupSelection,
+  getOpenSectionGroupSelectMode,
+  includesOpenSectionOnGroupSelectStart,
+  withOpenSectionOnGroupSelectStart
+} from "@/domain/sidebar/sidebarSettings";
 import { isSpace3DSection } from "@/domain/space3d/space3d";
 import { buildSectionHref } from "@/features/links/lib/links";
 import { type ContextMenuAction, useLinkContext } from "@/features/links/LinkContext";
 import {
   childItems,
   type SectionDropPosition,
-  sectionIdsInRange,
   type SidebarDropTarget,
   visibleSectionIdsInOrder
 } from "@/features/sidebar/lib/sidebarOrder";
@@ -170,18 +175,33 @@ export function Sidebar({
     setSelectedGroupIds([]);
   }, []);
 
-  const toggleGroupSection = useCallback((sectionId: string) => {
-    setSelectedGroupIds((current) =>
-      current.includes(sectionId) ? current.filter((id) => id !== sectionId) : [...current, sectionId]
-    );
-  }, []);
+  const toggleGroupSection = useCallback(
+    (sectionId: string) => {
+      setSelectedGroupIds((current) => {
+        if (current.length === 0) {
+          const mode = getOpenSectionGroupSelectMode();
+          return withOpenSectionOnGroupSelectStart(
+            [sectionId],
+            activeId,
+            includesOpenSectionOnGroupSelectStart(mode, "ctrl")
+          );
+        }
+        return current.includes(sectionId) ? current.filter((id) => id !== sectionId) : [...current, sectionId];
+      });
+    },
+    [activeId]
+  );
 
   const selectSectionRange = useCallback(
     (toId: string, additive: boolean) => {
-      const anchor = selectionAnchorRef.current ?? activeId;
-      const rangeIds = sectionIdsInRange(visibleSectionIds, anchor, toId);
+      const mode = getOpenSectionGroupSelectMode();
+      const rangeIds = buildShiftGroupSelection(visibleSectionIds, toId, activeId, selectionAnchorRef.current, mode);
       if (rangeIds.length === 0) return;
-      setSelectedGroupIds((current) => (additive ? [...new Set([...current, ...rangeIds])] : rangeIds));
+      const includeOpenOnShift = includesOpenSectionOnGroupSelectStart(mode, "shift");
+      setSelectedGroupIds((current) => {
+        const next = additive ? [...new Set([...current, ...rangeIds])] : rangeIds;
+        return current.length === 0 ? withOpenSectionOnGroupSelectStart(next, activeId, includeOpenOnShift) : next;
+      });
     },
     [activeId, visibleSectionIds]
   );

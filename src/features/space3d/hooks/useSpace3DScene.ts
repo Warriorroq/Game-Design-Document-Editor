@@ -113,7 +113,7 @@ export function useSpace3DScene({
     };
 
     const transformControls = new TransformControls(camera, renderer.domElement);
-    transformControls.setMode(transformModeToControls(editMode));
+    transformControls.setMode(transformModeToControls("move"));
     configureTransformControlsGizmo(transformControls);
     scene.add(transformControls.getHelper());
 
@@ -288,6 +288,10 @@ export function useSpace3DScene({
       sceneRef.current = null;
     };
   }, [containerRef]);
+
+  useEffect(() => {
+    sceneRef.current?.transformControls.setMode(transformModeToControls(editMode));
+  }, [editMode]);
 
   const gridKey = JSON.stringify(normalizeSpace3DGrid(space3d.grid));
 

@@ -1,5 +1,11 @@
 import { useMemo, useState } from "react";
 
+import {
+  getOpenSectionGroupSelectMode,
+  OPEN_SECTION_GROUP_SELECT_MODES,
+  parseOpenSectionGroupSelectMode,
+  saveOpenSectionGroupSelectMode
+} from "@/domain/sidebar/sidebarSettings";
 import { BoardSettingsPanel } from "@/features/board/components/BoardSettingsPanel";
 import { GitSettingsPanel } from "@/features/git/components/GitSettingsPanel";
 import type { GitStatus } from "@/features/git/lib/git";
@@ -7,7 +13,7 @@ import { useLocale } from "@/shared/context/LocaleContext";
 import { useShortcuts } from "@/shared/context/ShortcutsContext";
 import { useAppTheme } from "@/shared/hooks/useAppTheme";
 import { APP_LANGUAGES } from "@/shared/i18n";
-import { themeDescKey, themeNameKey } from "@/shared/i18n";
+import { sidebarOpenSectionModeLabelKey, themeDescKey, themeNameKey } from "@/shared/i18n";
 import { shortcutDescKey, shortcutLabelKey } from "@/shared/i18n/shortcutMessages";
 import { APP_THEME_IDS, themePreview } from "@/shared/lib/appTheme";
 import { isDesktopApp } from "@/shared/lib/desktop";
@@ -34,6 +40,7 @@ export function SettingsPage({
   const { themeId, setTheme } = useAppTheme();
   const { language, setLanguage, t } = useLocale();
   const { resetAll } = useShortcuts();
+  const [openSectionGroupSelectMode, setOpenSectionGroupSelectMode] = useState(getOpenSectionGroupSelectMode);
 
   const tabs = useMemo(() => {
     const order: SettingsTab[] = isDesktopApp
@@ -83,6 +90,25 @@ export function SettingsPage({
           {tab === "general" && (
             <section className="settings-section">
               <h2 className="settings-section-title">{t("settings.generalTitle")}</h2>
+              <h3 className="settings-subsection-title">{t("settings.sidebarTitle")}</h3>
+              <p className="settings-hint settings-hint--compact">{t("settings.sidebarMultiSelectHint")}</p>
+              <label className="settings-field">
+                <span>{t("settings.sidebarOpenSectionMode")}</span>
+                <select
+                  value={openSectionGroupSelectMode}
+                  onChange={(e) => {
+                    const mode = parseOpenSectionGroupSelectMode(e.target.value);
+                    saveOpenSectionGroupSelectMode(mode);
+                    setOpenSectionGroupSelectMode(mode);
+                  }}
+                >
+                  {OPEN_SECTION_GROUP_SELECT_MODES.map((mode) => (
+                    <option key={mode} value={mode}>
+                      {t(sidebarOpenSectionModeLabelKey(mode))}
+                    </option>
+                  ))}
+                </select>
+              </label>
             </section>
           )}
 
