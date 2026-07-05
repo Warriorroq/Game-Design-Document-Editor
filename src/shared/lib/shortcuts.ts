@@ -9,12 +9,13 @@ export const SHORTCUT_ACTION_IDS = [
   "desk.copy",
   "desk.paste",
   "desk.delete",
-  "desk.cancel"
+  "desk.cancel",
+  "sidebar.exitGroupSelect"
 ] as const;
 
 export type ShortcutActionId = (typeof SHORTCUT_ACTION_IDS)[number];
 
-export type ShortcutGroup = "editor" | "desk";
+export type ShortcutGroup = "editor" | "desk" | "sidebar";
 
 export interface ShortcutBinding {
   key: string;
@@ -94,6 +95,11 @@ export const SHORTCUT_DEFINITIONS: ShortcutDefinition[] = [
       shift: false,
       alt: false
     }
+  },
+  {
+    id: "sidebar.exitGroupSelect",
+    group: "sidebar",
+    defaultBinding: { key: "d", ctrlOrMeta: true, shift: false, alt: false }
   }
 ];
 

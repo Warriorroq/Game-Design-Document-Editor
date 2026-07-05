@@ -48,6 +48,8 @@ export interface EditorLayoutProps {
   onAddSpace3DSection: (folderId?: string) => void;
   onAddFolder: (parentFolderId?: string) => void;
   onRemoveSection: (id: string) => void;
+  onRemoveSections: DocumentStore["removeSections"];
+  onMoveSectionsToFolder: DocumentStore["moveSectionsToFolder"];
   onRemoveFolder: (id: string) => void;
   onUpdateFolder: DocumentStore["updateFolder"];
   onToggleFolder: DocumentStore["toggleFolderCollapsed"];
@@ -112,6 +114,8 @@ export function EditorLayout({
   onAddSpace3DSection,
   onAddFolder,
   onRemoveSection,
+  onRemoveSections,
+  onMoveSectionsToFolder,
   onRemoveFolder,
   onUpdateFolder,
   onToggleFolder,
@@ -197,6 +201,8 @@ export function EditorLayout({
         onAddSpace3DSection={onAddSpace3DSection}
         onAddFolder={onAddFolder}
         onRemove={onRemoveSection}
+        onRemoveSections={onRemoveSections}
+        onMoveSectionsToFolder={onMoveSectionsToFolder}
         onRemoveFolder={onRemoveFolder}
         onUpdateFolder={onUpdateFolder}
         onToggleFolder={onToggleFolder}

@@ -1203,6 +1203,18 @@ body.panel-resizing * {
   background: var(--accent-soft);
 }
 
+.section-item--group-selected {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  outline: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  outline-offset: -1px;
+}
+
+.section-list--group-drop-target {
+  outline: 1px dashed color-mix(in srgb, var(--accent) 55%, transparent);
+  outline-offset: -2px;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
 .section-link {
   flex: 1;
   display: flex;

@@ -214,6 +214,28 @@ export function useDocumentStore() {
     [mutateDoc]
   );
 
+  const removeSections = useCallback(
+    (ids: string[]) => {
+      if (ids.length === 0) return;
+      const nextDoc = mutations.removeSections(docRef.current, ids);
+      mutateDoc((prev) => mutations.removeSections(prev, ids));
+      setActiveSectionId((current) => {
+        if (nextDoc.sections.length === 0) return "";
+        if (!ids.includes(current)) return current;
+        return firstSectionId(nextDoc);
+      });
+    },
+    [mutateDoc]
+  );
+
+  const moveSectionsToFolder = useCallback(
+    (ids: string[], folderId: string | null) => {
+      if (ids.length === 0) return;
+      mutateDoc((prev) => mutations.moveSectionsToFolder(prev, ids, folderId));
+    },
+    [mutateDoc]
+  );
+
   const updateBoardItem = useCallback(
     (sectionId: string, itemId: string, patch: Partial<BoardItem>) => {
       mutateDoc((prev) => mutations.patchBoardItem(prev, sectionId, itemId, patch), { recordHistory: false });
@@ -445,6 +467,8 @@ export function useDocumentStore() {
     removeFolder,
     reorderSidebar,
     removeSection,
+    removeSections,
+    moveSectionsToFolder,
     updateBoardItem,
     addBoardItem,
     removeBoardItem,

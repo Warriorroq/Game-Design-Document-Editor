@@ -50,9 +50,12 @@ export function SettingsPage({
     return order.map((id) => ({ id, labelKey: labelKeys[id] }));
   }, []);
 
-  const shortcutGroups: ShortcutGroup[] = ["editor", "desk"];
-  const groupTitleKey = (group: ShortcutGroup) =>
-    group === "editor" ? "settings.shortcutsGroupEditor" : "settings.shortcutsGroupDesk";
+  const shortcutGroups: ShortcutGroup[] = ["editor", "sidebar", "desk"];
+  const groupTitleKey = (group: ShortcutGroup) => {
+    if (group === "editor") return "settings.shortcutsGroupEditor";
+    if (group === "sidebar") return "settings.shortcutsGroupSidebar";
+    return "settings.shortcutsGroupDesk";
+  };
 
   return (
     <div className="settings-page">

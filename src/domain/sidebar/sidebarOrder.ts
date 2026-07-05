@@ -257,6 +257,24 @@ export function applySidebarDrop(
   return moveSectionToParent(doc, drag.id, parentFolderId, insertIndex);
 }
 
+export function moveSectionsToFolder(doc: GddDocument, sectionIds: string[], folderId: string | null): GddDocument {
+  const uniqueIds = [...new Set(sectionIds)].filter((id) => doc.sections.some((section) => section.id === id));
+  let nextDoc = doc;
+  for (const sectionId of uniqueIds) {
+    const insertIndex = childItems(nextDoc, folderId).filter((entry) => entry.kind === "section").length;
+    nextDoc = moveSectionToParent(nextDoc, sectionId, folderId, insertIndex);
+  }
+  return nextDoc;
+}
+
+export function removeSectionsFromDoc(doc: GddDocument, sectionIds: string[]): GddDocument {
+  let nextDoc = doc;
+  for (const sectionId of sectionIds) {
+    nextDoc = removeSectionFromDoc(nextDoc, sectionId);
+  }
+  return nextDoc;
+}
+
 export function removeSectionFromDoc(doc: GddDocument, sectionId: string): GddDocument {
   const removed = doc.sections.find((section) => section.id === sectionId);
   if (!removed) return doc;
@@ -321,4 +339,29 @@ export function firstSectionId(doc: SidebarDoc): string {
     return "";
   }
   return walk(null);
+}
+
+function walkVisibleSectionIds(doc: SidebarDoc, parentFolderId: string | null): string[] {
+  const ids: string[] = [];
+  for (const entry of childItems(doc, parentFolderId)) {
+    if (entry.kind === "section") {
+      ids.push(entry.item.id);
+    } else if (!entry.item.collapsed) {
+      ids.push(...walkVisibleSectionIds(doc, entry.item.id));
+    }
+  }
+  return ids;
+}
+
+export function visibleSectionIdsInOrder(doc: SidebarDoc): string[] {
+  return walkVisibleSectionIds(doc, null);
+}
+
+export function sectionIdsInRange(orderedIds: string[], fromId: string, toId: string): string[] {
+  const fromIndex = orderedIds.indexOf(fromId);
+  const toIndex = orderedIds.indexOf(toId);
+  if (fromIndex < 0 || toIndex < 0) return toId ? [toId] : [];
+  const start = Math.min(fromIndex, toIndex);
+  const end = Math.max(fromIndex, toIndex);
+  return orderedIds.slice(start, end + 1);
 }
