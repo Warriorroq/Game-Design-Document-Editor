@@ -1,6 +1,15 @@
 import { useMemo, useState } from "react";
 
 import {
+  DEFAULT_GRAPH_TOOLTIP_HOLD_MS,
+  getGraphTooltipHoldMs,
+  graphTooltipHoldMsToSeconds,
+  graphTooltipHoldSecondsToMs,
+  MAX_GRAPH_TOOLTIP_HOLD_MS,
+  MIN_GRAPH_TOOLTIP_HOLD_MS,
+  saveGraphTooltipHoldMs
+} from "@/domain/graph/graphSettings";
+import {
   getOpenSectionGroupSelectMode,
   OPEN_SECTION_GROUP_SELECT_MODES,
   parseOpenSectionGroupSelectMode,
@@ -41,6 +50,9 @@ export function SettingsPage({
   const { language, setLanguage, t } = useLocale();
   const { resetAll } = useShortcuts();
   const [openSectionGroupSelectMode, setOpenSectionGroupSelectMode] = useState(getOpenSectionGroupSelectMode);
+  const [graphTooltipHoldSeconds, setGraphTooltipHoldSeconds] = useState(() =>
+    graphTooltipHoldMsToSeconds(getGraphTooltipHoldMs())
+  );
 
   const tabs = useMemo(() => {
     const order: SettingsTab[] = isDesktopApp
@@ -109,6 +121,39 @@ export function SettingsPage({
                   ))}
                 </select>
               </label>
+
+              <h3 className="settings-subsection-title">{t("settings.graphTitle")}</h3>
+              <p className="settings-hint settings-hint--compact">{t("settings.graphTooltipHoldHint")}</p>
+              <label className="settings-field">
+                <span>
+                  {t("settings.graphTooltipHold")}{" "}
+                  <em>
+                    {graphTooltipHoldSeconds.toFixed(1)} {t("settings.graphTooltipHoldUnit")}
+                  </em>
+                </span>
+                <input
+                  type="range"
+                  min={graphTooltipHoldMsToSeconds(MIN_GRAPH_TOOLTIP_HOLD_MS)}
+                  max={graphTooltipHoldMsToSeconds(MAX_GRAPH_TOOLTIP_HOLD_MS)}
+                  step={0.1}
+                  value={graphTooltipHoldSeconds}
+                  onChange={(e) => {
+                    const seconds = Number(e.target.value);
+                    setGraphTooltipHoldSeconds(seconds);
+                    saveGraphTooltipHoldMs(graphTooltipHoldSecondsToMs(seconds));
+                  }}
+                />
+              </label>
+              <button
+                type="button"
+                className="btn btn-ghost"
+                onClick={() => {
+                  const ms = saveGraphTooltipHoldMs(DEFAULT_GRAPH_TOOLTIP_HOLD_MS);
+                  setGraphTooltipHoldSeconds(graphTooltipHoldMsToSeconds(ms));
+                }}
+              >
+                {t("settings.graphTooltipHoldReset")}
+              </button>
             </section>
           )}
 

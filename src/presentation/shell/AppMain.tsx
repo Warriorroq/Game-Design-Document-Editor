@@ -6,6 +6,7 @@ import { useProjectFolder } from "@/application/project/useProjectFolder";
 import { importAsNewProject } from "@/domain/document/document";
 import type { GddDocument } from "@/domain/types";
 import { BoardAssetsDialog } from "@/features/board/components/BoardAssetsDialog";
+import { GlobalGraphView } from "@/features/graph/GlobalGraphView";
 import { useLinkContext } from "@/features/links/LinkContext";
 import { LinkContextMenu } from "@/features/links/LinkContextMenu";
 import { LinkPasteDialog } from "@/features/links/LinkPasteDialog";
@@ -19,7 +20,7 @@ import { useShortcuts } from "@/shared/context/ShortcutsContext";
 import { useResizablePanels } from "@/shared/hooks/useResizablePanels";
 import { useSidebarVisible } from "@/shared/hooks/useSidebarVisible";
 
-type AppView = "editor" | "settings";
+type AppView = "editor" | "settings" | "globalGraph";
 
 export function AppMain(props: DocumentStore) {
   const {
@@ -32,6 +33,7 @@ export function AppMain(props: DocumentStore) {
     updateSectionViewState,
     addSection,
     addSpace3DSection,
+    addGraphSection,
     addSpace3DModel,
     removeSpace3DModelAsset,
     updateSpace3DModelAssetName,
@@ -261,9 +263,12 @@ export function AppMain(props: DocumentStore) {
         doc={doc}
         onImportProject={handleImportProject}
         onNewProject={handleNewProject}
+        overlayOpen={view !== "editor"}
         settingsOpen={view === "settings"}
+        globalGraphOpen={view === "globalGraph"}
         onOpenSettings={() => setView("settings")}
-        onBackFromSettings={() => setView("editor")}
+        onOpenGlobalGraph={() => setView("globalGraph")}
+        onBackFromOverlay={() => setView("editor")}
         searchQuery={searchQuery}
         onSearchQueryChange={setSearchQuery}
         searchResults={searchResults}
@@ -284,6 +289,14 @@ export function AppMain(props: DocumentStore) {
           gitAvailable={projectFolder.gitAvailable}
           gitStatus={projectFolder.gitStatus}
           onRefreshGitStatus={() => void projectFolder.refreshGitStatus(projectFolder.folderPath)}
+        />
+      ) : view === "globalGraph" ? (
+        <GlobalGraphView
+          doc={doc}
+          onOpenSection={(sectionId) => {
+            setActiveSectionId(sectionId);
+            setView("editor");
+          }}
         />
       ) : (
         <EditorLayout
@@ -309,6 +322,7 @@ export function AppMain(props: DocumentStore) {
           onSelectSection={setActiveSectionId}
           onAddSection={addSection}
           onAddSpace3DSection={addSpace3DSection}
+          onAddGraphSection={addGraphSection}
           onAddFolder={addFolder}
           onRemoveSection={removeSection}
           onRemoveSections={removeSections}

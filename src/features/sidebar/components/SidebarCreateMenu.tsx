@@ -5,6 +5,7 @@ interface SidebarCreateMenuProps {
   parentFolderId: string | null;
   onAddSection: (folderId?: string) => void;
   onAddSpace3DSection: (folderId?: string) => void;
+  onAddGraphSection: (folderId?: string) => void;
   onAddFolder: (parentFolderId?: string) => void;
   onClose: () => void;
 }
@@ -13,6 +14,7 @@ export function SidebarCreateMenu({
   parentFolderId,
   onAddSection,
   onAddSpace3DSection,
+  onAddGraphSection,
   onAddFolder,
   onClose
 }: SidebarCreateMenuProps) {
@@ -30,6 +32,12 @@ export function SidebarCreateMenu({
     restoreAppFocus();
   };
 
+  const pickGraph = () => {
+    onAddGraphSection(parentFolderId ?? undefined);
+    onClose();
+    restoreAppFocus();
+  };
+
   const pickFolder = () => {
     onAddFolder(parentFolderId ?? undefined);
     onClose();
@@ -43,6 +51,9 @@ export function SidebarCreateMenu({
       </button>
       <button type="button" className="sidebar-create-menu-item" role="menuitem" onClick={pickSpace3D}>
         {t("sidebar.createSpace3D")}
+      </button>
+      <button type="button" className="sidebar-create-menu-item" role="menuitem" onClick={pickGraph}>
+        {t("sidebar.createGraph")}
       </button>
       <button type="button" className="sidebar-create-menu-item" role="menuitem" onClick={pickFolder}>
         {t("sidebar.createFolder")}

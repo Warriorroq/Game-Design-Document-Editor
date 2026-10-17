@@ -1,3 +1,4 @@
+import "@/features/graph/Graph.css";
 import "@/features/space3d/Space3D.css";
 
 import type { RefObject } from "react";
@@ -6,11 +7,13 @@ import { useCallback, useRef } from "react";
 import type { DocumentStore } from "@/application/document/useDocumentStore";
 import { resolveBoardItemSrc } from "@/domain/board/boardImageRegistry";
 import type { DeskClipboard } from "@/domain/board/deskClipboard";
+import { isGraphSection, isImmersiveSection } from "@/domain/graph/graph";
 import { isSpace3DSection } from "@/domain/space3d/space3d";
 import type { GddSection, GddSectionFolder } from "@/domain/types";
 import { ImageBoard } from "@/features/board/ImageBoard";
 import { DocumentMeta } from "@/features/editor/DocumentMeta";
 import { SectionEditor } from "@/features/editor/SectionEditor";
+import { GraphView } from "@/features/graph/GraphView";
 import type { SearchFocusTarget } from "@/features/search/lib/globalSearch";
 import { Sidebar } from "@/features/sidebar/Sidebar";
 import { Space3DView } from "@/features/space3d/Space3DView";
@@ -46,6 +49,7 @@ export interface EditorLayoutProps {
   onSelectSection: (id: string) => void;
   onAddSection: (folderId?: string) => void;
   onAddSpace3DSection: (folderId?: string) => void;
+  onAddGraphSection: (folderId?: string) => void;
   onAddFolder: (parentFolderId?: string) => void;
   onRemoveSection: (id: string) => void;
   onRemoveSections: DocumentStore["removeSections"];
@@ -112,6 +116,7 @@ export function EditorLayout({
   onSelectSection,
   onAddSection,
   onAddSpace3DSection,
+  onAddGraphSection,
   onAddFolder,
   onRemoveSection,
   onRemoveSections,
@@ -155,18 +160,21 @@ export function EditorLayout({
   onRenameSpace3DModelAsset
 }: EditorLayoutProps) {
   const isSpace3D = activeSection ? isSpace3DSection(activeSection) : false;
+  const isGraph = activeSection ? isGraphSection(activeSection) : false;
+  const isImmersive = activeSection ? isImmersiveSection(activeSection) : false;
   const resizingPanels = draggingEditor || draggingBoard;
   const compactLayout = useMediaQuery(COMPACT_LAYOUT_MEDIA);
   const { compactPane, setCompactPane } = useCompactPane();
-  const showCompactSwitch = compactLayout && !isSpace3D;
+  const showCompactSwitch = compactLayout && !isImmersive;
   const compactEditorFull = showCompactSwitch && compactPane === "editor";
   const compactBoardFull = showCompactSwitch && compactPane === "board";
   const hideEditorPane = showCompactSwitch ? compactPane !== "editor" : editorHidden;
-  const hideBoardPane = isSpace3D ? false : showCompactSwitch ? compactPane !== "board" : boardHidden;
+  const hideBoardPane = isImmersive ? false : showCompactSwitch ? compactPane !== "board" : boardHidden;
 
   const mainPanelClass = [
     "main-panel",
     isSpace3D ? "main-panel--space3d" : "",
+    isGraph ? "main-panel--graph" : "",
     showCompactSwitch ? `main-panel--compact main-panel--compact-${compactPane}` : ""
   ]
     .filter(Boolean)
@@ -199,6 +207,7 @@ export function EditorLayout({
         onSelect={onSelectSection}
         onAddSection={onAddSection}
         onAddSpace3DSection={onAddSpace3DSection}
+        onAddGraphSection={onAddGraphSection}
         onAddFolder={onAddFolder}
         onRemove={onRemoveSection}
         onRemoveSections={onRemoveSections}
@@ -210,7 +219,7 @@ export function EditorLayout({
       />
       <div ref={mainRef} className={mainPanelClass}>
         {showCompactSwitch && <CompactPaneToggle value={compactPane} onChange={setCompactPane} />}
-        {!isSpace3D && !compactLayout && (
+        {!isImmersive && !compactLayout && (
           <PanelSplitter
             edge="start"
             hidden={editorHidden}
@@ -220,7 +229,7 @@ export function EditorLayout({
           />
         )}
 
-        {!isSpace3D && (
+        {!isImmersive && (
           <div
             className={`content-column ${hideEditorPane ? "content-column--hidden" : ""}`}
             style={compactEditorFull ? compactFlex : panelFlexStyle(editorHidden, editorWidth, 280, resizingPanels)}
@@ -260,7 +269,7 @@ export function EditorLayout({
           </div>
         )}
 
-        {!isSpace3D && !compactLayout && (
+        {!isImmersive && !compactLayout && (
           <PanelSplitter
             edge="end"
             hidden={boardHidden}
@@ -273,14 +282,14 @@ export function EditorLayout({
         <div
           className={`board-pane ${hideBoardPane ? "board-pane--hidden" : ""}`}
           style={
-            isSpace3D
+            isImmersive
               ? { flex: "1 1 auto", width: "100%" }
               : compactBoardFull
                 ? compactFlex
                 : panelFlexStyle(boardHidden, boardWidth, 160, resizingPanels)
           }
         >
-          {(isSpace3D || !hideBoardPane) &&
+          {(isImmersive || !hideBoardPane) &&
             (activeSection ? (
               isSpace3D ? (
                 <Space3DView
@@ -293,6 +302,12 @@ export function EditorLayout({
                   onRenameModelAsset={onRenameSpace3DModelAsset}
                   onBeginTransientEdit={onBeginTransientEdit}
                   onEndTransientEdit={onEndTransientEdit}
+                />
+              ) : isGraph ? (
+                <GraphView
+                  key={activeSection.id}
+                  section={activeSection}
+                  onChange={(patch) => onUpdateSection(activeSection.id, patch)}
                 />
               ) : (
                 <ImageBoard

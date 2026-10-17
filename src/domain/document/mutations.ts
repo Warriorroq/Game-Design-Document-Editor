@@ -16,6 +16,7 @@ import {
   removeSectionsFromDoc,
   type SidebarDropTarget
 } from "@/domain/sidebar/sidebarOrder";
+import { defaultGraphData } from "@/domain/graph/graph";
 import {
   deleteSpace3DModelAsset,
   registerSpace3DModel,
@@ -51,6 +52,8 @@ export function addSection(
   const id = crypto.randomUUID();
   const order = nextChildOrder(doc, folderId ?? null);
   const isSpace3D = kind === "space3d";
+  const isGraph = kind === "graph";
+  const title = isSpace3D ? "3D Space" : isGraph ? "Graph" : "New Section";
   return {
     sectionId: id,
     doc: {
@@ -59,13 +62,14 @@ export function addSection(
         ...doc.sections,
         {
           id,
-          title: isSpace3D ? "3D Space" : "New Section",
+          title,
           description: "",
           content: "",
           order,
           folderId,
-          kind: isSpace3D ? "space3d" : undefined,
+          kind: isSpace3D ? "space3d" : isGraph ? "graph" : undefined,
           space3d: isSpace3D ? { objects: [] } : undefined,
+          graph: isGraph ? defaultGraphData() : undefined,
           board: [],
           shapes: [],
           strokes: [],

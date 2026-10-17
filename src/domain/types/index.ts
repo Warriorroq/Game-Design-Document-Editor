@@ -68,7 +68,47 @@ export interface GddSectionFolder {
   collapsed?: boolean;
 }
 
-export type SectionKind = "document" | "space3d";
+export type SectionKind = "document" | "space3d" | "graph";
+
+export type GraphEdgeStyle = "solid" | "dotted" | "ghost";
+
+export interface GraphSettings {
+  inkSpread: boolean;
+  inkHops: number;
+  inkSoftness: number;
+  inkIntensity: number;
+  edgeStyle: GraphEdgeStyle;
+  expand: number;
+  repulsion: number;
+  springStrength: number;
+  springLength: number;
+  orphanPull: number;
+}
+
+export interface GraphNodeData {
+  id: string;
+  name: string;
+  description: string;
+  color: string;
+  x: number;
+  y: number;
+  z: number;
+}
+
+export interface GraphEdgeData {
+  from: string;
+  to: string;
+  style?: GraphEdgeStyle;
+}
+
+export interface GraphData {
+  version: number;
+  pointCount: number;
+  centerId?: string | null;
+  settings: GraphSettings;
+  nodes: GraphNodeData[];
+  edges: GraphEdgeData[];
+}
 
 export type Space3DObjectType = "box" | "sphere" | "model";
 
@@ -134,6 +174,7 @@ export interface GddSection {
   /** Defaults to `"document"` when omitted. */
   kind?: SectionKind;
   space3d?: Space3DData;
+  graph?: GraphData;
   /** Saved editor scroll position (content column). */
   editorScrollTop?: number;
   /** Saved desk pan/zoom when leaving the section. */

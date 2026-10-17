@@ -1,5 +1,6 @@
 import { migrateBoardImages } from "@/domain/board/boardImageRegistry";
 import { ensureHtmlContent } from "@/domain/editor/editorContent";
+import { normalizeGraphData } from "@/domain/graph/graph";
 import { normalizeSpace3DData } from "@/domain/space3d/space3d";
 import type { BoardItem, GddDocument, GddSection, GddSectionFolder } from "@/domain/types";
 
@@ -57,9 +58,10 @@ export function normalizeDocument(doc: GddDocument & { board?: BoardItem[] }): G
       strokes,
       groups,
       folderId,
-      content: s.kind === "space3d" ? s.content : ensureHtmlContent(s.content),
-      kind: s.kind === "space3d" ? ("space3d" as const) : undefined,
-      space3d: s.kind === "space3d" ? normalizeSpace3DData(s.space3d) : undefined
+      content: s.kind === "space3d" || s.kind === "graph" ? s.content : ensureHtmlContent(s.content),
+      kind: s.kind === "space3d" || s.kind === "graph" ? s.kind : undefined,
+      space3d: s.kind === "space3d" ? normalizeSpace3DData(s.space3d) : undefined,
+      graph: s.kind === "graph" ? normalizeGraphData(s.graph) : undefined
     };
   });
 

@@ -1,3 +1,4 @@
+import { isGraphSection } from "@/domain/graph/graph";
 import { isSpace3DSection } from "@/domain/space3d/space3d";
 import { buildSectionHref } from "@/features/links/lib/links";
 import type { ContextMenuAction } from "@/features/links/LinkContext";
@@ -39,6 +40,8 @@ export function SidebarSectionRow({ section, depth }: SidebarSectionRowProps) {
   const filled = sectionHasContent(section);
   const active = section.id === activeId;
   const space3d = isSpace3DSection(section);
+  const graph = isGraphSection(section);
+  const immersive = space3d || graph;
   const inGroup = selectedGroupSet.has(section.id);
   const isDragging = draggingGroup && inGroup ? true : dragging?.kind === "section" && dragging.id === section.id;
   const dropBefore = dropTarget?.kind === "section" && dropTarget.id === section.id && dropTarget.position === "before";
@@ -83,6 +86,7 @@ export function SidebarSectionRow({ section, depth }: SidebarSectionRowProps) {
         "sidebar-row",
         "section-item",
         space3d ? "section-item--space3d" : "",
+        graph ? "section-item--graph" : "",
         depth > 0 ? "section-item--nested" : "",
         active ? "active" : "",
         hasGroupSelection && inGroup ? "section-item--group-selected" : "",
@@ -174,7 +178,12 @@ export function SidebarSectionRow({ section, depth }: SidebarSectionRowProps) {
             {t("sidebar.space3dBadgeLabel")}
           </span>
         )}
-        {!space3d && section.board.length > 0 && <span className="section-image-count">{section.board.length}</span>}
+        {graph && (
+          <span className="section-kind-badge" title={t("sidebar.graphBadge")}>
+            {t("sidebar.graphBadgeLabel")}
+          </span>
+        )}
+        {!immersive && section.board.length > 0 && <span className="section-image-count">{section.board.length}</span>}
       </button>
       <button
         type="button"

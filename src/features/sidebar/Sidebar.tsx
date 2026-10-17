@@ -23,6 +23,7 @@ interface SidebarProps {
   onSelect: (id: string) => void;
   onAddSection: (folderId?: string) => void;
   onAddSpace3DSection: (folderId?: string) => void;
+  onAddGraphSection: (folderId?: string) => void;
   onAddFolder: (parentFolderId?: string) => void;
   onRemove: (id: string) => void;
   onRemoveSections: (ids: string[]) => void;
@@ -41,6 +42,7 @@ export function Sidebar({
   onSelect,
   onAddSection,
   onAddSpace3DSection,
+  onAddGraphSection,
   onAddFolder,
   onRemove,
   onRemoveSections,
@@ -98,6 +100,7 @@ export function Sidebar({
         onClose={closeCreateMenu}
         onAddSection={onAddSection}
         onAddSpace3DSection={onAddSpace3DSection}
+        onAddGraphSection={onAddGraphSection}
         onAddFolder={onAddFolder}
       />
     );
@@ -153,6 +156,7 @@ export function Sidebar({
     closeCreateMenu,
     onAddSection,
     onAddSpace3DSection,
+    onAddGraphSection,
     onAddFolder
   ]);
 

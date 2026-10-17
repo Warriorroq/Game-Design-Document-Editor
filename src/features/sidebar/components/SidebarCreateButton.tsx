@@ -12,6 +12,7 @@ interface SidebarCreateButtonProps {
   onClose: () => void;
   onAddSection: (folderId?: string) => void;
   onAddSpace3DSection: (folderId?: string) => void;
+  onAddGraphSection: (folderId?: string) => void;
   onAddFolder: (parentFolderId?: string) => void;
 }
 
@@ -24,6 +25,7 @@ export function SidebarCreateButton({
   onClose,
   onAddSection,
   onAddSpace3DSection,
+  onAddGraphSection,
   onAddFolder
 }: SidebarCreateButtonProps) {
   const { t } = useLocale();
@@ -49,6 +51,7 @@ export function SidebarCreateButton({
           parentFolderId={parentFolderId}
           onAddSection={onAddSection}
           onAddSpace3DSection={onAddSpace3DSection}
+          onAddGraphSection={onAddGraphSection}
           onAddFolder={onAddFolder}
           onClose={onClose}
         />

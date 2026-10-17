@@ -739,6 +739,12 @@ mark.gdd-search-hit-active {
   color: var(--text-dim);
 }
 
+.settings-field span em {
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+
 .settings-field input,
 .settings-field select {
   padding: 8px 12px;

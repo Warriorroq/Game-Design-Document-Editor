@@ -14,9 +14,13 @@ interface ToolbarProps {
   doc: GddDocument;
   onImportProject: (doc: GddDocument) => void;
   onNewProject?: () => void;
+  /** True when a full-page overlay (settings / global graph) replaces the editor. */
+  overlayOpen?: boolean;
   settingsOpen?: boolean;
+  globalGraphOpen?: boolean;
   onOpenSettings?: () => void;
-  onBackFromSettings?: () => void;
+  onOpenGlobalGraph?: () => void;
+  onBackFromOverlay?: () => void;
   searchQuery?: string;
   onSearchQueryChange?: (query: string) => void;
   searchResults?: GlobalSearchResult[];
@@ -38,9 +42,12 @@ export function Toolbar({
   doc,
   onImportProject,
   onNewProject,
+  overlayOpen = false,
   settingsOpen = false,
+  globalGraphOpen = false,
   onOpenSettings,
-  onBackFromSettings,
+  onOpenGlobalGraph,
+  onBackFromOverlay,
   searchQuery = "",
   onSearchQueryChange,
   searchResults = [],
@@ -76,8 +83,8 @@ export function Toolbar({
   return (
     <header className="toolbar">
       <div className="toolbar-brand">
-        {settingsOpen ? (
-          <button type="button" className="btn btn-ghost" onClick={onBackFromSettings}>
+        {overlayOpen ? (
+          <button type="button" className="btn btn-ghost" onClick={onBackFromOverlay}>
             {t("toolbar.back")}
           </button>
         ) : (
@@ -93,7 +100,7 @@ export function Toolbar({
           </button>
         )}
       </div>
-      {!settingsOpen && onSearchQueryChange && onSelectSearchResult && (
+      {!overlayOpen && onSearchQueryChange && onSelectSearchResult && (
         <div className="toolbar-search">
           <GlobalSearch
             query={searchQuery}
@@ -104,7 +111,7 @@ export function Toolbar({
         </div>
       )}
       <div className="toolbar-right">
-        {!settingsOpen && (
+        {!overlayOpen && (
           <div className="toolbar-actions">
             <ProjectMenu
               doc={doc}
@@ -120,10 +127,21 @@ export function Toolbar({
               onFlushProject={onFlushProject}
               onOpenImageAssets={onOpenImageAssets}
             />
+            {onOpenGlobalGraph && (
+              <button
+                type="button"
+                className={`btn btn-ghost ${globalGraphOpen ? "active" : ""}`}
+                onClick={onOpenGlobalGraph}
+                aria-label={t("toolbar.globalGraph")}
+                title={t("toolbar.globalGraph")}
+              >
+                {t("toolbar.globalGraph")}
+              </button>
+            )}
             {onOpenSettings && (
               <button
                 type="button"
-                className="btn btn-ghost"
+                className={`btn btn-ghost ${settingsOpen ? "active" : ""}`}
                 onClick={onOpenSettings}
                 aria-label={t("toolbar.settings")}
                 title={t("toolbar.settings")}

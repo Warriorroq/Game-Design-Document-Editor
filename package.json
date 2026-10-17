@@ -1,7 +1,7 @@
 {
   "name": "gdd-editor",
   "private": true,
-  "version": "0.0.743",
+  "version": "0.7.81",
   "type": "module",
   "main": "electron/main.cjs",
   "scripts": {
@@ -39,6 +39,7 @@
     ],
     "win": {
       "icon": "build/icon.png",
+      "signAndEditExecutable": false,
       "target": [
         {
           "target": "nsis",

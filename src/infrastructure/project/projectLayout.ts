@@ -103,6 +103,7 @@ interface SectionFile {
   folderId?: string;
   kind?: GddSection["kind"];
   space3d?: GddSection["space3d"];
+  graph?: GddSection["graph"];
   editorScrollTop?: number;
   boardViewport?: GddSection["boardViewport"];
   board: SectionFileBoardItem[];
@@ -301,6 +302,7 @@ export function documentToFolderPayload(doc: GddDocument): FolderProjectPayload 
       folderId: section.folderId,
       kind: section.kind,
       space3d: section.space3d,
+      graph: section.graph,
       ...(section.editorScrollTop != null ? { editorScrollTop: section.editorScrollTop } : {}),
       ...(section.boardViewport ? { boardViewport: section.boardViewport } : {}),
       board: section.board.map((item) => boardItemToFile(updated, item, assets)),
@@ -405,6 +407,7 @@ export function folderPayloadToDocument(payload: FolderProjectPayload): GddDocum
         folderId: sectionFile.folderId,
         kind: sectionFile.kind,
         space3d: sectionFile.space3d,
+        graph: sectionFile.graph,
         editorScrollTop: sectionFile.editorScrollTop,
         boardViewport: sectionFile.boardViewport,
         board: sectionFile.board

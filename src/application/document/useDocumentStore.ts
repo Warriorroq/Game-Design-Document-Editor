@@ -166,6 +166,15 @@ export function useDocumentStore() {
     [mutateDoc]
   );
 
+  const addGraphSection = useCallback(
+    (folderId?: string) => {
+      const { doc: next, sectionId } = mutations.addSection(docRef.current, folderId, "graph");
+      mutateDoc(() => next);
+      setActiveSectionId(sectionId);
+    },
+    [mutateDoc]
+  );
+
   const addFolder = useCallback(
     (parentFolderId?: string) => {
       mutateDoc((prev) => mutations.addFolder(prev, parentFolderId));
@@ -461,6 +470,7 @@ export function useDocumentStore() {
     updateSectionViewState,
     addSection,
     addSpace3DSection,
+    addGraphSection,
     addFolder,
     updateFolder,
     toggleFolderCollapsed,
