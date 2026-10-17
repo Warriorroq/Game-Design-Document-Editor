@@ -19,7 +19,8 @@
   "build": {
     "appId": "com.gdd.editor",
     "productName": "GDD Editor",
-    "icon": "build/icon.png",
+    "icon": "build/icon.ico",
+    "afterPack": "scripts/afterPack.cjs",
     "directories": {
       "output": "release"
     },
@@ -38,7 +39,7 @@
       }
     ],
     "win": {
-      "icon": "build/icon.png",
+      "icon": "build/icon.ico",
       "signAndEditExecutable": false,
       "target": [
         {
@@ -57,7 +58,10 @@
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico"
     }
   },
   "dependencies": {
@@ -83,6 +87,7 @@
     "eslint-plugin-simple-import-sort": "^13.0.0",
     "globals": "^17.6.0",
     "prettier": "^3.8.4",
+    "rcedit": "^5.0.2",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.61.0",
     "vite": "^6.3.5",
