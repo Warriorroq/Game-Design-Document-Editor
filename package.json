@@ -1,7 +1,7 @@
 {
   "name": "gdd-editor",
   "private": true,
-  "version": "0.7.81",
+  "version": "0.0.781",
   "type": "module",
   "main": "electron/main.cjs",
   "scripts": {
